@@ -2,4 +2,7 @@ spring:
   application:
     name: user-service
   config:
-    import: optional:configserver:http://localhost:8203
+    import: configserver:http://localhost:8203
+  cloud:
+    config:
+      token: ${VAULT_TOKEN}
