@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        bootstrap: true
+        vault:
+          host: localhost
+          port: 8200
+          scheme: http
+          token: ${VAULT_TOKEN}
+          kv:
+            enabled: true
+            backend: secret
+        git:
+          uri: ${GIT_CONFIG_REPOSITORY_URI}
+          username: ${GIT_USERNAME}
+          password: ${GIT_PAT}
+          default-label: main
+          clone-on-start: true
+        composite:
+          - type: git
+          - type: vault
+
+server:
+  port: 8203

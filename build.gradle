@@ -24,8 +24,9 @@ ext {
 }
 
 dependencies {
+	implementation 'io.github.cdimascio:java-dotenv:5.2.2'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.cloud:spring-cloud-config-server'
-	implementation 'org.springframework.cloud:spring-cloud-starter-vault-config'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
