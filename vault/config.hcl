@@ -7,4 +7,4 @@ listener "tcp" {
     tls_disable = 1 # For local dev only, no TLS
 }
 
-ui = true # optional
+ui = true # optional vault server -config=./vault/config.hcl
