@@ -25,10 +25,11 @@ spring:
       port: ${REDIS_PORT}
       timeout: 2000ms
   mail:
-    host: ${MAIL_HOST}
+    host: smtp.gmail.com
     port: 587
     username: ${MAIL_USER}
     password: ${MAIL_PASSWORD}
+    protocol: smtp
     properties:
       mail:
         debug: true
