@@ -5,6 +5,8 @@ import com.aziz.user_service.dto.UserRegisterRequest;
 import com.aziz.user_service.dto.UserUpdateRequest;
 import com.aziz.user_service.model.User;
 import com.aziz.user_service.repository.UserRepository;
+import com.aziz.user_service.util.PreferredLanguage;
+import com.aziz.user_service.util.Role;
 import com.aziz.user_service.util.exceptions.*;
 import com.aziz.user_service.mappers.UserMapper;
 import lombok.RequiredArgsConstructor;
@@ -69,6 +71,10 @@ public class UserService {
         }
 
         User user = mapper.registerRequestToUser(request);
+
+        user.setRole(Role.ROLE_USER);
+        user.setPreferredLanguage(PreferredLanguage.ARABIC);
+
         repository.save(user);
         log.info("User successfully created with id: {}", user.getUserId());
         return mapper.userToDto(user);
