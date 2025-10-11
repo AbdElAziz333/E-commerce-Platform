@@ -11,6 +11,7 @@ import com.aziz.user_service.util.exceptions.*;
 import com.aziz.user_service.mappers.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,7 @@ import java.util.List;
 public class UserService {
     private final UserRepository repository;
     private final UserMapper mapper;
+    private final PasswordEncoder encoder;
 
     @Transactional(readOnly = true)
     public List<UserDto> getAllUsers() {
@@ -72,6 +74,7 @@ public class UserService {
 
         User user = mapper.registerRequestToUser(request);
 
+        user.setPassword(encoder.encode(user.getPassword()));
         user.setRole(Role.ROLE_USER);
         user.setPreferredLanguage(PreferredLanguage.ARABIC);
 
