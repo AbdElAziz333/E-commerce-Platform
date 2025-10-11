@@ -1,8 +1,12 @@
 package com.aziz.user_service.model;
 
+import com.aziz.user_service.util.Role;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @AllArgsConstructor
@@ -30,15 +34,20 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 13)
     private String phoneNumber;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private UserPreference userPreference;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private UserAccount userAccount;
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
+    private LocalDate createdAt;
+
+    @LastModifiedDate
+    @Column(nullable = false, updatable = false)
+    private LocalDate lastModifiedAt;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserAddress> userAddress;
+    private List<Address> address;
 }

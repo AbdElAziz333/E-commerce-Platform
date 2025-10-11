@@ -1,4 +1,4 @@
-package com.aziz.user_service.util.mappers;
+package com.aziz.user_service.mappers;
 
 import com.aziz.user_service.dto.UserDto;
 import com.aziz.user_service.dto.UserRegisterRequest;
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserMapper {
     public UserDto userToDto(User user) {
-        return new UserDto(user.getFirstName(), user.getLastName(), user.getPhoneNumber());
+        return new UserDto(user.getUserId(), user.getFirstName(), user.getLastName(), user.getPhoneNumber());
     }
 
     public User registerRequestToUser(UserRegisterRequest registerRequest) {

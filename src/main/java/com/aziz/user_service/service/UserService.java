@@ -6,7 +6,7 @@ import com.aziz.user_service.dto.UserUpdateRequest;
 import com.aziz.user_service.model.User;
 import com.aziz.user_service.repository.UserRepository;
 import com.aziz.user_service.util.exceptions.*;
-import com.aziz.user_service.util.mappers.UserMapper;
+import com.aziz.user_service.mappers.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -40,7 +40,7 @@ public class UserService {
                 })
                 .orElseThrow(() -> {
                     log.warn("Cannot fetch user with id: {}, user not found", id);
-                    return new UserNotFoundException("User not found with id: " + id);
+                    return new NotFoundException("User not found with id: " + id);
                 });
     }
 
@@ -55,20 +55,20 @@ public class UserService {
                 })
                 .orElseThrow(() -> {
                     log.warn("Cannot fetch user with email {}, user not found", email);
-                    return new UserNotFoundException("User not found with email: " + email);
+                    return new NotFoundException("User not found with email: " + email);
                 });
     }
 
     @Transactional
-    public UserDto addUser(UserRegisterRequest registerRequest) {
-        log.debug("Attempting to register new user with email: {}", registerRequest.getEmail());
+    public UserDto addUser(UserRegisterRequest request) {
+        log.debug("Attempting to register new user with email: {}", request.getEmail());
 
-        if (repository.existsByEmail(registerRequest.getEmail())) {
-            log.warn("User already exists with email: {}", registerRequest.getEmail());
-            throw new UserAlreadyExistsException("User already exists with email: " + registerRequest.getEmail());
+        if (repository.existsByEmail(request.getEmail())) {
+            log.warn("User already exists with email: {}", request.getEmail());
+            throw new UserAlreadyExistsException("User already exists with email: " + request.getEmail());
         }
 
-        User user = mapper.registerRequestToUser(registerRequest);
+        User user = mapper.registerRequestToUser(request);
         repository.save(user);
         log.info("User successfully created with id: {}", user.getUserId());
         return mapper.userToDto(user);
@@ -81,7 +81,7 @@ public class UserService {
         User user = repository.findById(updateRequest.getId()).orElseThrow(
                 () -> {
                     log.warn("Cannot update user -- user not found with id: {}", updateRequest.getId());
-                    return new UserNotFoundException("User not found with id: " + updateRequest.getId());
+                    return new NotFoundException("User not found with id: " + updateRequest.getId());
                 });
 
         user.setFirstName(updateRequest.getFirstName());
@@ -100,7 +100,7 @@ public class UserService {
         User user = repository.findById(id).orElseThrow(
                 () -> {
                     log.warn("Cannot delete user -- user not found with id: {}", id);
-                    return new UserNotFoundException("User not found with id: " + id);
+                    return new NotFoundException("User not found with id: " + id);
                 });
 
         repository.delete(user);
@@ -114,10 +114,18 @@ public class UserService {
         User user = repository.findByEmail(email).orElseThrow(
                 () -> {
                     log.warn("Cannot delete user -- user not found with email: {}", email);
-                    return new UserNotFoundException("User not found with email: " + email);
+                    return new NotFoundException("User not found with email: " + email);
                 });
 
         repository.delete(user);
         log.info("Successfully deleted user with email: {}", email);
+    }
+
+    public boolean userExistsById(Long id) {
+        return repository.existsById(id);
+    }
+
+    public User getUserEntityById(Long id) {
+        return repository.findById(id).orElseThrow(() -> new NotFoundException("User not found with id: " + id));
     }
 }
