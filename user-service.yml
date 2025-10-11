@@ -14,12 +14,19 @@ spring:
     clean-disabled: true
   data:
     mongodb:
-      uri: mongodb://${LHOST}:${MONGO_PORT}/${MONGO_DB}
+      host: ${LHOST}
+      port: ${MONGO_PORT}
+      username: ${MONGO_USER}
+      password: ${MONGO_PASSWORD}
     redis:
       host: ${LHOST}
       port: ${REDIS_PORT}
       timeout: 2000ms
-
+  mail:
+    host: ${MAIL_HOST}
+    port: 587
+    username: ${MAIL_USER}
+    password: ${MAIL_PASSWORD}
 logging:
   level:
     root: INFO
