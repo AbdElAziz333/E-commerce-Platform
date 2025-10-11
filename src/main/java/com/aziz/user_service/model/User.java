@@ -39,9 +39,11 @@ public class User {
     private String phoneNumber;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 30)
     private Role role;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 30)
     private PreferredLanguage preferredLanguage;
 
     @CreatedDate
@@ -54,4 +56,15 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Address> address;
+
+    @PrePersist
+    public void onCreate() {
+        this.createdAt = LocalDate.now();
+        this.lastModifiedAt = LocalDate.now();
+    }
+
+    @PreUpdate
+    public void onUpdate() {
+        this.lastModifiedAt = LocalDate.now();
+    }
 }

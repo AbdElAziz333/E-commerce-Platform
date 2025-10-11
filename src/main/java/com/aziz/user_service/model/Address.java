@@ -28,6 +28,7 @@ public class Address {
     private String streetLine2;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 30)
     private City city;
 
     @Column(nullable = false, length = 100)
