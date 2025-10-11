@@ -10,6 +10,7 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL,
     phone_number VARCHAR(13) NOT NULL,
     role role,
+    preferred_language preferred_language,
     created_at DATE NOT NULL,
     last_modified_at DATE NOT NULL
 );

@@ -1,5 +1,6 @@
 package com.aziz.user_service.model;
 
+import com.aziz.user_service.util.PreferredLanguage;
 import com.aziz.user_service.util.Role;
 import jakarta.persistence.*;
 import lombok.*;
@@ -39,6 +40,9 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @Enumerated(EnumType.STRING)
+    private PreferredLanguage preferredLanguage;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
