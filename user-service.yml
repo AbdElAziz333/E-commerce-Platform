@@ -37,6 +37,12 @@ spring:
           auth: true
           starttls:
             enable: true
+jwt:
+  secret: ${JWT_SECRET}
+  cookieName: jwt
+  maxAge: 36000000
+  secure: false
+
 logging:
   level:
     root: INFO
