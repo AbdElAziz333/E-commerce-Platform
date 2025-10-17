@@ -5,6 +5,9 @@ import com.aziz.user_service.dto.AddressRegisterRequest;
 import com.aziz.user_service.model.Address;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Component
 public class AddressMapper {
     public AddressDto addressToDto(Address address) {
@@ -17,6 +20,26 @@ public class AddressMapper {
                 .postalCode(address.getPostalCode())
                 .isDefaultShipping(address.getIsDefaultShipping())
                 .build();
+    }
+
+    public List<AddressDto> addressesToDtos(List<Address> addresses) {
+        List<AddressDto> addressDtos = new ArrayList<>();
+
+        for (Address address : addresses) {
+            addressDtos.add(
+                    AddressDto.builder()
+                            .addressId(address.getAddressId())
+                            .streetLine1(address.getStreetLine1())
+                            .streetLine2(address.getStreetLine2())
+                            .city(address.getCity())
+                            .state(address.getState())
+                            .postalCode(address.getPostalCode())
+                            .isDefaultShipping(address.getIsDefaultShipping())
+                            .build()
+            );
+        }
+
+        return addressDtos;
     }
 
     public Address registerRequestToAddress(AddressRegisterRequest request) {

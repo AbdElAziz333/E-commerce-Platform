@@ -2,6 +2,7 @@ package com.aziz.user_service.model;
 
 import com.aziz.user_service.util.PreferredLanguage;
 import com.aziz.user_service.util.Role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -51,7 +52,7 @@ public class User {
     private LocalDate createdAt;
 
     @LastModifiedDate
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false)
     private LocalDate lastModifiedAt;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
