@@ -19,8 +19,8 @@ services:
   product-elasticsearch-svc:
     image: elasticsearch:9.1.5
     ports:
-      - "${ELASTICSEARCH_URL_PORT}:9200"
-      - "${ELASTICSEARCH_DB_PORT}:9300"
+      - "${ELASTICSEARCH_HTTP_PORT}:9200"
+      - "${ELASTICSEARCH_TRANSPORT_PORT}:9300"
     networks:
       - product-net
     volumes:
@@ -29,6 +29,7 @@ services:
       - elasticsearch_password
     environment:
       - discovery.type=single-node
+      - ELASTIC_USERNAME=${ELASTIC_USERNAME}
       - ELASTIC_PASSWORD_FILE=/run/secrets/elasticsearch_password
       - xpack.security.enabled=true
       - xpack.security.http.ssl.enabled=false
