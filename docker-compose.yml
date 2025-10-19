@@ -7,7 +7,7 @@ services:
     networks:
       - product-net
     volumes:
-      - product-mongo-data:/data/db
+      - product_mongo_data:/data/db
     secrets:
       - mongo_password
     environment:
@@ -16,23 +16,25 @@ services:
       MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/mongo_password
     restart: no
 
-  product-elasticsearch-svc:
+  product-elastic-svc:
+    container_name: product-elastic
     image: elasticsearch:9.1.5
     ports:
-      - "${ELASTICSEARCH_HTTP_PORT}:9200"
-      - "${ELASTICSEARCH_TRANSPORT_PORT}:9300"
+      - "${ELASTIC_HTTP_PORT}:9200"
+      - "${ELASTIC_TRANSPORT_PORT}:9300"
     networks:
       - product-net
     volumes:
-      - product-elasticsearch-data:/usr/share/elasticsearch/data
+      - product_elastic_data:/usr/share/elasticsearch/data
     secrets:
-      - elasticsearch_password
+      - elastic_password
     environment:
-      - discovery.type=single-node
-      - ELASTIC_USERNAME=${ELASTIC_USERNAME}
-      - ELASTIC_PASSWORD_FILE=/run/secrets/elasticsearch_password
-      - xpack.security.enabled=true
-      - xpack.security.http.ssl.enabled=false
+      discovery.type: single-node
+      ELASTIC_USERNAME: ${ELASTIC_USERNAME}
+      ELASTIC_PASSWORD_FILE: /run/secrets/elastic_password
+      xpack.security.enabled: true
+      xpack.security.http.ssl.enabled: false
+#      xpack.security.transport.ssl.enabled: false
     restart: no
 
 networks:
@@ -40,11 +42,11 @@ networks:
     driver: bridge
 
 volumes:
-  product-mongo-data:
-  product-elasticsearch-data:
+  product_mongo_data:
+  product_elastic_data:
 
 secrets:
-  elasticsearch_password:
-    file: secrets/elasticsearch_password.txt
+  elastic_password:
+    file: secrets/elastic_password.txt
   mongo_password:
     file: secrets/mongo_password.txt
