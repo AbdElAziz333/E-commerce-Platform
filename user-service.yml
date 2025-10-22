@@ -52,4 +52,7 @@ jwt:
   secure: false
 
 web:
-  frontendUrl: http://localhost:5173
+  frontendUrl: ${FRONTEND_URI}
+
+server:
+  port: 8080

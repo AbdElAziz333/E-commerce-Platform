@@ -8,7 +8,10 @@ spring:
       database: ${MONGO_DB}
       authentication-database: admin
     elasticsearch:
-      username: ${ELASTICSEARCH_USERNAME}
-      password: ${ELASTICSEARCH_PASSWORD}
+      username: ${ELASTIC_USERNAME}
+      password: ${ELASTIC_PASSWORD}
       uris:
-        - http://${LHOST}:${ELASTICSEARCH_HTTP_PORT}
+        - http://${LHOST}:${ELASTIC_HTTP_PORT}
+
+server:
+  port: 8081
