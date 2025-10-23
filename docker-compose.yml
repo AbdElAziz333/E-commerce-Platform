@@ -26,16 +26,40 @@ services:
       - product-net
     volumes:
       - product_elastic_data:/usr/share/elasticsearch/data
-    secrets:
-      - elastic_password
     environment:
       discovery.type: single-node
-      ELASTIC_USERNAME: ${ELASTIC_USERNAME}
-      ELASTIC_PASSWORD_FILE: /run/secrets/elastic_password
-      xpack.security.enabled: true
-      xpack.security.http.ssl.enabled: false
-#      xpack.security.transport.ssl.enabled: false
+      xpack.security.enabled: false
+      bootstrap.memory_lock: true
+      ES_JAVA_OPTS: -Xms1g -Xmx1g
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
     restart: no
+
+  product-kafka-svc:
+    image: bitnami/kafka:latest
+    ports:
+      - "${KAFKA_SERVER_PORT}:9092"
+      - "9093:9093"
+    networks:
+      - product-net
+    volumes:
+      - product_kafka_data:/bitnami/kafka
+    environment:
+      # Enable KRaft mode (no Zookeeper)
+      KAFKA_CFG_PROCESS_ROLES: controller,broker
+      KAFKA_CFG_NODE_ID: 1
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+
+      # Required even without auth
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+
+      # Allow insecure listener (for dev only)
+      ALLOW_PLAINTEXT_LISTENER: yes
 
 networks:
   product-net:
@@ -44,6 +68,7 @@ networks:
 volumes:
   product_mongo_data:
   product_elastic_data:
+  product_kafka_data:
 
 secrets:
   elastic_password:
