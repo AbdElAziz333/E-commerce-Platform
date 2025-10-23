@@ -7,11 +7,19 @@ spring:
       password: ${MONGO_PASSWORD}
       database: ${MONGO_DB}
       authentication-database: admin
-    elasticsearch:
-      username: ${ELASTIC_USERNAME}
-      password: ${ELASTIC_PASSWORD}
-      uris:
-        - http://${LHOST}:${ELASTIC_HTTP_PORT}
+  kafka:
+    bootstrap-servers: ${LHOST}:${KAFKA_SERVER_PORT}
+    consumer:
+      group-id: product-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+kafka:
+  topic: product-topic
 
 server:
   port: 8081
