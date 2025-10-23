@@ -4,11 +4,12 @@ spring:
       discovery:
         locator:
           enabled: true
+          lower-case-service-id: true
       routes:
         - id: user-service
           uri: lb://user-service
           predicates:
-            - Path=/api/v1/students/**
+            - Path=/api/v1/users/**
         - id: product-service
           uri: lb://product-service
           predicates:
