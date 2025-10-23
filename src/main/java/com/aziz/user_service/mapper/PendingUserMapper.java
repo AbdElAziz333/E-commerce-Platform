@@ -1,4 +1,4 @@
-package com.aziz.user_service.mappers;
+package com.aziz.user_service.mapper;
 
 import com.aziz.user_service.dto.RegistrationRequest;
 import com.aziz.user_service.model.PendingUser;

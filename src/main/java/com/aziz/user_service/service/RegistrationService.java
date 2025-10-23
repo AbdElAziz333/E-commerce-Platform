@@ -2,8 +2,8 @@ package com.aziz.user_service.service;
 
 import com.aziz.user_service.dto.OtpRequest;
 import com.aziz.user_service.dto.RegistrationRequest;
-import com.aziz.user_service.mappers.PendingUserMapper;
-import com.aziz.user_service.mappers.UserMapper;
+import com.aziz.user_service.mapper.PendingUserMapper;
+import com.aziz.user_service.mapper.UserMapper;
 import com.aziz.user_service.model.PendingUser;
 import com.aziz.user_service.model.User;
 import com.aziz.user_service.repository.PendingUserRepository;

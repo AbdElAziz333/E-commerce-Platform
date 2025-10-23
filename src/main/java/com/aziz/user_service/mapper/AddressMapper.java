@@ -1,4 +1,4 @@
-package com.aziz.user_service.mappers;
+package com.aziz.user_service.mapper;
 
 import com.aziz.user_service.dto.AddressDto;
 import com.aziz.user_service.dto.AddressRegisterRequest;

@@ -6,7 +6,7 @@ import com.aziz.user_service.model.Address;
 import com.aziz.user_service.model.User;
 import com.aziz.user_service.repository.AddressRepository;
 import com.aziz.user_service.util.exceptions.NotFoundException;
-import com.aziz.user_service.mappers.AddressMapper;
+import com.aziz.user_service.mapper.AddressMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
