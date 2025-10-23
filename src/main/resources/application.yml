@@ -2,12 +2,11 @@ spring:
   application:
     name: config-server
   profiles:
-    active: composite
+    active: git, vault
   cloud:
     config:
       server:
-        composite:
-        - type: vault
+        vault:
           host: localhost
           port: 8200
           scheme: http
@@ -17,7 +16,7 @@ spring:
           kv:
             enabled: true
             backend: secret
-        - type: git
+        git:
           uri: ${GIT_CONFIG_REPOSITORY_URI}
           username: ${GIT_USERNAME}
           password: ${GIT_PAT}
