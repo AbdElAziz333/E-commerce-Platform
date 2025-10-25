@@ -1,5 +1,6 @@
 package com.aziz.user_service.dto;
 
+import com.aziz.user_service.util.Role;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
@@ -26,4 +27,6 @@ public class UserDto {
     @NotBlank
     @Length(min = 11, max = 13, message = "Phone number must be between 11 and 13 digits.")
     private String phoneNumber;
+
+    private Role role;
 }

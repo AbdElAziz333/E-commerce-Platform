@@ -2,12 +2,10 @@ package com.aziz.user_service.controller;
 
 import com.aziz.user_service.dto.CurrentUserDto;
 import com.aziz.user_service.dto.UserDto;
-import com.aziz.user_service.dto.UserRegisterRequest;
 import com.aziz.user_service.dto.UserUpdateRequest;
 import com.aziz.user_service.service.UserService;
 import com.aziz.user_service.util.ApiResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -44,11 +42,6 @@ public class UserController {
     @GetMapping(params = "email")
     public ResponseEntity<ApiResponse<UserDto>> getUserByEmail(@RequestParam String email) {
         return ResponseEntity.ok(ApiResponse.success(String.format("User with email %s, fetched successfully", email), service.getUserByEmail(email)));
-    }
-
-    @PostMapping
-    public ResponseEntity<ApiResponse<UserDto>> addUser(@RequestBody UserRegisterRequest registerRequest) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("User Registered Successfully", service.addUser(registerRequest)));
     }
 
     @PatchMapping

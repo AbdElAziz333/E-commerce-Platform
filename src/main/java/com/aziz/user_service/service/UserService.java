@@ -2,7 +2,6 @@ package com.aziz.user_service.service;
 
 import com.aziz.user_service.dto.CurrentUserDto;
 import com.aziz.user_service.dto.UserDto;
-import com.aziz.user_service.dto.UserRegisterRequest;
 import com.aziz.user_service.dto.UserUpdateRequest;
 import com.aziz.user_service.mapper.AddressMapper;
 import com.aziz.user_service.model.User;
@@ -66,26 +65,6 @@ public class UserService {
                     log.warn("Cannot fetch user with email {}, user not found", email);
                     return new NotFoundException("User not found with email: " + email);
                 });
-    }
-
-    @Transactional
-    public UserDto addUser(UserRegisterRequest request) {
-        log.debug("Attempting to register new user with email: {}", request.getEmail());
-
-        if (repository.existsByEmail(request.getEmail())) {
-            log.warn("User already exists with email: {}", request.getEmail());
-            throw new UserAlreadyExistsException("User already exists with email: " + request.getEmail());
-        }
-
-        User user = mapper.registerRequestToUser(request);
-
-        user.setPassword(encoder.encode(user.getPassword()));
-        user.setRole(Role.ROLE_USER);
-        user.setPreferredLanguage(PreferredLanguage.ARABIC);
-
-        repository.save(user);
-        log.info("User successfully created with id: {}", user.getUserId());
-        return mapper.userToDto(user);
     }
 
     @Transactional
