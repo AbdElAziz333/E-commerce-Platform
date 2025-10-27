@@ -2,4 +2,4 @@ spring:
   application:
     name: api-gateway
   config:
-    import: configserver:http://${LHOST}:${CONFIG_SERVER_PORT}
+    import: configserver:http://${LHOST}:8203

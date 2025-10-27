@@ -1,7 +1,7 @@
 package com.aziz.api_gateway.service;
 
 import com.aziz.api_gateway.client.UserFeignClient;
-import com.aziz.api_gateway.dto.OtpRequest;
+import com.aziz.api_gateway.dto.OtpVerificationRequest;
 import com.aziz.api_gateway.dto.PendingUserDto;
 import com.aziz.api_gateway.dto.RegistrationRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,7 +18,7 @@ public class RegistrationService {
         return feignClient.createUser(request).getData();
     }
 
-    public void verifyOtp(OtpRequest request, HttpServletResponse httpResponse) {
+    public void verifyOtp(OtpVerificationRequest request, HttpServletResponse httpResponse) {
         PendingUserDto dto = feignClient.verifyOtp(request).getData();
         String jwt = jwtService.generateToken(dto.getEmail());
 

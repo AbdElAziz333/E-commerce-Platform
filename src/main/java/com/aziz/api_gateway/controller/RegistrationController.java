@@ -1,6 +1,6 @@
 package com.aziz.api_gateway.controller;
 
-import com.aziz.api_gateway.dto.OtpRequest;
+import com.aziz.api_gateway.dto.OtpVerificationRequest;
 import com.aziz.api_gateway.dto.RegistrationRequest;
 import com.aziz.api_gateway.service.RegistrationService;
 import com.aziz.api_gateway.util.ApiResponse;
@@ -27,7 +27,7 @@ public class RegistrationController {
     }
 
     @PostMapping("/verify-otp")
-    public ResponseEntity<ApiResponse<Void>> verifyOtpAndActiveUser(@RequestBody OtpRequest request, HttpServletResponse httpResponse) {
+    public ResponseEntity<ApiResponse<Void>> verifyOtpAndActiveUser(@RequestBody OtpVerificationRequest request, HttpServletResponse httpResponse) {
         service.verifyOtp(request, httpResponse);
 
         return ResponseEntity.ok(ApiResponse.success("Successfully verified, logging in...", null));
