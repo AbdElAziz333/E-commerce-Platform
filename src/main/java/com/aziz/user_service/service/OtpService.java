@@ -1,9 +1,10 @@
 package com.aziz.user_service.service;
 
-import com.aziz.user_service.util.MailMessageSender;
+import com.aziz.user_service.dto.OtpVerificationRequest;
+import com.aziz.user_service.repository.OtpRepository;
 import com.aziz.user_service.util.exceptions.InvalidOtpException;
+import com.aziz.user_service.util.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
@@ -17,11 +18,9 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class OtpService {
-    private final RedisTemplate<String, String> redisTemplate;
-    private final MailMessageSender mailMessageSender;
+    private final OtpRepository repository;
 
     private final Duration OTP_DURATION = Duration.ofMinutes(10);
-    private final String OTP_PREFIX = "OTP:";
     private final int OTP_LENGTH = 6;
 
     /**
@@ -31,13 +30,14 @@ public class OtpService {
      * @return verificationId
      * @author Aziz
      * */
-    public String sendOtpToEmail(String email) {
+    public OtpVerificationRequest createOtp(String email) {
         String otp = generateOtp();
         String verificationId = generateVerificationId();
-        String value = email + ":" + otp;
-        redisTemplate.opsForValue().set(getRedisKey(verificationId), value, OTP_DURATION);
-        mailMessageSender.sendEmailVerification(email, otp);
-        return verificationId;
+
+        OtpVerificationRequest verification = new OtpVerificationRequest(verificationId, email, otp);
+        repository.save(verification, OTP_DURATION);
+
+        return verification;
     }
 
     /**
@@ -47,24 +47,16 @@ public class OtpService {
      * @param otp the OTP to be verified
      * @author Aziz
      * */
-    public String verifyOtp(String verificationId, String otp) {
-        String redisKey = getRedisKey(verificationId);
-        String storedValue = redisTemplate.opsForValue().get(redisKey);
+    public String verifyAndGetEmail(String verificationId, String otp) {
+        OtpVerificationRequest verification = repository.findById(verificationId)
+                .orElseThrow(() -> new NotFoundException("OTP expired or not found"));
 
-        if (storedValue == null) {
-            throw new InvalidOtpException("OTP expired or not found");
+        if (!verification.getOtp().equals(otp)) {
+            throw new InvalidOtpException("Invalid Otp");
         }
 
-        String[] parts = storedValue.split(":");
-        String email = parts[0];
-        String storedOtp = parts[1];
-
-        if (!storedOtp.equals(otp)) {
-            throw new InvalidOtpException("Invalid OTP");
-        }
-
-        redisTemplate.delete(redisKey);
-        return email;
+        repository.delete(verificationId);
+        return verification.getEmail();
     }
 
     /**
@@ -89,9 +81,5 @@ public class OtpService {
         byte[] bytes = new byte[16];
         random.nextBytes(bytes);
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
-    }
-
-    private String getRedisKey(String verificationId) {
-        return OTP_PREFIX + verificationId;
     }
 }

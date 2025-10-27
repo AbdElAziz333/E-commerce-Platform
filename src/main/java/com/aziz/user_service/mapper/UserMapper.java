@@ -1,5 +1,6 @@
 package com.aziz.user_service.mapper;
 
+import com.aziz.user_service.dto.PendingUserDto;
 import com.aziz.user_service.dto.UserDto;
 import com.aziz.user_service.model.PendingUser;
 import com.aziz.user_service.model.User;
@@ -13,7 +14,7 @@ public class UserMapper {
         return new UserDto(user.getUserId(), user.getFirstName(), user.getLastName(), user.getPhoneNumber(), user.getRole());
     }
 
-    public User pendingUserToUser(PendingUser pendingUser) {
+    public User pendingUserDtoToUser(PendingUserDto pendingUser) {
         return User.builder()
                 .firstName(pendingUser.getFirstName())
                 .lastName(pendingUser.getLastName())

@@ -2,6 +2,8 @@ package com.aziz.user_service.dto;
 
 import lombok.*;
 
+import java.util.Date;
+
 @Getter
 @Setter
 @Builder
@@ -14,5 +16,5 @@ public class PendingUserDto {
     private String email;
     private String password;
     private String phoneNumber;
-    private String registeredAt;
+    private Date registeredAt;
 }

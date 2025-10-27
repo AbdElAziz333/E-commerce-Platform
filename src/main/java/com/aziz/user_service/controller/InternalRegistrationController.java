@@ -22,7 +22,7 @@ public class InternalRegistrationController {
     }
 
     @PostMapping("/verify-otp")
-    public ResponseEntity<ApiResponse<PendingUserDto>> verifyOtp(@RequestBody OtpRequest request) {
+    public ResponseEntity<ApiResponse<PendingUserDto>> verifyOtp(@RequestBody OtpVerificationRequest request) {
         return ResponseEntity
                 .ok(
                         ApiResponse.success("Verified OTP Successfully",

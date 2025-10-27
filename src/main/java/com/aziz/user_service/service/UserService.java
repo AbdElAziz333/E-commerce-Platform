@@ -1,9 +1,8 @@
 package com.aziz.user_service.service;
 
-import com.aziz.user_service.dto.CurrentUserDto;
+import com.aziz.user_service.dto.PendingUserDto;
 import com.aziz.user_service.dto.UserDto;
 import com.aziz.user_service.dto.UserUpdateRequest;
-import com.aziz.user_service.mapper.AddressMapper;
 import com.aziz.user_service.model.User;
 import com.aziz.user_service.repository.UserRepository;
 import com.aziz.user_service.util.PreferredLanguage;
@@ -12,11 +11,9 @@ import com.aziz.user_service.util.exceptions.*;
 import com.aziz.user_service.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 import java.util.List;
 
@@ -27,7 +24,6 @@ public class UserService {
     private final UserRepository repository;
     private final UserMapper mapper;
     private final PasswordEncoder encoder;
-    private final AddressMapper addressMapper;
 
     @Transactional(readOnly = true)
     public List<UserDto> getAllUsers() {
@@ -65,6 +61,22 @@ public class UserService {
                     log.warn("Cannot fetch user with email {}, user not found", email);
                     return new NotFoundException("User not found with email: " + email);
                 });
+    }
+
+    public void createUser(PendingUserDto dto) {
+        log.debug("Attempting to register new user with email: {}", dto.getEmail());
+
+        if (repository.existsByEmail(dto.getEmail())) {
+            log.warn("User already exists with email: {}", dto.getEmail());
+            throw new AlreadyExistsException("User already exists with email: " + dto.getEmail());
+        }
+
+        User user = mapper.pendingUserDtoToUser(dto);
+        user.setRole(Role.ROLE_USER);
+        user.setPreferredLanguage(PreferredLanguage.ARABIC);
+
+        repository.save(user);
+        log.info("User successfully created with id: {}", user.getUserId());
     }
 
     @Transactional
@@ -116,31 +128,5 @@ public class UserService {
 
     public boolean userExistsById(Long id) {
         return repository.existsById(id);
-    }
-
-    public User getUserEntityById(Long id) {
-        return repository.findById(id).orElseThrow(() -> new NotFoundException("User not found with id: " + id));
-    }
-
-    @Transactional(readOnly = true)
-    public CurrentUserDto getCurrentUser(UserDetails userDetails) {
-        User user = getCurrentUserEntity(userDetails);
-        return CurrentUserDto.builder()
-                .id(user.getUserId())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .phoneNumber(user.getPhoneNumber())
-                .preferredLanguage(user.getPreferredLanguage())
-                .addresses(addressMapper.addressesToDtos(user.getAddress()))
-                .build();
-
-    }
-
-    private User getCurrentUserEntity(UserDetails userDetails) {
-        Assert.notNull(userDetails, "User Details must not be null.");
-
-        return repository.findByEmail(
-                userDetails.getUsername()).orElseThrow(
-                        () -> new NotFoundException("User not found with email: " + userDetails.getUsername()));
     }
 }

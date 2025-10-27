@@ -1,14 +1,11 @@
 package com.aziz.user_service.controller;
 
-import com.aziz.user_service.dto.CurrentUserDto;
 import com.aziz.user_service.dto.UserDto;
 import com.aziz.user_service.dto.UserUpdateRequest;
 import com.aziz.user_service.service.UserService;
 import com.aziz.user_service.util.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,14 +15,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService service;
-
-    @GetMapping("/current")
-    public ResponseEntity<ApiResponse<CurrentUserDto>> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(
-                ApiResponse.success(
-                        "Successfully fetched the authenticated user",
-                        service.getCurrentUser(userDetails)));
-    }
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<UserDto>>> getAllUsers() {

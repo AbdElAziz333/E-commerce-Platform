@@ -2,7 +2,9 @@ package com.aziz.user_service.service;
 
 import com.aziz.user_service.dto.*;
 import com.aziz.user_service.mapper.PendingUserMapper;
+import com.aziz.user_service.mapper.UserMapper;
 import com.aziz.user_service.model.PendingUser;
+import com.aziz.user_service.model.User;
 import com.aziz.user_service.repository.PendingUserRepository;
 import com.aziz.user_service.util.MailMessageSender;
 import com.aziz.user_service.util.exceptions.AlreadyExistsException;
@@ -18,6 +20,7 @@ public class InternalRegistrationService {
     private final PendingUserMapper mapper;
     private final OtpService otpService;
     private final MailMessageSender mailMessageSender;
+    private final UserService userService;
 
     @Transactional
     public String createUser(RegistrationRequest request) {
@@ -26,20 +29,26 @@ public class InternalRegistrationService {
         }
 
         PendingUser user = mapper.registerRequestToPendingUser(request);
-
         repository.save(user);
-        return otpService.sendOtpToEmail(request.getEmail());
+
+        OtpVerificationRequest verification = otpService.createOtp(request.getEmail());
+        mailMessageSender.sendEmailVerification(request.getEmail(), verification.getOtp());
+
+        return verification.getVerificationId();
     }
 
     @Transactional
-    public PendingUserDto verifyOtp(OtpRequest request) {
-        String email = otpService.verifyOtp(request.getVerificationId(), request.getOtp());
+    public PendingUserDto verifyOtp(OtpVerificationRequest request) {
+        String email = otpService.verifyAndGetEmail(request.getVerificationId(), request.getOtp());
 
         PendingUserDto dto = repository.findByEmail(email)
                 .map(mapper::pendingUserToDto)
                 .orElseThrow(() -> new NotFoundException("Pending user not found"));
 
-        mailMessageSender.sendEmailVerified(email, dto.getFirstName());
+        userService.createUser(dto);
+
+        repository.deleteByEmail(request.getEmail());
+        mailMessageSender.sendWelcomeEmail(email, dto.getFirstName());
 
         return dto;
     }

@@ -7,6 +7,8 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.Date;
+
 @Builder
 @Getter
 @Setter
@@ -33,7 +35,7 @@ public class PendingUser {
     @Field(name = "phone_number")
     private String phoneNumber;
 
-    @Indexed(expireAfter = "15m")
+    @Indexed(expireAfter = "2m")
     @CreatedDate
     private String registeredAt;
 }

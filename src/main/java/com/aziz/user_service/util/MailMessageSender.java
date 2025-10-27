@@ -12,13 +12,13 @@ public class MailMessageSender {
 
     /**
      * Sends a verification message to the email registered.
-     * @param to the email to the registered user
+     * @param email the email to the registered user
      * @param otp the one time password sent to da email
      * @author Aziz
      * */
-    public void sendEmailVerification(String to, String otp) {
+    public void sendEmailVerification(String email, String otp) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(to);
+        message.setTo(email);
         message.setSubject("Welcome to E-commerce");
         message.setText(String.format("Halo, your OTP: %s\nIt will expire after some time, please don't share it with anyone.", otp));
         mailSender.send(message);
@@ -30,7 +30,7 @@ public class MailMessageSender {
      * @param firstName the firstName of the user
      * @author Aziz
      * */
-    public void sendEmailVerified(String email, String firstName) {
+    public void sendWelcomeEmail(String email, String firstName) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(email);
         message.setSubject("Thanks for using our services!");
