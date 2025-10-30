@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${LHOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      default-zone: http://${LHOST}:8761/eureka/
+
+server:
+  port: 8082
