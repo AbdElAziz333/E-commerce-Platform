@@ -2,4 +2,4 @@ spring:
   application:
     name: product-service
   config:
-    import: configserver:http://localhost:8203
+    import: configserver:http://${LHOST}:8203

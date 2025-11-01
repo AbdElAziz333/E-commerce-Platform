@@ -3,7 +3,6 @@ package com.aziz.product_service.controller;
 import com.aziz.product_service.dto.ProductDto;
 import com.aziz.product_service.dto.ProductRegisterRequest;
 import com.aziz.product_service.dto.ProductUpdateRequest;
-import com.aziz.product_service.model.Product;
 import com.aziz.product_service.model.ProductSearch;
 import com.aziz.product_service.repository.search.ProductSearchRepository;
 import com.aziz.product_service.service.ProductService;
@@ -66,7 +65,7 @@ public class ProductController {
         return ResponseEntity.ok(ApiResponse.success("Successfully registered product", service.addProduct(registerRequest)));
     }
 
-    @PutMapping
+    @PatchMapping
     public ResponseEntity<ApiResponse<ProductDto>> updateProduct(@RequestBody ProductUpdateRequest updateRequest) {
         return ResponseEntity.ok(ApiResponse.success("Successfully updated product", service.updateProduct(updateRequest)));
     }

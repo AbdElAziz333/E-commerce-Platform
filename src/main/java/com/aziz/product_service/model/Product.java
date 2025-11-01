@@ -7,6 +7,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Document(collection = "products")
 @Getter
@@ -24,6 +25,7 @@ public class Product {
     private String slug;
     private Double price;
     private Integer stockQuantity;
+    private List<String> variantAttributes;
 
     @CreatedDate
     private LocalDate createdAt;
