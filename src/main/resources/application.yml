@@ -7,7 +7,7 @@ spring:
     config:
       server:
         vault:
-          host: localhost
+          host: ${LHOST}
           port: 8200
           scheme: http
           authentication: token
