@@ -1,6 +1,7 @@
 package com.aziz.api_gateway.service;
 
 import com.aziz.api_gateway.config.JwtConfig;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -28,25 +29,37 @@ public class JwtService {
         parser = Jwts.parser().verifyWith(secretKey).build();
     }
 
-    public String generateToken(String email) {
+    public String generateToken(Long id, String role) {
         return Jwts.builder()
-                .subject(email)
+                .subject(id.toString())
+                .claim("role", role)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + config.getMaxAge()))
                 .signWith(secretKey)
                 .compact();
     }
 
-    public String getEmailFromJwt(String token) {
+    public Long getUserIdFromJwt(String token) {
+        return Long.parseLong(parser
+                .parseSignedClaims(token)
+                .getPayload()
+                .getSubject());
+    }
+
+    public String getRoleFromJwt(String token) {
         return parser
                 .parseSignedClaims(token)
                 .getPayload()
-                .getSubject();
+                .get("role", String.class);
     }
 
     public boolean validateJwtToken(String token) {
-        parser.parseSignedClaims(token);
-        return true;
+        try {
+            parser.parseSignedClaims(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
     }
 
     public void addJwtToCookieResponse(String jwt, HttpServletResponse response) {

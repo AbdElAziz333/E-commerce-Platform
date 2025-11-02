@@ -13,7 +13,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -34,15 +33,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = parseJwt(request);
 
         if (token != null && service.validateJwtToken(token)) {
-            String email = service.getEmailFromJwt(token);
+            Long userId = service.getUserIdFromJwt(token);
+            String role = service.getRoleFromJwt(token);
 
             UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(email, null,
-                            List.of(new SimpleGrantedAuthority("ROLE_USER")));
+                    new UsernamePasswordAuthenticationToken(
+                            userId,
+                            null,
+                            List.of(new SimpleGrantedAuthority(role)));
 
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-            // Set authentication in the security context
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
@@ -50,14 +50,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String parseJwt(HttpServletRequest request) {
-        // if stored in da authorization header
-        String authHeader = request.getHeader("Authorization");
-
-        if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
-            return authHeader.substring(7);
-        }
-
-        // if stored in a cookie
         Cookie[] cookies = request.getCookies();
 
         if (cookies != null) {

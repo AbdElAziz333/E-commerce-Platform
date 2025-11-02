@@ -13,5 +13,5 @@ public class JwtConfig {
     private String secret;
     private String cookieName;
     private long maxAge;
-    private boolean secured;
+    private boolean secured = false;
 }
