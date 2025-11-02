@@ -1,6 +1,6 @@
 package com.aziz.user_service.dto;
 
-import com.aziz.user_service.util.City;
+import com.aziz.user_service.util.enums.City;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;

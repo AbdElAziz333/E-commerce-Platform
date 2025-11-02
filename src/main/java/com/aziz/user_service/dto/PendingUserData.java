@@ -1,20 +1,19 @@
 package com.aziz.user_service.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
-@Getter
-@Setter
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PendingUserDto {
-    private String id;
+public class PendingUserData {
+    private String verificationId;
     private String firstName;
     private String lastName;
     private String email;
     private String password;
     private String phoneNumber;
-    private Date registeredAt;
 }

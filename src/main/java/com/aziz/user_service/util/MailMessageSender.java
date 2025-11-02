@@ -19,7 +19,7 @@ public class MailMessageSender {
     public void sendEmailVerification(String email, String otp) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(email);
-        message.setSubject("Welcome to E-commerce");
+        message.setSubject("E-commerce | OTP");
         message.setText(String.format("Halo, your OTP: %s\nIt will expire after some time, please don't share it with anyone.", otp));
         mailSender.send(message);
     }
@@ -33,7 +33,7 @@ public class MailMessageSender {
     public void sendWelcomeEmail(String email, String firstName) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(email);
-        message.setSubject("Thanks for using our services!");
+        message.setSubject("Email Verified!");
         message.setText(String.format("Halo %s, thanks for verifying the OTP and using our services! <3", firstName));
         mailSender.send(message);
     }

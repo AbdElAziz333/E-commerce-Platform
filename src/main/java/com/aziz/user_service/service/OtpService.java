@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public class OtpService {
     private final OtpRepository repository;
 
-    private final Duration OTP_DURATION = Duration.ofMinutes(10);
+    private final Duration OTP_DURATION = Duration.ofMinutes(5);
     private final int OTP_LENGTH = 6;
 
     /**

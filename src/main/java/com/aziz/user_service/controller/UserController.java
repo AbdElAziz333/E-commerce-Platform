@@ -18,19 +18,12 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<UserDto>>> getAllUsers() {
-        return ResponseEntity.ok(
-                ApiResponse.success("Fetched all users", service.getAllUsers())
-        );
+        return ResponseEntity.ok(ApiResponse.success("Fetched all users", service.getAllUsers()));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<UserDto>> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.success(String.format("User with id %s, fetched successfully", id), service.getUserById(id)));
-    }
-
-    @GetMapping(params = "email")
-    public ResponseEntity<ApiResponse<UserDto>> getUserByEmail(@RequestParam String email) {
-        return ResponseEntity.ok(ApiResponse.success(String.format("User with email %s, fetched successfully", email), service.getUserByEmail(email)));
     }
 
     @PatchMapping
@@ -39,18 +32,8 @@ public class UserController {
     }
 
     @DeleteMapping
-    public ResponseEntity<ApiResponse<Void>> deleteUser(
-            @RequestParam(required = false) Long id,
-            @RequestParam(required = false) String email
-    ) {
-        if (id != null) {
-            service.deleteUserById(id);
-            return ResponseEntity.ok(ApiResponse.success(String.format("User with id: %s deleted successfully", id), null));
-        } else if (email != null) {
-            service.deleteUserByEmail(email);
-            return ResponseEntity.ok(ApiResponse.success(String.format("User with email: %s deleted successfully", email), null));
-        } else {
-            throw new IllegalArgumentException("Either must be provided.");
-        }
+    public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable Long id) {
+        service.deleteUserById(id);
+        return ResponseEntity.ok(ApiResponse.success(String.format("User with id: %s deleted successfully", id), null));
     }
 }

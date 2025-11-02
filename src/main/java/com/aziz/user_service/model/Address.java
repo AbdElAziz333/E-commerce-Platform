@@ -1,6 +1,6 @@
 package com.aziz.user_service.model;
 
-import com.aziz.user_service.util.City;
+import com.aziz.user_service.util.enums.City;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;

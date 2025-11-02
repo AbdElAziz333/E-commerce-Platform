@@ -1,6 +1,6 @@
 package com.aziz.user_service.dto;
 
-import com.aziz.user_service.util.PreferredLanguage;
+import com.aziz.user_service.util.enums.PreferredLanguage;
 import lombok.*;
 
 import java.util.List;
@@ -14,6 +14,7 @@ public class CurrentUserDto {
     private Long id;
     private String firstName;
     private String lastName;
+    private String email;
     private String phoneNumber;
     private PreferredLanguage preferredLanguage;
     private List<AddressDto> addresses;

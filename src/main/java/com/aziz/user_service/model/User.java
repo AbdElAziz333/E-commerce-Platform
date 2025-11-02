@@ -1,8 +1,7 @@
 package com.aziz.user_service.model;
 
-import com.aziz.user_service.util.PreferredLanguage;
-import com.aziz.user_service.util.Role;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.aziz.user_service.util.enums.PreferredLanguage;
+import com.aziz.user_service.util.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
