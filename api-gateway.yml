@@ -12,9 +12,6 @@ spring:
               uri: lb://user-service
               predicates:
                 - Path=/api/v1/internal/**
-                - Path=/api/v1/addresses/**
-              filters:
-                - AddRequestHeader=X-Internal-Secret, my-very-strong-secret-key
             - id: product-service
               uri: lb://product-service
               predicates:
@@ -34,7 +31,7 @@ jwt:
   secret: ${JWT_SECRET}
   cookieName: jwt
   maxAge: 36000000
-  secure: false
+  secured: false
 
 web:
   frontendUrl: http://${LHOST}:5173
