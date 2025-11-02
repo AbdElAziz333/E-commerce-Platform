@@ -8,5 +8,6 @@ export interface SignupRequest {
 
 export interface OtpRequest {
     verificationId: string
+    email: string
     otp: string
 }

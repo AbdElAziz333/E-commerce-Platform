@@ -1,3 +1,7 @@
 export type PreferredLanguage = "ARABIC" | "ENGLISH" | "RUSSIAN"
 export type City = "CAIRO" | "EL_BEHEIRA" | "ALEXANDRIA" | "TANTA"
 export type Role = "ROLE_USER" | "ROLE_VENDOR" | "ROLE_ADMIN"
+export type OrderStatus = "PENDING" | "CONFIRMED" | "SHIPPED" | "DELIVERED" | "CANCELED"
+export type Carrier = "FedEx" | "Aramex"
+export type PaymentMethod = "VISA" | "VODAFONE_CASH" | "PAYPAL"
+export type PaymentStatus = "PENDING" | "PAID" | "FAILED" | "REFUNDED"

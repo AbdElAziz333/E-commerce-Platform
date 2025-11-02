@@ -1,6 +1,0 @@
-export const homePageUrl = "/"
-export const usersPageUrl = "/users"
-export const signupPageUrl = "/signup"
-export const otpVerificationPageUrl = "/signup/verify-otp"
-export const loginPageUrl = "/login"
-export const authenticatedUserPageUrl = "/user/my-profile"

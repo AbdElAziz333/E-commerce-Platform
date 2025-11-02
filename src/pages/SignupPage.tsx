@@ -1,6 +1,6 @@
 import {signup} from "../services/registerService.ts";
 import {useNavigate} from "react-router-dom";
-import {otpVerificationPageUrl} from "../routes/urls.ts";
+import {otpVerificationPageUrl} from "../routes/routes.tsx";
 import {useState} from "react";
 import type {SignupRequest} from "../types/registrationTypes.ts";
 
@@ -25,7 +25,7 @@ export default function SignupPage() {
 
         try {
             const verificationId = await signup(formData)
-            navigate(otpVerificationPageUrl, {state: {verificationId}})
+            navigate(otpVerificationPageUrl, {state: {verificationId, email: formData.email}})
         } catch (err) {
             console.error(`Error adding user: ${err}`)
         }

@@ -1,18 +1,28 @@
 import axios from "axios";
 
-const USERS_SERVICE_URL = import.meta.env.VITE_USERS_SERVICE_URL;
+const API_GATEWAY_URL = import.meta.env.VITE_API_GATEWAY_URL;
 
 export const userServiceApi = axios.create({
-    baseURL: `${USERS_SERVICE_URL}/api/v1/users`,
+    baseURL: `${API_GATEWAY_URL}/api/v1`,
     withCredentials: true
 })
 
 export const registrationServiceApi = axios.create({
-    baseURL: `${USERS_SERVICE_URL}/api/v1/registration`,
+    baseURL: `${API_GATEWAY_URL}/api/v1/registration`,
     withCredentials: true
 })
 
 export const loginServiceApi = axios.create({
-    baseURL: `${USERS_SERVICE_URL}/api/v1/login`,
+    baseURL: `${API_GATEWAY_URL}/api/v1/auth`,
+    withCredentials: true
+})
+
+export const productServiceApi = axios.create({
+    baseURL: `${API_GATEWAY_URL}/api/v1/products`,
+    withCredentials: true
+})
+
+export const orderServiceApi = axios.create({
+    baseURL: `${API_GATEWAY_URL}/api/v1/orders`,
     withCredentials: true
 })

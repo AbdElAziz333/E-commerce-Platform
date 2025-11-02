@@ -3,7 +3,7 @@ import type {LoginRequest} from "../types/loginTypes.ts";
 import {login} from "../services/authService.ts";
 import * as React from "react";
 import {useNavigate} from "react-router-dom";
-import {authenticatedUserPageUrl} from "../routes/urls.ts";
+import {authenticatedUserPageUrl} from "../routes/routes.tsx";
 
 export default function LoginPage() {
     const navigate = useNavigate();
@@ -22,6 +22,7 @@ export default function LoginPage() {
         e.preventDefault()
 
         try {
+            // JWT is stored in http-only cookie
             await login(formData)
             navigate(authenticatedUserPageUrl)
         } catch (err) {
