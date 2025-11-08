@@ -10,8 +10,15 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 @Setter
 public class JwtConfig {
-    private String secret;
-    private String cookieName;
-    private long maxAge;
-    private boolean secured = false;
+    private TokenProperties accessToken;
+    private TokenProperties refreshToken;
+
+    @Setter
+    @Getter
+    public static class TokenProperties {
+        private String secret;
+        private String cookieName;
+        private long maxAge;
+        private boolean secured = false;
+    }
 }

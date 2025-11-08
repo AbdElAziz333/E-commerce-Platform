@@ -26,6 +26,9 @@ public class RegistrationController {
                 "Successfully registered, please check your email and verify the otp", verificationId));
     }
 
+    // No rate limiting on OTP verification (brute force vulnerability)
+    // No account lockout after failed attempts
+    // Missing request validation
     @PostMapping("/verify-otp")
     public ResponseEntity<ApiResponse<Void>> verifyOtpAndActiveUser(@RequestBody OtpVerificationRequest request, HttpServletResponse httpResponse) {
         service.verifyOtp(request, httpResponse);

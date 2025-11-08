@@ -1,10 +1,8 @@
 package com.aziz.api_gateway.security;
 
-import com.aziz.api_gateway.config.JwtConfig;
 import com.aziz.api_gateway.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -22,18 +20,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService service;
-    private final JwtConfig config;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
+        String token = service.parseAccessToken(request);
 
-        String token = parseJwt(request);
-
-        if (token != null && service.validateJwtToken(token)) {
-            Long userId = service.getUserIdFromJwt(token);
+        if (token != null && service.validateAccessToken(token)) {
+            Long userId = service.getUserIdFromJwt(token, false);
             String role = service.getRoleFromJwt(token);
 
             UsernamePasswordAuthenticationToken authentication =
@@ -47,19 +43,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
-    }
-
-    private String parseJwt(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals(config.getCookieName())) {
-                    return cookie.getValue();
-                }
-            }
-        }
-
-        return null;
     }
 }
