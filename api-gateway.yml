@@ -8,23 +8,22 @@ spring:
       server:
         webmvc:
           routes:
+            - id: auth-service
+              uri: lb://auth-service
+              predicates:
+                - Path=/api/v1/auth/**
+            - id: registration-service
+              uri: lb://auth-service
+              predicates:
+                - Path=/api/v1/registration/**
             - id: user-service-public
               uri: lb://user-service
               predicates:
                 - Path=/api/v1/users/**
-            - id: user-service-internal
-              uri: lb://user-service
-              predicates:
-                - Path=/api/v1/internal/**
             - id: product-service
               uri: lb://product-service
               predicates:
                 - Path=/api/v1/products/**
-  data:
-    redis:
-      host: localhost
-      port: 6380
-      timeout: 2000ms
 
 eureka:
   client:
@@ -37,16 +36,8 @@ server:
   port: 8202
 
 jwt:
-  accessToken:
-    secret: ${ACCESS_TOKEN_SECRET}
-    cookieName: access_token
-    maxAge: 900000 # 15 minutes
-    secured: false
-  refreshToken:
-    secret: ${REFRESH_TOKEN_SECRET}
-    cookieName: refresh_token
-    maxAge: 1209600000 # 15 days
-    secured: false
+  accessTokenSecret: ${ACCESS_TOKEN_SECRET}
+  cookieName: access_token
 
 web:
   frontendUrl: http://${LHOST}:5173
