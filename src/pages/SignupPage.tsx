@@ -20,19 +20,19 @@ export default function SignupPage() {
     return (
         <div>
             <form onSubmit={handleSubmit(onSubmit)}>
-                <input type="text" placeholder="Firstname" {...register("firstName", {required: true})} />
+                <input type="text" placeholder="Firstname" {...register("firstName", {required: "Firstname is required"})} />
                 {errors.firstName && <div>{errors.firstName.message}</div>}
 
-                <input type="text" placeholder="Lastname" {...register("lastName", {required: true})} />
+                <input type="text" placeholder="Lastname" {...register("lastName", {required: "Lastname is required"})} />
                 {errors.lastName && <div>{errors.lastName.message}</div>}
 
-                <input type="email" placeholder="Email" {...register("email", {required: true})} />
+                <input type="email" placeholder="Email" {...register("email", {required: "Email is required"})} />
                 {errors.email && <div>{errors.email.message}</div>}
 
-                <input type="password" placeholder="Password" {...register("password", {required: true})} />
+                <input type="password" placeholder="Password" {...register("password", {required: "Password is required"})} />
                 {errors.password && <div>{errors.password.message}</div>}
 
-                <input type="tel" placeholder="Phone Number" {...register("phoneNumber", {required: true})} />
+                <input type="tel" placeholder="Phone Number" {...register("phoneNumber", {required: "Phone Number is required"})} />
                 {errors.phoneNumber && <div>{errors.phoneNumber.message}</div>}
 
                 <button type="submit">Signup</button>

@@ -21,10 +21,10 @@ export default function LoginPage() {
         <>
             <div>
                 <form onSubmit={handleSubmit(onSubmit)}>
-                    <input type="email" placeholder="Enter email" {...register("email", {required: true})} />
+                    <input type="email" placeholder="Enter email" {...register("email", {required: "Email is required"})} />
                     {errors.email && <div>{errors.email.message}</div>}
 
-                    <input type="password" placeholder="Enter password" {...register("password", {required: true})} />
+                    <input type="password" placeholder="Enter password" {...register("password", {required: "Password is required"})} />
                     {errors.password && <div>{errors.password.message}</div>}
 
                     <button type="submit">Login</button>

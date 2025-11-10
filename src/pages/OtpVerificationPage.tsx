@@ -37,7 +37,7 @@ export default function OtpVerificationPage() {
         <div>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <p>Please check your email and Enter the OTP</p>
-                <input type="text" placeholder="Enter OTP" maxLength={6} {...register("otp", {required: true, minLength: 6, maxLength: 6})} />
+                <input type="text" placeholder="Enter OTP" maxLength={6} {...register("otp", {required: "OTP is required", minLength: 6, maxLength: 6})} />
                 {errors.otp && <div>{errors.otp.message}</div>}
 
                 <input type="hidden" {...register("verificationId")} />
