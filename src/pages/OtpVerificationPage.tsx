@@ -23,13 +23,12 @@ export default function OtpVerificationPage() {
         }
     }, [state, navigate, setValue]);
 
-    const onSubmit: SubmitHandler<OtpRequest> = async (data: OtpRequest) => {
+    const onSubmit: SubmitHandler<OtpRequest> = async (data) => {
         try {
             await verifyOtp(data)
-            // after OTP verification, JWT set in a cookie
             navigate(authenticatedUserPageUrl)
         } catch (err) {
-            console.error(`Error adding user: ${err}`)
+            console.error(`Error verifying OTP: ${err}`)
         }
     }
 
@@ -37,7 +36,12 @@ export default function OtpVerificationPage() {
         <div>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <p>Please check your email and Enter the OTP</p>
-                <input type="text" placeholder="Enter OTP" maxLength={6} {...register("otp", {required: "OTP is required", minLength: 6, maxLength: 6})} />
+                <input type="text" placeholder="Enter OTP" maxLength={6} {
+                    ...register("otp", {
+                        required: "OTP is required",
+                        minLength: {value: 6, message: "OTP must be 6 digits"},
+                        maxLength: {value: 6, message: "OTP must be 6 digits"}
+                    })} />
                 {errors.otp && <div>{errors.otp.message}</div>}
 
                 <input type="hidden" {...register("verificationId")} />
