@@ -25,7 +25,7 @@ export default function UsersPage() {
                 {users.map((user) => (
                     <Link to={`/user/${user.id}`}>
                         <li key={user.id}>
-                            {user.firstName} {user.lastName} - {user.phoneNumber}
+                            {user.firstName} {user.lastName}
                         </li>
                     </Link>
                 ))}
