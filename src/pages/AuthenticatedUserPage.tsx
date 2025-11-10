@@ -41,7 +41,7 @@ export default function AuthenticatedUserPage() {
                 <p>Id: {userData?.id}</p>
                 <p>Firstname: {userData?.firstName}</p>
                 <p>Lastname: {userData?.lastName}</p>
-                <p>Lastname: {userData?.email}</p>
+                <p>Email: {userData?.email}</p>
                 <p>Phone Number: {userData?.phoneNumber}</p>
                 <p>Preferred Language: {userData?.preferredLanguage}</p>
 
