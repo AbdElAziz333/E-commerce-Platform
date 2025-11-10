@@ -11,7 +11,7 @@ export default function OtpVerificationPage() {
 
     const state = location.state as { verificationId?: string, email: string};
 
-    const {register, handleSubmit, setValue} = useForm<OtpRequest>();
+    const {register, handleSubmit, formState: {errors} ,setValue} = useForm<OtpRequest>();
 
     useEffect(() => {
         if (!state?.verificationId || !state?.email) {
@@ -37,7 +37,9 @@ export default function OtpVerificationPage() {
         <div>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <p>Please check your email and Enter the OTP</p>
-                <input type="text" placeholder="Enter OTP" maxLength={6} {...register("otp", {required: true})} />
+                <input type="text" placeholder="Enter OTP" maxLength={6} {...register("otp", {required: true, minLength: 6, maxLength: 6})} />
+                {errors.otp && <div>{errors.otp.message}</div>}
+
                 <input type="hidden" {...register("verificationId")} />
                 <input type="hidden" {...register("email")} />
 

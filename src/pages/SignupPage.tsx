@@ -6,7 +6,7 @@ import {type SubmitHandler, useForm} from "react-hook-form";
 
 export default function SignupPage() {
     const navigate = useNavigate()
-    const {register, handleSubmit} = useForm<SignupRequest>();
+    const {register, handleSubmit, formState: {errors}} = useForm<SignupRequest>();
 
     const onSubmit: SubmitHandler<SignupRequest> = async (data: SignupRequest) => {
         try {
@@ -21,10 +21,19 @@ export default function SignupPage() {
         <div>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <input type="text" placeholder="Firstname" {...register("firstName", {required: true})} />
+                {errors.firstName && <div>{errors.firstName.message}</div>}
+
                 <input type="text" placeholder="Lastname" {...register("lastName", {required: true})} />
+                {errors.lastName && <div>{errors.lastName.message}</div>}
+
                 <input type="email" placeholder="Email" {...register("email", {required: true})} />
+                {errors.email && <div>{errors.email.message}</div>}
+
                 <input type="password" placeholder="Password" {...register("password", {required: true})} />
+                {errors.password && <div>{errors.password.message}</div>}
+
                 <input type="tel" placeholder="Phone Number" {...register("phoneNumber", {required: true})} />
+                {errors.phoneNumber && <div>{errors.phoneNumber.message}</div>}
 
                 <button type="submit">Signup</button>
             </form>
