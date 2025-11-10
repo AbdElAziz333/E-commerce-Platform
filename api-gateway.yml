@@ -16,11 +16,11 @@ spring:
               uri: lb://auth-service
               predicates:
                 - Path=/api/v1/registration/**
-            - id: user-service-current
+            - id: user-current
               uri: lb://auth-service
               predicates:
-                - Path=/api/v1/users/**
-            - id: user-service-public
+                - Path=/api/v1/users/current
+            - id: user-service
               uri: lb://user-service
               predicates:
                 - Path=/api/v1/users/**
