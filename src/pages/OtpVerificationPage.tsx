@@ -1,8 +1,9 @@
-import {useEffect, useState} from "react";
+import {useEffect} from "react";
 import type {OtpRequest} from "../types/registrationTypes.ts";
 import {verifyOtp} from "../services/registerService.ts";
 import {useLocation, useNavigate} from "react-router-dom";
 import {authenticatedUserPageUrl, signupPageUrl} from "../routes/routes.tsx";
+import {type SubmitHandler, useForm} from "react-hook-form";
 
 export default function OtpVerificationPage() {
     const location = useLocation();
@@ -10,24 +11,21 @@ export default function OtpVerificationPage() {
 
     const state = location.state as { verificationId?: string, email: string};
 
-    const [formData, setFormData] = useState<OtpRequest>({
-        verificationId: state?.verificationId || "",
-        email: state?.email || "",
-        otp: ""
-    })
+    const {register, handleSubmit, setValue} = useForm<OtpRequest>();
 
     useEffect(() => {
         if (!state?.verificationId || !state?.email) {
             console.error("No verificationId or email found — user must signup first.");
             navigate(signupPageUrl);
+        } else {
+            setValue("verificationId", state.verificationId);
+            setValue("email", state.email);
         }
-    }, [state, navigate]);
+    }, [state, navigate, setValue]);
 
-    async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();
-
+    const onSubmit: SubmitHandler<OtpRequest> = async (data: OtpRequest) => {
         try {
-            await verifyOtp(formData)
+            await verifyOtp(data)
             // after OTP verification, JWT set in a cookie
             navigate(authenticatedUserPageUrl)
         } catch (err) {
@@ -37,9 +35,11 @@ export default function OtpVerificationPage() {
 
     return (
         <div>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit(onSubmit)}>
                 <p>Please check your email and Enter the OTP</p>
-                <input type="text" name="otp" value={formData.otp} onChange={(e) => setFormData(prev => ({...prev, otp: e.target.value}))} placeholder="Enter OTP" maxLength={6} required />
+                <input type="text" placeholder="Enter OTP" maxLength={6} {...register("otp", {required: true})} />
+                <input type="hidden" {...register("verificationId")} />
+                <input type="hidden" {...register("email")} />
 
                 <button type="submit">Verify OTP</button>
             </form>

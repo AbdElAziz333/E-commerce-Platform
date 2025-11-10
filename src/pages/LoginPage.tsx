@@ -1,41 +1,28 @@
-import {useState} from "react";
 import type {LoginRequest} from "../types/loginTypes.ts";
 import {login} from "../services/authService.ts";
-import * as React from "react";
 import {useNavigate} from "react-router-dom";
 import {authenticatedUserPageUrl} from "../routes/routes.tsx";
+import {type SubmitHandler, useForm} from "react-hook-form";
 
 export default function LoginPage() {
     const navigate = useNavigate();
+    const { register, handleSubmit } = useForm<LoginRequest>()
 
-    const [formData, setFormData] = useState<LoginRequest>({
-        email: "",
-        password: ""
-    })
-
-    function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-        const {name, value} = e.target;
-        setFormData(prev => ({...prev, [name]: value}))
-    }
-
-    async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault()
-
+    const onSubmit: SubmitHandler<LoginRequest> = async (data: LoginRequest) => {
         try {
-            // JWT is stored in http-only cookie
-            await login(formData)
+            await login(data)
             navigate(authenticatedUserPageUrl)
         } catch (err) {
-            console.error("Error: ", err)
+            console.error("Error: ", err);
         }
     }
 
     return (
         <>
             <div>
-                <form onSubmit={handleSubmit}>
-                    <input type="email" name="email" value={formData.email} placeholder="Enter email" onChange={handleChange} required />
-                    <input type="password" name="password" value={formData.password} placeholder="Enter password" onChange={handleChange} required />
+                <form onSubmit={handleSubmit(onSubmit)}>
+                    <input type="email" placeholder="Enter email" {...register("email", {required: true})} />
+                    <input type="password" placeholder="Enter password" {...register("password", {required: true})} />
 
                     <button type="submit">Login</button>
                 </form>
