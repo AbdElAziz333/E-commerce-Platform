@@ -3,15 +3,18 @@ import {useNavigate} from "react-router-dom";
 import {otpVerificationPageUrl} from "../routes/routes.tsx";
 import type {SignupRequest} from "../types/registrationTypes.ts";
 import {type SubmitHandler, useForm} from "react-hook-form";
+import {useOtpSession} from "../hooks/useOtpSession.ts";
 
 export default function SignupPage() {
     const navigate = useNavigate()
+    const { saveOtpData } = useOtpSession();
     const {register, handleSubmit, formState: {errors}} = useForm<SignupRequest>();
 
     const onSubmit: SubmitHandler<SignupRequest> = async (data) => {
         try {
             const verificationId = await signup(data);
-            navigate(otpVerificationPageUrl, {state: {verificationId, email: data.email}})
+            saveOtpData({verificationId, email: data.email})
+            navigate(otpVerificationPageUrl)
         } catch (err) {
             console.error(`Signup Error: ${err}`)
         }

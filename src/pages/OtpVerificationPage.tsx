@@ -1,31 +1,31 @@
 import {useEffect} from "react";
 import type {OtpRequest} from "../types/registrationTypes.ts";
 import {verifyOtp} from "../services/registerService.ts";
-import {useLocation, useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {authenticatedUserPageUrl, signupPageUrl} from "../routes/routes.tsx";
 import {type SubmitHandler, useForm} from "react-hook-form";
+import {useOtpSession} from "../hooks/useOtpSession.ts";
 
 export default function OtpVerificationPage() {
-    const location = useLocation();
     const navigate = useNavigate();
-
-    const state = location.state as { verificationId?: string, email: string};
+    const { ensureOtpData, clearOtpData } = useOtpSession();
 
     const {register, handleSubmit, formState: {errors} ,setValue} = useForm<OtpRequest>();
 
     useEffect(() => {
-        if (!state?.verificationId || !state?.email) {
-            console.error("No verificationId or email found — user must signup first.");
-            navigate(signupPageUrl);
-        } else {
-            setValue("verificationId", state.verificationId);
-            setValue("email", state.email);
+        const otpData = ensureOtpData(signupPageUrl);
+
+        if (otpData) {
+            setValue("verificationId", otpData.verificationId);
+            setValue("email", otpData.email);
         }
-    }, [state, navigate, setValue]);
+
+    }, [navigate, setValue]);
 
     const onSubmit: SubmitHandler<OtpRequest> = async (data) => {
         try {
             await verifyOtp(data)
+            clearOtpData();
             navigate(authenticatedUserPageUrl)
         } catch (err) {
             console.error(`Error verifying OTP: ${err}`)

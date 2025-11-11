@@ -11,3 +11,8 @@ export interface OtpRequest {
     email: string
     otp: string
 }
+
+export interface OtpData {
+    verificationId: string
+    email: string
+}
