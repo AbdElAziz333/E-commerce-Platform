@@ -1,29 +1,11 @@
-import {useEffect, useState} from "react";
-import type {CurrentUserDto} from "../types/userTypes.ts";
 import {useNavigate} from "react-router-dom";
 import {logout} from "../services/authService.ts";
-import {getCurrentUser} from "../services/userService.ts";
 import {loginPageUrl} from "../routes/routes.tsx";
+import {useAuth} from "../hooks/useAuth.ts";
 
 export default function AuthenticatedUserPage() {
     const navigate = useNavigate();
-
-    const [userData, setUserData] = useState<CurrentUserDto | null>(null);
-
-    useEffect(() => {
-        async function fetchUserData() {
-            try {
-                const currentUser = await getCurrentUser();
-                setUserData(currentUser)
-            } catch (err) {
-                console.error(`Error fetching user: ${err}`)
-                // Redirect to login if unauthorized
-                navigate(loginPageUrl)
-            }
-        }
-
-        fetchUserData()
-    }, [navigate]);
+    const { user: userData, loading } = useAuth();
 
     async function logoutUser() {
         try {
@@ -32,6 +14,13 @@ export default function AuthenticatedUserPage() {
         } catch (err) {
             console.error(`Error logging out: ${err}`)
         }
+    }
+
+    if (loading) return <div>Loading...</div>;
+
+    if (!userData) {
+        navigate(loginPageUrl);
+        return null;
     }
 
     return (

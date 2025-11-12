@@ -7,6 +7,8 @@ import OtpVerificationPage from "../pages/OtpVerificationPage.tsx";
 import AuthenticatedUserPage from "../pages/AuthenticatedUserPage.tsx";
 import LoginPage from "../pages/LoginPage.tsx";
 import SignupPage from "../pages/SignupPage.tsx";
+import {PublicRoute} from "./PublicRoute.tsx";
+import {ProtectedRoute} from "./ProtectedRoute.tsx";
 
 export const homePageUrl = "/"
 export const usersPageUrl = "/users"
@@ -18,9 +20,49 @@ export const authenticatedUserPageUrl = "/user/my-profile"
 export const router = createBrowserRouter([
     {
         path: homePageUrl,
-        element: <HomePage />,
+        element: (
+            <PublicRoute>
+                <HomePage />
+            </PublicRoute>
+        ),
         errorElement: <NotFoundPage />
 
+    },
+    {
+        path: signupPageUrl,
+        element: (
+            <PublicRoute>
+                <SignupPage />
+            </PublicRoute>
+        ),
+        errorElement: <NotFoundPage />
+    },
+    {
+        path: otpVerificationPageUrl,
+        element: (
+            <PublicRoute>
+                <OtpVerificationPage />
+            </PublicRoute>
+        ),
+        errorElement: <NotFoundPage />
+    },
+    {
+        path: loginPageUrl,
+        element: (
+            <PublicRoute>
+                <LoginPage />
+            </PublicRoute>
+        ),
+        errorElement: <NotFoundPage />
+    },
+    {
+        path: authenticatedUserPageUrl,
+        element: (
+            <ProtectedRoute>
+                <AuthenticatedUserPage />
+            </ProtectedRoute>
+        ),
+        errorElement: <NotFoundPage />
     },
     {
         path: usersPageUrl,
@@ -30,26 +72,6 @@ export const router = createBrowserRouter([
     {
         path: "/user/:userId?",
         element: <UserPage />,
-        errorElement: <NotFoundPage />
-    },
-    {
-        path: signupPageUrl,
-        element: <SignupPage />,
-        errorElement: <NotFoundPage />
-    },
-    {
-        path: otpVerificationPageUrl,
-        element: <OtpVerificationPage />,
-        errorElement: <NotFoundPage />
-    },
-    {
-        path: loginPageUrl,
-        element: <LoginPage />,
-        errorElement: <NotFoundPage />
-    },
-    {
-        path: authenticatedUserPageUrl,
-        element: <AuthenticatedUserPage />,
         errorElement: <NotFoundPage />
     }
 ])

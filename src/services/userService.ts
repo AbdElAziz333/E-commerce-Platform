@@ -2,7 +2,7 @@ import {userServiceApi} from "./api.ts";
 import type {CurrentUserDto, UserDto, UserUpdateRequest} from "../types/userTypes.ts";
 
 export async function getCurrentUser(): Promise<CurrentUserDto> {
-    return (await userServiceApi.get("/auth/current")).data.data
+    return (await userServiceApi.get("/user/current")).data.data
 }
 
 export async function getAllUsers(): Promise<UserDto[]> {
