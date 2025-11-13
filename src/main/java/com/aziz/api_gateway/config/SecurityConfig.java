@@ -33,7 +33,10 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/v1/user/current",
                                 "/api/v1/auth/logout",
-                                "/api/v1/auth/refresh"
+                                "/api/v1/auth/refresh",
+                                "/api/v1/addresses/**",
+                                "/api/v1/orders/**",
+                                "/api/v1/order-items/**"
                         ).authenticated()
                         .anyRequest().permitAll()
                 )
