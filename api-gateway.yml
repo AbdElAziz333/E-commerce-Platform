@@ -24,10 +24,22 @@ spring:
               uri: lb://user-service
               predicates:
                 - Path=/api/v1/users/**
+            - id: address-service
+              uri: lb://user-service
+              predicates:
+                - Path=/api/v1/addresses/**
             - id: product-service
               uri: lb://product-service
               predicates:
                 - Path=/api/v1/products/**
+            - id: order-service
+              uri: lb://order-service
+              predicates:
+                - Path=/api/v1/orders/**
+            - id: order-items-service
+              uri: lb://order-service
+              predicates:
+                - Path=/api/v1/order-items/**
 
 eureka:
   client:
