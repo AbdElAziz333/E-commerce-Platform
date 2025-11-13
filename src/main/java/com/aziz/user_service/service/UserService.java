@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -25,32 +24,19 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public List<UserDto> getAllUsers() {
-        log.debug("Fetching all users from database");
-        List<UserDto> users = repository.findAll().stream().map(mapper::userToDto).toList();
-        log.debug("Fetched {} users", users.size());
-        return users;
+        return repository.findAll().stream().map(mapper::userToDto).toList();
     }
 
     @Transactional(readOnly = true)
     public UserDto getUserById(Long id) {
-        log.debug("Fetching user with id: {}", id);
-
         return repository.findById(id)
-                .map(user -> {
-                    log.info("Successfully fetched user with id: {}", id);
-                    return mapper.userToDto(user);
-                })
-                .orElseThrow(() -> {
-                    log.warn("Cannot fetch user with id: {}, user not found", id);
-                    return new NotFoundException("User not found with id: " + id);
-                });
+                .map(mapper::userToDto)
+                .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
     }
 
+    @Transactional
     public AuthUserDto createUser(PendingUserData data) {
-        log.debug("Attempting to register new user with email: {}", data.getEmail());
-
         if (repository.existsByEmail(data.getEmail())) {
-            log.warn("User already exists with email: {}", data.getEmail());
             throw new AlreadyExistsException("User already exists with email: " + data.getEmail());
         }
 
@@ -59,49 +45,36 @@ public class UserService {
         user.setPreferredLanguage(PreferredLanguage.ARABIC);
 
         repository.save(user);
-        log.info("User successfully created with id: {}", user.getUserId());
         return new AuthUserDto(user.getUserId(), user.getRole());
     }
 
     @Transactional
-    public UserDto updateUser(UserUpdateRequest updateRequest) {
-        log.debug("Attempting to update user with id: {}", updateRequest.getId());
+    public UserDto updateUser(UserUpdateRequest request) {
+        User user = repository.findById(request.getId())
+                .orElseThrow(() -> new NotFoundException("User not found with id: " + request.getId()));
 
-        User user = repository.findById(updateRequest.getId()).orElseThrow(
-                () -> {
-                    log.warn("Cannot update user -- user not found with id: {}", updateRequest.getId());
-                    return new NotFoundException("User not found with id: " + updateRequest.getId());
-                });
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        user.setPhoneNumber(request.getPhoneNumber());
+        user.setPassword(encoder.encode(request.getPassword()));
 
-        user.setFirstName(updateRequest.getFirstName());
-        user.setLastName(updateRequest.getLastName());
-        user.setPassword(encoder.encode(updateRequest.getPassword()));
-        user.setPhoneNumber(updateRequest.getPhoneNumber());
         repository.save(user);
-        log.info("Successfully updated user with id: {}", updateRequest.getId());
         return mapper.userToDto(user);
     }
 
     @Transactional
     public void deleteUserById(Long id) {
-        log.debug("Attempting to delete user with id: {}", id);
-
-        User user = repository.findById(id).orElseThrow(
-                () -> {
-                    log.warn("Cannot delete user -- user not found with id: {}", id);
-                    return new NotFoundException("User not found with id: " + id);
-                });
-
+        User user = repository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
         repository.delete(user);
-        log.info("Successfully deleted user with id: {}", id);
-    }
-
-    public boolean existsById(Long id) {
-        return repository.existsById(id);
     }
 
     public boolean existsByEmail(String email) {
         return repository.existsByEmail(email);
+    }
+
+    public boolean existsById(Long id) {
+        return repository.existsById(id);
     }
 
     public User getUserEntityById(Long id) {

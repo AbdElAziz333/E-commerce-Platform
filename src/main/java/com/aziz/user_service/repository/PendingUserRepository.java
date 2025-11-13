@@ -13,6 +13,7 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 public class PendingUserRepository {
+
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
 
@@ -22,8 +23,8 @@ public class PendingUserRepository {
     public void save(PendingUserData data) {
         try {
             String key = getKey(data.getVerificationId());
-            String jsonValue = objectMapper.writeValueAsString(data);
-            redisTemplate.opsForValue().set(key, jsonValue, PENDING_USER_TTL);
+            String json = objectMapper.writeValueAsString(data);
+            redisTemplate.opsForValue().set(key, json, PENDING_USER_TTL);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Failed to serialize pending user data", e);
         }
@@ -31,23 +32,16 @@ public class PendingUserRepository {
 
     public Optional<PendingUserData> findById(String verificationId) {
         try {
-            String key = getKey(verificationId);
-            String jsonValue = redisTemplate.opsForValue().get(key);
-
-            if (jsonValue == null) {
-                return Optional.empty();
-            }
-
-            PendingUserData pendingUser = objectMapper.readValue(jsonValue, PendingUserData.class);
-            return Optional.of(pendingUser);
+            String json = redisTemplate.opsForValue().get(getKey(verificationId));
+            if (json == null) return Optional.empty();
+            return Optional.of(objectMapper.readValue(json, PendingUserData.class));
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Failed to deserialize pending user data", e);
         }
     }
 
     public void delete(String verificationId) {
-        String key = getKey(verificationId);
-        redisTemplate.delete(key);
+        redisTemplate.delete(getKey(verificationId));
     }
 
     private String getKey(String verificationId) {

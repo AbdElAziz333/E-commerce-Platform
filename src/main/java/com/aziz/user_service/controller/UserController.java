@@ -14,26 +14,26 @@ import java.util.List;
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 public class UserController {
-    private final UserService service;
+    private final UserService userService;
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<UserDto>>> getAllUsers() {
-        return ResponseEntity.ok(ApiResponse.success("Fetched all users", service.getAllUsers()));
+        return ResponseEntity.ok(ApiResponse.success("Fetched all users", userService.getAllUsers()));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<UserDto>> getUserById(@PathVariable Long id) {
-        return ResponseEntity.ok(ApiResponse.success(String.format("User with id %s, fetched successfully", id), service.getUserById(id)));
+        return ResponseEntity.ok(ApiResponse.success("User fetched successfully", userService.getUserById(id)));
     }
 
     @PatchMapping
-    public ResponseEntity<ApiResponse<UserDto>> updateUser(@RequestBody UserUpdateRequest updateRequest) {
-        return ResponseEntity.ok(ApiResponse.success(String.format("User with id %s, updated successfully", updateRequest.getId()), service.updateUser(updateRequest)));
+    public ResponseEntity<ApiResponse<UserDto>> updateUser(@RequestBody UserUpdateRequest request) {
+        return ResponseEntity.ok(ApiResponse.success("User updated successfully", userService.updateUser(request)));
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable Long id) {
-        service.deleteUserById(id);
-        return ResponseEntity.ok(ApiResponse.success(String.format("User with id: %s deleted successfully", id), null));
+        userService.deleteUserById(id);
+        return ResponseEntity.ok(ApiResponse.success("User deleted successfully", null));
     }
 }
