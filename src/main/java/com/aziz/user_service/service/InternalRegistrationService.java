@@ -1,7 +1,9 @@
 package com.aziz.user_service.service;
 
 import com.aziz.user_service.dto.*;
+import com.aziz.user_service.mapper.UserMapper;
 import com.aziz.user_service.repository.PendingUserRepository;
+import com.aziz.user_service.repository.UserRepository;
 import com.aziz.user_service.util.MailMessageSender;
 import com.aziz.user_service.util.exceptions.AlreadyExistsException;
 import com.aziz.user_service.util.exceptions.NotFoundException;
@@ -18,23 +20,23 @@ public class InternalRegistrationService {
     private final UserService userService;
     private final PendingUserRepository pendingUserRepository;
     private final PasswordEncoder encoder;
+    private final UserRepository repository;
+    private final UserMapper mapper;
 
     @Transactional
     public String createUser(RegistrationRequest request) {
-        if (userService.existsByEmail(request.getEmail())) {
+        if (repository.existsByEmail(request.getEmail())) {
             throw new AlreadyExistsException("User already exists with email: " + request.getEmail());
         }
 
         OtpVerificationRequest verification = otpService.createOtp(request.getEmail());
 
-        PendingUserData pendingUserData = PendingUserData.builder()
-                        .firstName(request.getFirstName())
-                        .lastName(request.getLastName())
-                        .email(request.getEmail())
-                        .password(encoder.encode(request.getPassword()))
-                        .phoneNumber(request.getPhoneNumber())
-                        .verificationId(verification.getVerificationId())
-                        .build();
+        PendingUserData pendingUserData = mapper
+                .registrationRequestToPendingUserData(
+                        request,
+                        encoder.encode(request.getPassword()),
+                        verification.getVerificationId()
+                );
 
         pendingUserRepository.save(pendingUserData);
         mailMessageSender.sendEmailVerification(request.getEmail(), verification.getOtp());

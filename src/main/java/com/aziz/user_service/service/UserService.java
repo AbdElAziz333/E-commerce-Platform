@@ -69,14 +69,6 @@ public class UserService {
         repository.delete(user);
     }
 
-    public boolean existsByEmail(String email) {
-        return repository.existsByEmail(email);
-    }
-
-    public boolean existsById(Long id) {
-        return repository.existsById(id);
-    }
-
     public User getUserEntityById(Long id) {
         return repository.findById(id).orElseThrow(() -> new NotFoundException("User not found with id: " + id));
     }

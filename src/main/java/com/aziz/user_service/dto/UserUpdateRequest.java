@@ -3,12 +3,13 @@ package com.aziz.user_service.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.validator.constraints.Length;
 
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 public class UserUpdateRequest {
     private Long id;
 
