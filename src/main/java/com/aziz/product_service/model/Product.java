@@ -1,11 +1,14 @@
 package com.aziz.product_service.model;
 
 import lombok.*;
+import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -18,6 +21,10 @@ import java.util.List;
 public class Product {
     @Id
     private String productId;
+
+    @Field
+    private Long userId;
+
     private String name;
     private String description;
     private String shortDescription;
@@ -32,4 +39,5 @@ public class Product {
 
     @LastModifiedDate
     private LocalDate updatedAt;
+
 }

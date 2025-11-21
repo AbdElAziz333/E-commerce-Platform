@@ -2,9 +2,7 @@ package com.aziz.product_service.model;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.elasticsearch.annotations.*;
 
 @Getter
 @Setter
@@ -16,19 +14,23 @@ public class ProductSearch {
     @Id
     private String productId;
 
-    @Field(type = FieldType.Text)
+    @MultiField(mainField = @Field(type = FieldType.Text),
+        otherFields = {@InnerField(suffix = "keyword", type = FieldType.Keyword)})
     private String name;
 
-    @Field(type = FieldType.Text)
+    @MultiField(mainField = @Field(type = FieldType.Text),
+            otherFields = {@InnerField(suffix = "keyword", type = FieldType.Keyword)})
     private String description;
 
-    @Field(type = FieldType.Text)
+    @MultiField(mainField = @Field(type = FieldType.Text),
+            otherFields = {@InnerField(suffix = "keyword", type = FieldType.Keyword)})
     private String shortDescription;
 
     @Field(type = FieldType.Keyword)
     private String sku;
 
-    @Field(type = FieldType.Keyword)
+    @MultiField(mainField = @Field(type = FieldType.Text),
+            otherFields = {@InnerField(suffix = "keyword", type = FieldType.Keyword)})
     private String slug;
 
     @Field(type = FieldType.Double)

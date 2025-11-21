@@ -1,14 +1,18 @@
 package com.aziz.product_service.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
 @Builder
 public class ProductDto {
+    private Long userId;
     private String productId;
 
     private String name;
@@ -24,4 +28,5 @@ public class ProductDto {
     private Double price;
 
     private Integer stockQuantity;
+    private List<String> variantAttributes;
 }
