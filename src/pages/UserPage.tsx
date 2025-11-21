@@ -7,7 +7,7 @@ export default function UserPage() {
     const {userId} = useParams()
 
     const [userData, setUserData] = useState<UserDto>({
-        id: 0,
+        userId: 0,
         firstName: "",
         lastName: ""
     })
@@ -26,7 +26,7 @@ export default function UserPage() {
 
     return(
         <div>
-            <h3>ID: {userData.id}</h3>
+            <h3>ID: {userData.userId}</h3>
             <h3>Firstname: {userData.firstName}</h3>
             <h3>Lastname: {userData.lastName}</h3>
         </div>

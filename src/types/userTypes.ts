@@ -2,7 +2,7 @@ import type {PreferredLanguage} from "./commonTypes.ts";
 import type {AddressDto} from "./addressTypes.ts";
 
 export interface CurrentUserDto {
-    id: number
+    userId: number
     firstName: string
     lastName: string
     email: string
@@ -12,13 +12,13 @@ export interface CurrentUserDto {
 }
 
 export interface UserDto {
-    id: number
+    userId: number
     firstName: string
     lastName: string
 }
 
 export interface UserUpdateRequest {
-    id: number
+    userId: number
     firstName: string
     lastName: string
     password: string

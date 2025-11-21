@@ -23,8 +23,8 @@ export default function UsersPage() {
             <h1>All users</h1>
             <ul>
                 {users.map((user) => (
-                    <li key={user.id}>
-                        <Link to={`/user/${user.id}`}>
+                    <li key={user.userId}>
+                        <Link to={`/user/${user.userId}`}>
                             {user.firstName} {user.lastName}
                         </Link>
                     </li>
