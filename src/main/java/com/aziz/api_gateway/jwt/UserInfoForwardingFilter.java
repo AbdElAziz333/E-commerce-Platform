@@ -41,13 +41,13 @@ public class UserInfoForwardingFilter extends OncePerRequestFilter {
                 private final Map<String, String> customHeaders = new HashMap<>();
 
                 {
-                    customHeaders.put("x-user-id", userId.toString());
-                    customHeaders.put("x-user-role", role);
+                    customHeaders.put("X-User-Id", userId.toString());
+                    customHeaders.put("X-User-Role", role);
                 }
 
                 @Override
                 public String getHeader(String name) {
-                    String headerValue = customHeaders.get(name.toLowerCase());
+                    String headerValue = customHeaders.get(name);
 
                     if (headerValue != null) {
                         return headerValue;
@@ -70,7 +70,7 @@ public class UserInfoForwardingFilter extends OncePerRequestFilter {
 
                 @Override
                 public Enumeration<String> getHeaders(String name) {
-                    String headerValue = customHeaders.get(name.toLowerCase());
+                    String headerValue = customHeaders.get(name);
 
                     if (headerValue != null) {
                         return Collections.enumeration(Collections.singletonList(headerValue));
