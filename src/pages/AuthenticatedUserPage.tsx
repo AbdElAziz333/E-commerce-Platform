@@ -1,11 +1,23 @@
-import {useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {logout} from "../services/authService.ts";
-import {loginPageUrl} from "../routes/routes.tsx";
+import {
+    authenticatedUserProductsPageUrl,
+    loginPageUrl,
+    productCreationPageUrl,
+    productsPageUrl, productsSearchPageUrl
+} from "../routes/routes.tsx";
 import {useAuth} from "../hooks/useAuth.ts";
+import {useEffect} from "react";
 
 export default function AuthenticatedUserPage() {
     const navigate = useNavigate();
     const { user: userData, loading } = useAuth();
+
+    useEffect(() => {
+        if (!loading && !userData) {
+            navigate(loginPageUrl);
+        }
+    }, [loading, userData]);
 
     async function logoutUser() {
         try {
@@ -19,7 +31,6 @@ export default function AuthenticatedUserPage() {
     if (loading) return <div>Loading...</div>;
 
     if (!userData) {
-        navigate(loginPageUrl);
         return null;
     }
 
@@ -27,7 +38,7 @@ export default function AuthenticatedUserPage() {
         <>
             <div>
                 <h1>My Profile</h1>
-                <p>Id: {userData?.id}</p>
+                <p>Id: {userData?.userId}</p>
                 <p>Firstname: {userData?.firstName}</p>
                 <p>Lastname: {userData?.lastName}</p>
                 <p>Email: {userData?.email}</p>
@@ -46,6 +57,18 @@ export default function AuthenticatedUserPage() {
                         </ul>
                     </div>
                 )}
+
+                <p>===========================================</p>
+                <Link to={productsPageUrl}>All Products</Link>
+                <br />
+                <br />
+                <Link to={authenticatedUserProductsPageUrl}>My Products</Link>
+                <br />
+                <br />
+                <Link to={productCreationPageUrl}>Add Product</Link>
+                <br />
+                <br />
+                <Link to={productsSearchPageUrl}>Search Products</Link>
 
                 <button onClick={logoutUser}>Logout</button>
             </div>
