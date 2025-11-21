@@ -3,7 +3,7 @@ import {getCurrentUser} from "../services/userService.ts";
 import type {CurrentUserDto} from "../types/userTypes.ts";
 
 export function useAuth() {
-    const [user, setUser] = useState<CurrentUserDto | null>();
+    const [user, setUser] = useState<CurrentUserDto | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
