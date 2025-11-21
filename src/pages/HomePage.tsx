@@ -1,5 +1,5 @@
 import {Link} from "react-router-dom";
-import {loginPageUrl, signupPageUrl} from "../routes/routes.tsx";
+import {loginPageUrl, productsPageUrl, signupPageUrl} from "../routes/routes.tsx";
 
 export default function HomePage() {
     return (
@@ -8,6 +8,8 @@ export default function HomePage() {
             <Link to={signupPageUrl}>Signup</Link>
             <br />
             <Link to={loginPageUrl}>Login</Link>
+            <br />
+            <Link to={productsPageUrl}>All Products</Link>
         </div>
     )
 }
