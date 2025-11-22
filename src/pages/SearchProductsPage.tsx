@@ -10,7 +10,9 @@ export default function SearchProductsPage() {
 
     async function handleSearch() {
         if (!query.trim()) return;
+
         setLoading(true);
+
         try {
             const data = await searchProducts(query);
             setResults(data);
@@ -38,7 +40,7 @@ export default function SearchProductsPage() {
             <ul>
                 {results.map(product => (
                     <li key={product.productId}>
-                        <Link to={`/product/${product.productId}`}>
+                        <Link to={`/product/${product.slug}`}>
                             {product.name} - {product.shortDescription} - ${product.price}
                         </Link>
                     </li>
