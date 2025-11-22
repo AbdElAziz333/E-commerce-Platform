@@ -1,5 +1,6 @@
 package com.aziz.product_service.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.*;
@@ -10,6 +11,7 @@ import org.springframework.data.elasticsearch.annotations.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(indexName = "products")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ProductSearch {
     @Id
     private String productId;
