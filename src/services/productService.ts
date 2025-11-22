@@ -21,8 +21,8 @@ export async function deleteProductById(productId: string): Promise<void> {
     return (await productServiceApi.delete(`/${productId}`)).data.data
 }
 
-export async function searchProducts(q: string, page = 0, size = 10): Promise<ProductDto[]> {
-    return (await productServiceApi.get(`/search?q=${q}&page=${page}&size=${size}`)).data.data;
+export async function searchProducts(q: string, page = 0): Promise<ProductDto[]> {
+    return (await productServiceApi.get(`/search?q=${q}&page=${page}`)).data.data;
 }
 
 export async function getAuthenticatedUserProducts(): Promise<ProductDto[]> {
