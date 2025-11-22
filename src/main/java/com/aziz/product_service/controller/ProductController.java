@@ -56,9 +56,12 @@ public class ProductController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<ApiResponse<List<ProductSearch>>> search(@RequestParam("q") String q,
-                                    @RequestParam(defaultValue = "0") int page,
-                                    @RequestParam(defaultValue = "10") int size) throws IOException {
+    public ResponseEntity<ApiResponse<List<ProductSearch>>> search(
+            @RequestParam("q") String q,
+            @RequestParam(defaultValue = "0") int page
+    ) throws IOException {
+
+        int pageSize = 75;
 
         // Build a multi_match query on analyzed text fields
         Query query = MultiMatchQuery.of(m -> m
@@ -72,8 +75,8 @@ public class ProductController {
                 s -> s
                         .index("products")
                         .query(query)
-                        .from(page * size)
-                        .size(size),
+                        .from(page * pageSize)
+                        .size(pageSize),
                 ProductSearch.class
         );
 
