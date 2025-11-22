@@ -18,7 +18,7 @@ services:
 
   product-elastic-svc:
     container_name: product-elastic
-    image: elasticsearch:8.15.2
+    image: elasticsearch:9.1.5
     ports:
       - "${ELASTIC_HTTP_PORT}:9200"
       - "${ELASTIC_TRANSPORT_PORT}:9300"
@@ -30,12 +30,12 @@ services:
       discovery.type: single-node
       xpack.security.enabled: false
       action.auto_create_index: true
-      ES_JAVA_OPTS: -Xms512m -Xmx512m
+      ES_JAVA_OPTS: "-Xms1g -Xmx1g"
     restart: no
 
   product-kibana-svc:
     container_name: product-kibana
-    image: kibana:8.15.2
+    image: kibana:9.1.5
     ports:
       - "5601:5601"
     networks:
