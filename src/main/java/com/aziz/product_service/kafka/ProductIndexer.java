@@ -15,7 +15,7 @@ public class ProductIndexer {
     private final ProductSearchRepository searchRepository;
     private final ProductMapper mapper;
 
-    @KafkaListener(topics = "product-events", groupId = "product-indexer-group")
+    @KafkaListener(topics = "${kafka.topic}", groupId = "${spring.kafka.consumer.group-id}")
     public void handleProductEvent(ProductEvent event) {
         switch (event.getType()) {
             case CREATE, UPDATE -> {
