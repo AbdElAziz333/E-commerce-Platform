@@ -70,6 +70,8 @@ export default function AuthenticatedUserPage() {
                 <br />
                 <Link to={productsSearchPageUrl}>Search Products</Link>
 
+                <br />
+                <br />
                 <button onClick={logoutUser}>Logout</button>
             </div>
         </>

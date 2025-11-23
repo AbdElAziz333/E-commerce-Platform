@@ -2,6 +2,7 @@ import {useState} from "react";
 import type {ProductDto} from "../types/productTypes.ts";
 import {searchProducts} from "../services/productService.ts";
 import {Link} from "react-router-dom";
+import {authenticatedUserPageUrl, homePageUrl} from "../routes/routes.tsx";
 
 export default function SearchProductsPage() {
     const [query, setQuery] = useState("");
@@ -46,6 +47,11 @@ export default function SearchProductsPage() {
                     </li>
                 ))}
             </ul>
+
+            <br />
+            <Link to={authenticatedUserPageUrl}>My Page</Link>
+            <br />
+            <Link to={homePageUrl}>Home Page</Link>
         </div>
     );
 }

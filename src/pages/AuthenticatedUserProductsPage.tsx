@@ -2,6 +2,7 @@ import {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 import type {ProductDto} from "../types/productTypes.ts";
 import {getAuthenticatedUserProducts} from "../services/productService.ts";
+import {authenticatedUserPageUrl} from "../routes/routes.tsx";
 
 export default function AuthenticatedUserProductsPage() {
     const [products, setProducts] = useState<ProductDto[]>();
@@ -32,6 +33,8 @@ export default function AuthenticatedUserProductsPage() {
                     </li>
                 )))}
             </ul>
+            <br />
+            <Link to={authenticatedUserPageUrl}>My Page</Link>
         </div>
     )
 }

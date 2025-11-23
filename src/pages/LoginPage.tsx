@@ -1,7 +1,7 @@
 import type {LoginRequest} from "../types/loginTypes.ts";
 import {login} from "../services/authService.ts";
-import {useNavigate} from "react-router-dom";
-import {authenticatedUserPageUrl} from "../routes/routes.tsx";
+import {Link, useNavigate} from "react-router-dom";
+import {authenticatedUserPageUrl, homePageUrl, signupPageUrl} from "../routes/routes.tsx";
 import {type SubmitHandler, useForm} from "react-hook-form";
 
 export default function LoginPage() {
@@ -45,6 +45,10 @@ export default function LoginPage() {
 
                     <button type="submit">Login</button>
                 </form>
+                <br />
+                <Link to={signupPageUrl}>don't have an account yet? create one!</Link>
+                <br />
+                <Link to={homePageUrl}>Home page</Link>
             </div>
         </>
     )

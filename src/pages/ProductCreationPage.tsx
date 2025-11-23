@@ -2,6 +2,8 @@ import {type SubmitHandler, useForm} from "react-hook-form";
 import type {ProductCreationRequest} from "../types/productTypes.ts";
 import {createProduct} from "../services/productService.ts";
 import {useState} from "react";
+import {Link} from "react-router-dom";
+import {authenticatedUserPageUrl} from "../routes/routes.tsx";
 
 export default function ProductCreationPage() {
     const {register, handleSubmit, formState: {errors}, reset} = useForm<ProductCreationRequest>()
@@ -104,6 +106,8 @@ export default function ProductCreationPage() {
                     {isLoading ? "Creating..." : "Create Product"}
                 </button>
             </form>
+            <br />
+            <Link to={authenticatedUserPageUrl}>My Page</Link>
         </div>
     );
 }
