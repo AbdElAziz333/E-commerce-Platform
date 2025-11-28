@@ -10,7 +10,7 @@ spring:
       ddl-auto: none
   flyway:
     enabled: true
-    locations: classpath:db/migrations
+    locations: classpath:db/migration
     baseline-on-migrate: true
     clean-disabled: true
   data:
