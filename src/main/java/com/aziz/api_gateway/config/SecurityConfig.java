@@ -1,6 +1,8 @@
 package com.aziz.api_gateway.config;
 
 import com.aziz.api_gateway.jwt.JwtAuthenticationFilter;
+import com.aziz.api_gateway.jwt.SessionManagementFilter;
+import com.aziz.api_gateway.jwt.UserInfoForwardingFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +21,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final SessionManagementFilter sessionManagementFilter;
+    private final UserInfoForwardingFilter userInfoForwardingFilter;
     private final WebConfig webConfig;
 
     @Bean
@@ -40,6 +44,7 @@ public class SecurityConfig {
                         ).authenticated()
                         .anyRequest().permitAll()
                 )
+                .addFilterBefore(sessionManagementFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

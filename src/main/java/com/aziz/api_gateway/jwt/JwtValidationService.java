@@ -47,9 +47,11 @@ public class JwtValidationService {
 
     public String parseAccessToken(HttpServletRequest request) {
         if (request.getCookies() == null) return null;
+
         for (Cookie cookie : request.getCookies()) {
             if (cookie.getName().equals(config.getCookieName())) return cookie.getValue();
         }
+
         return null;
     }
 }

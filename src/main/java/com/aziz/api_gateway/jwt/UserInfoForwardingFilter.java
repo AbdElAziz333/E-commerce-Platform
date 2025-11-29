@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,7 +18,7 @@ import java.io.IOException;
 import java.util.*;
 
 @Component
-@Order(Ordered.LOWEST_PRECEDENCE)
+@Order
 @RequiredArgsConstructor
 public class UserInfoForwardingFilter extends OncePerRequestFilter {
 
@@ -41,19 +40,15 @@ public class UserInfoForwardingFilter extends OncePerRequestFilter {
                 private final Map<String, String> customHeaders = new HashMap<>();
 
                 {
-                    customHeaders.put("X-User-Id", userId.toString());
-                    customHeaders.put("X-User-Role", role);
+                    customHeaders.put("User-Id", userId.toString());
+                    customHeaders.put("User-Role", role);
                 }
 
                 @Override
                 public String getHeader(String name) {
                     String headerValue = customHeaders.get(name);
 
-                    if (headerValue != null) {
-                        return headerValue;
-                    }
-
-                    return super.getHeader(name);
+                    return headerValue != null ? headerValue : super.getHeader(name);
                 }
 
                 @Override
@@ -72,11 +67,7 @@ public class UserInfoForwardingFilter extends OncePerRequestFilter {
                 public Enumeration<String> getHeaders(String name) {
                     String headerValue = customHeaders.get(name);
 
-                    if (headerValue != null) {
-                        return Collections.enumeration(Collections.singletonList(headerValue));
-                    }
-
-                    return super.getHeaders(name);
+                    return headerValue != null ? Collections.enumeration(Collections.singleton(headerValue)) : super.getHeaders(name);
                 }
             };
 
