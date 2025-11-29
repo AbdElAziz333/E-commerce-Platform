@@ -1,10 +1,14 @@
-import {useParams} from "react-router-dom";
+import {Link, useNavigate, useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import type {ProductDto} from "../types/productTypes.ts";
 import {getProductBySlug} from "../services/productService.ts";
+import {addItemToCart} from "../services/cartService.ts";
+import type {AddItemRequest} from "../types/cartTypes.ts";
+import {authenticatedUserPageUrl, cartPageUrl} from "../routes/routes.tsx";
 
 export default function ProductPage() {
     const {slug} = useParams();
+    const navigate = useNavigate();
 
     const [productData, setProductData] = useState<ProductDto>({
         userId: 0,
@@ -19,6 +23,8 @@ export default function ProductPage() {
         variantAttributes: []
     })
 
+    const [quantity, setQuantity] = useState<number>(1);
+
     useEffect(() => {
         async function fetchProductData() {
             try {
@@ -30,6 +36,30 @@ export default function ProductPage() {
 
         fetchProductData()
     }, [slug]);
+
+    async function handleAddToCart(e: React.FormEvent) {
+        e.preventDefault();
+
+        if (!productData) {
+            return;
+        }
+
+        const addItemRequest: AddItemRequest = {
+            productId: productData.productId,
+            productSlug: productData.slug,
+            quantity: quantity,
+            unitPrice: productData.price,
+            productNameSnapshot: productData.name
+        };
+
+        try {
+            await addItemToCart(addItemRequest);
+            navigate(cartPageUrl);
+            console.log(`${productData.name} add successfully to cart!`)
+        } catch (err) {
+            console.error(`Error adding item to cart: ${err}`);
+        }
+    }
 
     return (
         <div>
@@ -43,6 +73,15 @@ export default function ProductPage() {
             <h3>Product Price: {productData.price}</h3>
             <h3>Product Stock: {productData.stockQuantity}</h3>
             <h3>Product Variants: {productData.variantAttributes}</h3>
+
+            <form onSubmit={handleAddToCart}>
+                <p>Quantity</p>
+                <input type="number" value={quantity} onChange={e => setQuantity(Number(e.target.value))} min="1" required />
+
+                <button type="submit">Add item to cart</button>
+            </form>
+
+            <Link to={authenticatedUserPageUrl}>My Page</Link>
         </div>
     )
 }

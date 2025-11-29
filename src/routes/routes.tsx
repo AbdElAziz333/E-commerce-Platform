@@ -14,6 +14,7 @@ import ProductPage from "../pages/ProductPage.tsx";
 import ProductCreationPage from "../pages/ProductCreationPage.tsx";
 import SearchProductsPage from "../pages/SearchProductsPage.tsx";
 import AuthenticatedUserProductsPage from "../pages/AuthenticatedUserProductsPage.tsx";
+import CartPage from "../pages/CartPage.tsx";
 
 export const homePageUrl = "/"
 export const usersPageUrl = "/users"
@@ -25,6 +26,7 @@ export const productsPageUrl = "/products";
 export const productCreationPageUrl = "/products/create"
 export const authenticatedUserProductsPageUrl = "/products/my-products"
 export const productsSearchPageUrl = "/products/search"
+export const cartPageUrl = "/cart"
 
 export const router = createBrowserRouter([
     {
@@ -107,5 +109,10 @@ export const router = createBrowserRouter([
         path: authenticatedUserProductsPageUrl,
         element: <AuthenticatedUserProductsPage />,
         errorElement: <NotFoundPage />
+    },
+    {
+        path: cartPageUrl,
+        element: <CartPage />,
+        errorElement: <NotFoundPage />
     }
-])
+]);

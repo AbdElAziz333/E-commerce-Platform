@@ -1,7 +1,7 @@
 import {Link, useNavigate} from "react-router-dom";
 import {logout} from "../services/authService.ts";
 import {
-    authenticatedUserProductsPageUrl,
+    authenticatedUserProductsPageUrl, cartPageUrl,
     loginPageUrl,
     productCreationPageUrl,
     productsPageUrl, productsSearchPageUrl
@@ -69,6 +69,9 @@ export default function AuthenticatedUserPage() {
                 <br />
                 <br />
                 <Link to={productsSearchPageUrl}>Search Products</Link>
+                <br />
+                <br />
+                <Link to={cartPageUrl}>My Cart</Link>
 
                 <br />
                 <br />
