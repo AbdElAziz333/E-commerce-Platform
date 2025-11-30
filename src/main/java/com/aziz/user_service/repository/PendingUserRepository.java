@@ -13,7 +13,6 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 public class PendingUserRepository {
-
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
 

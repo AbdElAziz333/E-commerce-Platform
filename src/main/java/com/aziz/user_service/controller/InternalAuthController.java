@@ -21,7 +21,7 @@ public class InternalAuthController {
     }
 
     @GetMapping("/current")
-    public ResponseEntity<ApiResponse<CurrentUserDto>> getCurrentUser(@RequestHeader("X-User-Id") Long userId) {
+    public ResponseEntity<ApiResponse<CurrentUserDto>> getCurrentUser(@RequestHeader("User-Id") Long userId) {
         return ResponseEntity.ok(ApiResponse.success("Successfully fetched user", service.getCurrentUser(userId)));
     }
 }
