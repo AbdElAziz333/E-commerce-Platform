@@ -1,0 +1,28 @@
+services:
+  order-postgres-svc:
+    container_name: order-pg
+    image: postgres:alpine
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    networks:
+      - ecommerce-net
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    secrets:
+      - postgres_password
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    restart: no
+
+volumes:
+  pgdata:
+
+secrets:
+  postgres_password:
+    file: secrets/postgres_password.txt
+
+networks:
+  ecommerce-net:
+    external: true
