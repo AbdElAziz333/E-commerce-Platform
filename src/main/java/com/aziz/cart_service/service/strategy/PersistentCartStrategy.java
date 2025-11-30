@@ -49,7 +49,8 @@ public class PersistentCartStrategy implements CartStorageStrategy {
     @Override
     @Transactional
     public int getItemCount(Long userId, String sessionId) {
-        return cartRepository.findByUserId(userId).map(cart -> cart.getItems().stream().mapToInt(CartItem::getQuantity).sum()).orElse(0);
+        return cartRepository.findByUserId(userId).map(cart -> cart.getItems().stream()
+                .mapToInt(CartItem::getQuantity).sum()).orElse(0);
     }
 
     @Override
@@ -65,15 +66,8 @@ public class PersistentCartStrategy implements CartStorageStrategy {
             it.setQuantity(request.getQuantity());
             it.setTotalPrice(request.getUnitPrice().multiply(BigDecimal.valueOf(it.getQuantity())));
         } else {
-            CartItem cartItem = CartItem.builder()
-                    .productId(request.getProductId())
-                    .productNameSnapshot(request.getProductNameSnapshot())
-                    .productSlug(request.getProductSlug())
-                    .quantity(request.getQuantity())
-                    .unitPriceSnapshot(request.getUnitPrice())
-                    .totalPrice(request.getUnitPrice().multiply(BigDecimal.valueOf(request.getQuantity())))
-                    .cart(cart)
-                    .build();
+            CartItem cartItem = mapper.addItemRequestToCartItem(request);
+            cartItem.setCart(cart);
 
             cart.getItems().add(cartItem);
         }
@@ -116,15 +110,8 @@ public class PersistentCartStrategy implements CartStorageStrategy {
         cart.getItems().clear();
 
         for (CartItemDto itemDto : newCart.getItems()) {
-            CartItem ci = CartItem.builder()
-                    .productId(itemDto.getProductId())
-                    .productNameSnapshot(itemDto.getProductNameSnapshot())
-                    .productSlug(itemDto.getProductSlug())
-                    .quantity(itemDto.getQuantity())
-                    .unitPriceSnapshot(itemDto.getUnitPrice())
-                    .totalPrice(itemDto.getTotalPrice())
-                    .cart(cart)
-                    .build();
+            CartItem ci = mapper.cartItemDtoToCartItem(itemDto);
+            ci.setCart(cart);
 
             cart.getItems().add(ci);
         }

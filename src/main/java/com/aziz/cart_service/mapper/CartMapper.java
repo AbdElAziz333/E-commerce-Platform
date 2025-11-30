@@ -31,7 +31,7 @@ public class CartMapper {
                 .build();
     }
 
-    public CartItem addRequestToCartItem(AddItemRequest request, Cart cart) {
+    public CartItem addItemRequestToCartItem(AddItemRequest request) {
         return CartItem.builder()
                 .productId(request.getProductId())
                 .productNameSnapshot(request.getProductNameSnapshot())
@@ -39,7 +39,28 @@ public class CartMapper {
                 .quantity(request.getQuantity())
                 .unitPriceSnapshot(request.getUnitPrice())
                 .totalPrice(request.getUnitPrice().multiply(BigDecimal.valueOf(request.getQuantity())))
-                .cart(cart)
+                .build();
+    }
+
+    public CartItemDto addItemRequestToCartItemDto(AddItemRequest request) {
+        return CartItemDto.builder()
+                .productId(request.getProductId())
+                .productNameSnapshot(request.getProductNameSnapshot())
+                .productSlug(request.getProductSlug())
+                .quantity(request.getQuantity())
+                .unitPrice(request.getUnitPrice())
+                .totalPrice(request.getUnitPrice().multiply(BigDecimal.valueOf(request.getQuantity())))
+                .build();
+    }
+
+    public CartItem cartItemDtoToCartItem(CartItemDto dto) {
+        return CartItem.builder()
+                .productId(dto.getProductId())
+                .productNameSnapshot(dto.getProductNameSnapshot())
+                .productSlug(dto.getProductSlug())
+                .quantity(dto.getQuantity())
+                .unitPriceSnapshot(dto.getUnitPrice())
+                .totalPrice(dto.getTotalPrice())
                 .build();
     }
 }

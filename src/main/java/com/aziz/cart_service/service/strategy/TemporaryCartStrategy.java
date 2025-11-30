@@ -71,14 +71,7 @@ public class TemporaryCartStrategy implements CartStorageStrategy {
             itemDto.setQuantity(itemDto.getQuantity() + request.getQuantity());
             itemDto.setTotalPrice(itemDto.getUnitPrice().multiply(BigDecimal.valueOf(itemDto.getQuantity())));
         } else {
-            CartItemDto newItem = CartItemDto.builder()
-                    .productId(request.getProductId())
-                    .productNameSnapshot(request.getProductNameSnapshot())
-                    .quantity(request.getQuantity())
-                    .unitPrice(request.getUnitPrice())
-                    .totalPrice(request.getUnitPrice().multiply(BigDecimal.valueOf(request.getQuantity())))
-                    .build();
-
+            CartItemDto newItem = mapper.addItemRequestToCartItemDto(request);
             cart.getItems().add(newItem);
         }
 

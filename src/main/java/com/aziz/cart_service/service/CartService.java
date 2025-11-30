@@ -3,8 +3,6 @@ package com.aziz.cart_service.service;
 import com.aziz.cart_service.dto.AddItemRequest;
 import com.aziz.cart_service.dto.CartDto;
 import com.aziz.cart_service.dto.CartItemDto;
-import com.aziz.cart_service.mapper.CartMapper;
-import com.aziz.cart_service.repository.TemporaryCartRepository;
 import com.aziz.cart_service.service.strategy.PersistentCartStrategy;
 import com.aziz.cart_service.service.strategy.TemporaryCartStrategy;
 import jakarta.ws.rs.BadRequestException;
@@ -21,7 +19,6 @@ import java.util.stream.Collectors;
 public class CartService {
     private final PersistentCartStrategy persistentStrategy;
     private final TemporaryCartStrategy temporaryStrategy;
-    private final CartMapper mapper;
 
     private CartStorageStrategy pickStrategy(Long userId) {
         return userId != null ? persistentStrategy : temporaryStrategy;
@@ -64,6 +61,7 @@ public class CartService {
 
         for (CartItemDto gi : guest.getItems()) {
             CartItemDto existing = map.get(gi.getProductId());
+
             if (existing != null) {
                 existing.setQuantity(existing.getQuantity() + gi.getQuantity());
                 existing.setTotalPrice(existing.getUnitPrice().multiply(BigDecimal.valueOf(existing.getQuantity())));
