@@ -40,7 +40,7 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<ProductDto>> createProduct(@RequestHeader("X-User-Id") Long userId, @RequestBody ProductCreationRequest registerRequest) {
+    public ResponseEntity<ApiResponse<ProductDto>> createProduct(@RequestHeader("User-Id") Long userId, @RequestBody ProductCreationRequest registerRequest) {
         return ResponseEntity.ok(ApiResponse.success("Successfully registered product", service.createProduct(userId, registerRequest)));
     }
 
@@ -93,7 +93,7 @@ public class ProductController {
     }
 
     @GetMapping("/u")
-    public ResponseEntity<ApiResponse<List<ProductDto>>> getProductsByUserId(@RequestHeader("X-User-Id") Long userId) {
+    public ResponseEntity<ApiResponse<List<ProductDto>>> getProductsByUserId(@RequestHeader("User-Id") Long userId) {
         return ResponseEntity.ok(ApiResponse.success("Successfully fetched all products for user with id: " + userId, service.getProductsByUserId(userId)));
     }
 }
