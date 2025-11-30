@@ -16,10 +16,10 @@ public class UserController {
     private final UserFeignClient userFeignClient;
 
     @GetMapping("/current")
-    public ResponseEntity<?> getCurrentUser(@RequestHeader(value = "X-User-Id", required = false) Long userId) {
+    public ResponseEntity<?> getCurrentUser(@RequestHeader("User-Id") Long userId) {
         if (userId == null) {
             return ResponseEntity.badRequest()
-                    .body(ApiResponse.error("X-User-Id header is missing"));
+                    .body(ApiResponse.error("User-Id header is missing"));
         }
 
         return ResponseEntity.ok(userFeignClient.getCurrentUser(userId));

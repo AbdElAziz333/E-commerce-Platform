@@ -18,5 +18,5 @@ public interface UserFeignClient {
     ApiResponse<AuthUserDto> verifyCredentials(@RequestBody LoginRequest request);
 
     @GetMapping("/api/v1/internal/auth/current")
-    ApiResponse<CurrentUserDto> getCurrentUser(@RequestHeader("X-User-Id") Long userId);
+    ApiResponse<CurrentUserDto> getCurrentUser(@RequestHeader("User-Id") Long userId);
 }
