@@ -32,14 +32,14 @@ spring:
               uri: lb://product-service
               predicates:
                 - Path=/api/v1/products/**
-            - id: order-service
-              uri: lb://order-service
-              predicates:
-                - Path=/api/v1/orders/**
             - id: cart-service
               uri: lb://cart-service
               predicates:
                 - Path=/api/v1/carts/**
+            - id: order-service
+              uri: lb://order-service
+              predicates:
+                - Path=/api/v1/orders/**
             - id: order-items-service
               uri: lb://order-service
               predicates:
@@ -58,6 +58,16 @@ server:
 jwt:
   accessTokenSecret: ${ACCESS_TOKEN_SECRET}
   cookieName: access_token
+
+session:
+  cookie: sessionId
+  maxAge: 7776000000 # 90 days
+  secure: false
+  headerName: Session-Id
+
+user:
+  idHeader: User-Id
+  roleHeader: User-Role
 
 web:
   frontendUrl: http://${LHOST}:5173

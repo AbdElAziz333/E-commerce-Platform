@@ -3,7 +3,6 @@ spring:
     url: jdbc:postgresql://${LHOST}:${POSTGRES_PORT}/${POSTGRES_DB}
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
-    port: ${POSTGRES_PORT}
   jpa:
     open-in-view: false
     hibernate:
