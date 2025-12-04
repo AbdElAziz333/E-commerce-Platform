@@ -23,5 +23,12 @@ spring:
           default-label: main
           clone-on-start: true
 
+logging:
+  level:
+    root: INFO
+    com.aziz.config_server: DEBUG
+    pattern:
+      console: "%d{HH:mm:ss} %-5level [%thread] %logger{36} - %msg%n"
+
 server:
   port: 8203
