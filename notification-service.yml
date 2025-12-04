@@ -1,0 +1,32 @@
+spring:
+  data:
+    cassandra:
+      keyspace-name: notification-db
+      contact-points: localhost
+      port: 9042
+
+  kafka:
+    bootstrap-servers: ${LHOST}:${KAFKA_BROKER_PORT}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.JsonSerializer
+    consumer:
+      group-id: notification-indexer-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      default-zone: http://${LHOST}:8761/eureka/
+
+kafka:
+  topic: notification-topic
+
+server:
+  port: 8085
