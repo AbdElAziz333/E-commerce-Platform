@@ -45,7 +45,7 @@ logging:
     console: "%d{HH:mm:ss} %-5level [%thread] %logger{36} - %msg%n"
 
 kafka:
-  topic: notification-topic
+  notification-topic: notification-topic
 
 server:
   port: 8085

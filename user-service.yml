@@ -17,19 +17,18 @@ spring:
       host: ${LHOST}
       port: ${REDIS_PORT}
       timeout: 2000ms
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ${MAIL_USER}
-    password: ${MAIL_PASSWORD}
-    protocol: smtp
-    properties:
-      mail:
-        debug: false
-        smtp:
-          auth: true
-          starttls:
-            enable: true
+  kafka:
+    bootstrap-servers: ${LHOST}:${KAFKA_BROKER_PORT}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: notification-indexer-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
 
 eureka:
   client:
@@ -47,3 +46,6 @@ logging:
 
 server:
   port: 8080
+
+kafka:
+  notification-topic: notification-topic
