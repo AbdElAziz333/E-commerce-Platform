@@ -12,10 +12,14 @@ spring:
     consumer:
       group-id: notification-indexer-group
       auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       properties:
         spring.json.trusted.packages: "*"
+        spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.type.mapping: "com.aziz.user_service.events.UserEvent:com.aziz.notification_service.events.UserEvent,com.aziz.order_service.events.OrderEvent:com.aziz.notification_service.events.OrderEvent"
+
   mail:
     host: smtp.gmail.com
     port: 587
@@ -50,3 +54,6 @@ server:
 kafka:
   user-events: user-events
   order-events: order-events
+#  types:
+#    user-service: com.aziz.user_service.kafka.UserEvent
+#    notification-service: com.aziz.notification_service.kafka.UserEvent
