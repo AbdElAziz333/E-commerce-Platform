@@ -48,6 +48,4 @@ server:
   port: 8080
 
 kafka:
-  topics:
-    user-otp: user-otp-topic
-    user-registered: user-registered-topic
+  user-events: user-events

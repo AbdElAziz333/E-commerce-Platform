@@ -48,7 +48,5 @@ server:
   port: 8085
 
 kafka:
-  topics:
-    user-otp: user-otp-topic
-    user-registered: user-registered-topic
-    order-created: order-created-topic
+  user-events: user-events
+  order-events: order-events
