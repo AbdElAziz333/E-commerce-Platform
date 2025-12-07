@@ -33,8 +33,8 @@ public class AddressController {
                 service.getAllAddressesByUserId(userId)));
     }
 
-    @PostMapping("/{id}")
-    public ResponseEntity<ApiResponse<AddressDto>> addAddress(@RequestBody AddressRegisterRequest request, @PathVariable Long userId) {
+    @PostMapping
+    public ResponseEntity<ApiResponse<AddressDto>> addAddress(@RequestBody AddressRegisterRequest request, @RequestHeader("User-Id") Long userId) {
         return ResponseEntity.ok(
                 ApiResponse.success("Address Registered Successfully", service.addAddress(request, userId))
         );

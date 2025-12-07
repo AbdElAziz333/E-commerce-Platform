@@ -10,11 +10,13 @@ import com.aziz.user_service.util.exceptions.BadCredentialsException;
 import com.aziz.user_service.util.exceptions.NotFoundException;
 import com.aziz.user_service.util.exceptions.UsernameNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class InternalAuthService {
@@ -22,14 +24,22 @@ public class InternalAuthService {
     private final PasswordEncoder encoder;
     private final AddressMapper addressMapper;
 
+    @Transactional
     public AuthUserDto verifyCredentials(LoginRequest request) {
+        log.debug("Attempting to verify credentials for a user with email: {}, so he can login", request.getEmail());
+
         User user = repository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> {
+                    log.error("Cannot verify credentials for user with email: {}, user not found", request.getEmail());
+                    return new UsernameNotFoundException("User not found");
+                });
 
         if (!encoder.matches(request.getPassword(), user.getPassword())) {
+            log.error("Password are wrong, please enter a valid one.");
             throw new BadCredentialsException("Invalid credentials");
         }
 
+        log.info("User with email: {}, successfully verified credentials and logged in", request.getEmail());
         return new AuthUserDto(user.getUserId(), user.getRole());
     }
 

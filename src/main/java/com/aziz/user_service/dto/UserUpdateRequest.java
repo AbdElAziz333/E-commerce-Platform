@@ -11,8 +11,6 @@ import org.hibernate.validator.constraints.Length;
 @Builder
 @AllArgsConstructor
 public class UserUpdateRequest {
-    private Long id;
-
     @NotEmpty
     @NotBlank
     @Size(max = 30, message = "Firstname length must be less than 30 characters.")

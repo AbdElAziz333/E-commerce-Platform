@@ -67,14 +67,16 @@ public class AddressService {
         return mapper.addressToDto(address);
     }
 
+    //TODO: needs rewriting
     @Transactional
     public AddressDto updateAddress(AddressDto dto) {
         log.debug("Attempting to update address with id: {}", dto.getAddressId());
 
-        if (!repository.existsById(dto.getAddressId())) {
-            log.error("Cannot update address with id: {}, address not found", dto.getAddressId());
-            throw new NotFoundException("Address not found with id: " + dto.getAddressId());
-        }
+        Address address = repository.findById(dto.getAddressId())
+                .orElseThrow(() -> {
+                    log.error("Cannot update address with id: {}, address not found", dto.getAddressId());
+                    return new NotFoundException("Address not found with id: " + dto.getAddressId());
+                });
 
         repository.save(mapper.dtoToAddress(dto));
         log.info("Address with id: {} successfully updated", dto.getAddressId());

@@ -9,6 +9,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
+/**
+ * A DTO that holds user registration data.
+ * */
 @Getter
 @Setter
 @AllArgsConstructor
@@ -33,6 +36,7 @@ public class RegistrationRequest {
     @Size(min = 8, message = "Password must be at least 8 characters.")
     private String password;
 
+    //TODO: needs validation
     @NotEmpty
     @NotBlank
     @Length(min = 11, max = 13, message = "Phone number must be between 11 and 13 digits.")

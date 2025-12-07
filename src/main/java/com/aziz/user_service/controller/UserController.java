@@ -27,8 +27,8 @@ public class UserController {
     }
 
     @PatchMapping
-    public ResponseEntity<ApiResponse<UserDto>> updateUser(@RequestBody UserUpdateRequest request) {
-        return ResponseEntity.ok(ApiResponse.success("User updated successfully", userService.updateUser(request)));
+    public ResponseEntity<ApiResponse<UserDto>> updateUser(@RequestHeader("User-Id") Long userId, @RequestBody UserUpdateRequest request) {
+        return ResponseEntity.ok(ApiResponse.success("User updated successfully", userService.updateUser(userId, request)));
     }
 
     @DeleteMapping("/{id}")
