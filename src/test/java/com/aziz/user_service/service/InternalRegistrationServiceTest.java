@@ -7,7 +7,6 @@ import com.aziz.user_service.dto.RegistrationRequest;
 import com.aziz.user_service.mapper.UserMapper;
 import com.aziz.user_service.repository.PendingUserRepository;
 import com.aziz.user_service.repository.UserRepository;
-import com.aziz.user_service.util.MailMessageSender;
 import com.aziz.user_service.util.exceptions.AlreadyExistsException;
 import com.aziz.user_service.util.exceptions.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,9 +27,6 @@ import static org.mockito.Mockito.*;
 class InternalRegistrationServiceTest {
     @Mock
     private OtpService otpService;
-
-    @Mock
-    private MailMessageSender mailMessageSender;
 
     @Mock
     private UserService userService;
@@ -77,7 +73,8 @@ class InternalRegistrationServiceTest {
         assertEquals(otpVerificationRequest.getVerificationId(), result);
 
         verify(pendingUserRepository, times(1)).save(pendingUserData);
-        verify(mailMessageSender, times(1)).sendEmailVerification(registrationRequest.getEmail(), otpVerificationRequest.getOtp());
+        // TODO: needs to be migrated to kafka publishers
+//        verify(mailMessageSender, times(1)).sendEmailVerification(registrationRequest.getEmail(), otpVerificationRequest.getOtp());
     }
 
     @Test
@@ -98,7 +95,8 @@ class InternalRegistrationServiceTest {
 
         assertEquals(authUserDto.getUserId(), result.getUserId());
         verify(pendingUserRepository, times(1)).delete(otpVerificationRequest.getVerificationId());
-        verify(mailMessageSender, times(1)).sendWelcomeEmail(otpVerificationRequest.getEmail(), pendingUserData.getFirstName());
+        // TODO: needs to be migrated to kafka publishers
+//        verify(mailMessageSender, times(1)).sendWelcomeEmail(otpVerificationRequest.getEmail(), pendingUserData.getFirstName());
     }
 
     @Test
