@@ -11,12 +11,14 @@ import com.aziz.auth_service.util.TokenEncryptor;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -27,6 +29,7 @@ public class AuthService {
     private final TokenEncryptor encryptor;
 
     public Map<String, String> login(LoginRequest loginRequest, HttpServletResponse httpResponse) {
+        log.debug("Attempting to login user with email: {}", loginRequest.getEmail());
         ApiResponse<AuthUserDto> response = userFeignClient.verifyCredentials(loginRequest);
         AuthUserDto user = response.getData();
 
@@ -39,6 +42,8 @@ public class AuthService {
         jwtService.addRefreshTokenToCookie(refreshToken, httpResponse);
 
         refreshTokenRepository.saveToken(user.getUserId(), tokenId, refreshToken, Instant.now().plusMillis(jwtConfig.getRefreshToken().getMaxAge()));
+
+        log.info("User successfully logged in with email: {}", loginRequest.getEmail());
 
         return Map.of(
                 "userId", user.getUserId().toString(),

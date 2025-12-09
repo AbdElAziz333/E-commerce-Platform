@@ -3,7 +3,6 @@ package com.aziz.auth_service.client;
 import com.aziz.auth_service.dto.*;
 import com.aziz.auth_service.util.ApiResponse;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @FeignClient(name = "user-service")

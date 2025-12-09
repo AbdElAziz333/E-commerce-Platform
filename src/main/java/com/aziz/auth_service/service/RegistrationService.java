@@ -8,10 +8,12 @@ import com.aziz.auth_service.dto.RegistrationRequest;
 import com.aziz.auth_service.repository.RefreshTokenRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RegistrationService {
@@ -21,7 +23,10 @@ public class RegistrationService {
     private final JwtConfig jwtConfig;
 
     public String signup(RegistrationRequest request) {
-        return feignClient.createUser(request).getData();
+        log.debug("Attempting to register new user with email: {}", request.getEmail());
+        String verificationId = feignClient.createUser(request).getData();
+        log.info("user registered successfully with email: {}", request.getEmail());
+        return verificationId;
     }
 
     public void verifyOtp(OtpVerificationRequest request, HttpServletResponse httpResponse) {
