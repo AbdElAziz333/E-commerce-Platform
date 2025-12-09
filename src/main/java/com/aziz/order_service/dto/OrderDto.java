@@ -7,11 +7,12 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
-@Builder
 @Getter
 @Setter
+@Builder
 public class OrderDto {
     private UUID orderId;
     private String orderNumber;
@@ -19,14 +20,11 @@ public class OrderDto {
     private BigDecimal shippingAmount;
     private BigDecimal totalAmount;
     private Long shippingAddressId;
-    private Carrier carrier;
-    private String trackingNumber;
     private LocalDate estimatedDeliveryDate;
     private LocalDate deliveredAt;
-
-    private Long transactionId;
     private PaymentStatus paymentStatus;
     private PaymentMethod paymentMethod;
 
     private String notes;
+    private List<OrderItemDto> orderItems;
 }

@@ -3,8 +3,3 @@ spring:
     name: order-service
   config:
     import: configserver:http://${LHOST}:8203
-  flyway:
-    enabled: true
-    locations: classpath:db/migration
-    baseline-on-migrate: true
-    clean-disabled: true

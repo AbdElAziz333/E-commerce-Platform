@@ -31,17 +31,17 @@ public class OrderItem {
     @Column(nullable = false, updatable = false)
     private BigDecimal unitPrice;
 
-    @Column(nullable = false, updatable = false)
-    private BigDecimal taxAmount;
+//    @Column(nullable = false, updatable = false)
+//    private BigDecimal taxAmount;
 
     @Column(nullable = false, updatable = false)
     private BigDecimal totalPrice;
 
-    @Column(nullable = false, updatable = false, columnDefinition = "JSONB")
-    private List<String> variantAttributes;
+//    @Column(nullable = false, updatable = false, columnDefinition = "JSONB")
+//    private List<String> variantAttributes;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
-    private String productId;
+//    private String productId;
 }

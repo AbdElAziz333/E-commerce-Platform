@@ -38,9 +38,9 @@ public class Order {
     @Column(nullable = false)
     private BigDecimal totalAmount;
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Carrier carrier;
+//    @Column(nullable = false)
+//    @Enumerated(EnumType.STRING)
+//    private Carrier carrier;
 
     private String trackingNumber;
 
@@ -62,8 +62,8 @@ public class Order {
     @Column(nullable = false)
     private Long shippingAddressId;
 
-    @Column(nullable = false)
-    private Long transactionId;
+//    @Column(nullable = false)
+//    private Long transactionId;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -73,11 +73,7 @@ public class Order {
     @Column(nullable = false)
     private PaymentMethod paymentMethod;
 
-    @OneToMany(
-            mappedBy = "order",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems;
 
     @PrePersist
