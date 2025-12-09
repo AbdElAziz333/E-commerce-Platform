@@ -60,4 +60,10 @@ public class InternalAuthService {
                 .addresses(addressMapper.addressesToDtos(user.getAddress()))
                 .build();
     }
+
+    @Transactional(readOnly = true)
+    public String getCurrentUserEmail(Long userId) {
+        return repository.findEmailById(userId).orElseThrow(() -> new NotFoundException("Current user's email not found!"));
+
+    }
 }
