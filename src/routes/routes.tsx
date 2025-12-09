@@ -15,18 +15,20 @@ import ProductCreationPage from "../pages/ProductCreationPage.tsx";
 import SearchProductsPage from "../pages/SearchProductsPage.tsx";
 import AuthenticatedUserProductsPage from "../pages/AuthenticatedUserProductsPage.tsx";
 import CartPage from "../pages/CartPage.tsx";
+import OrdersPage from "../pages/OrdersPage.tsx";
 
-export const homePageUrl = "/"
-export const usersPageUrl = "/users"
-export const signupPageUrl = "/signup"
-export const otpVerificationPageUrl = "/signup/verify-otp"
-export const loginPageUrl = "/login"
-export const authenticatedUserPageUrl = "/user/my-profile"
+export const homePageUrl = "/";
+export const usersPageUrl = "/users";
+export const signupPageUrl = "/signup";
+export const otpVerificationPageUrl = "/signup/verify-otp";
+export const loginPageUrl = "/login";
+export const authenticatedUserPageUrl = "/user/my-profile";
 export const productsPageUrl = "/products";
-export const productCreationPageUrl = "/products/create"
-export const authenticatedUserProductsPageUrl = "/products/my-products"
-export const productsSearchPageUrl = "/products/search"
-export const cartPageUrl = "/cart"
+export const productCreationPageUrl = "/products/create";
+export const authenticatedUserProductsPageUrl = "/products/my-products";
+export const productsSearchPageUrl = "/products/search";
+export const cartPageUrl = "/cart";
+export const ordersPageUrl = "/orders";
 
 export const router = createBrowserRouter([
     {
@@ -113,6 +115,11 @@ export const router = createBrowserRouter([
     {
         path: cartPageUrl,
         element: <CartPage />,
+        errorElement: <NotFoundPage />
+    },
+    {
+        path: ordersPageUrl,
+        element: <OrdersPage />,
         errorElement: <NotFoundPage />
     }
 ]);

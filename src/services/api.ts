@@ -26,3 +26,8 @@ export const cartServiceApi = axios.create({
     baseURL: `${API_GATEWAY_URL}/api/v1/carts`,
     withCredentials: true
 });
+
+export const orderServiceApi = axios.create({
+    baseURL: `${API_GATEWAY_URL}/api/v1/orders`,
+    withCredentials: true
+});
