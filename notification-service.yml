@@ -55,6 +55,4 @@ server:
 kafka:
   user-events: user-events
   order-events: order-events
-#  types:
-#    user-service: com.aziz.user_service.kafka.UserEvent
-#    notification-service: com.aziz.notification_service.kafka.UserEvent
+  payment-events: payment-events
