@@ -17,8 +17,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.*;
 
-@Component
 @Order
+@Component
 @RequiredArgsConstructor
 public class UserInfoForwardingFilter extends OncePerRequestFilter {
 

@@ -27,7 +27,6 @@ public class SessionManagementFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         boolean authenticated = auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken);
 

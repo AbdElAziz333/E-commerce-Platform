@@ -3,13 +3,3 @@ spring:
     name: api-gateway
   config:
     import: configserver:http://${LHOST}:8203
-
-session:
-  cookie: sessionId
-  maxAge: 7776000000 # 90 days
-  secure: false
-  headerName: Session-Id
-
-user:
-  idHeader: User-Id
-  roleHeader: User-Role
