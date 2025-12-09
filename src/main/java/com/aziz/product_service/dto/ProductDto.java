@@ -28,5 +28,5 @@ public class ProductDto {
     private Double price;
 
     private Integer stockQuantity;
-    private List<String> variantAttributes;
+//    private List<String> variantAttributes;
 }

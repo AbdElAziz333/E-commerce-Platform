@@ -8,11 +8,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
 
-@Configuration
-@ConfigurationProperties(prefix = "kafka")
 @Getter
 @Setter
 @EnableKafka
+@Configuration
+@ConfigurationProperties(prefix = "kafka")
 public class KafkaConfig {
     private String topic;
 

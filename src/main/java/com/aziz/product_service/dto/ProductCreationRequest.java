@@ -3,6 +3,7 @@ package com.aziz.product_service.dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -16,5 +17,5 @@ public class ProductCreationRequest {
     private String sku;
     private Double price;
     private Integer stockQuantity;
-    private List<String> variantAttributes;
+//    private List<String> variantAttributes;
 }

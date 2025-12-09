@@ -1,23 +1,22 @@
 package com.aziz.product_service.model;
 
 import lombok.*;
-import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.List;
 
-@Document(collection = "products")
+
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Document(collection = "products")
 public class Product {
     @Id
     private String productId;
@@ -32,7 +31,7 @@ public class Product {
     private String slug;
     private Double price;
     private Integer stockQuantity;
-    private List<String> variantAttributes;
+//    private List<String> variantAttributes;
 
     @CreatedDate
     private LocalDate createdAt;

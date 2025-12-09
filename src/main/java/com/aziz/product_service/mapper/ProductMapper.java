@@ -19,7 +19,7 @@ public class ProductMapper {
                 .sku(request.getSku())
                 .price(request.getPrice())
                 .stockQuantity(request.getStockQuantity())
-                .variantAttributes(request.getVariantAttributes())
+//                .variantAttributes(request.getVariantAttributes())
                 .build();
     }
 
@@ -47,7 +47,7 @@ public class ProductMapper {
                 .slug(product.getSlug())
                 .price(product.getPrice())
                 .stockQuantity(product.getStockQuantity())
-                .variantAttributes(product.getVariantAttributes())
+//                .variantAttributes(product.getVariantAttributes())
                 .build();
     }
 

@@ -40,21 +40,33 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<ProductDto>> createProduct(@RequestHeader("User-Id") Long userId, @RequestBody ProductCreationRequest registerRequest) {
+    public ResponseEntity<ApiResponse<ProductDto>> createProduct(
+            @RequestHeader("User-Id") Long userId,
+            @RequestBody ProductCreationRequest registerRequest
+    ) {
         return ResponseEntity.ok(ApiResponse.success("Successfully registered product", service.createProduct(userId, registerRequest)));
     }
 
     @PatchMapping
-    public ResponseEntity<ApiResponse<ProductDto>> updateProduct(@RequestBody ProductUpdateRequest updateRequest) {
-        return ResponseEntity.ok(ApiResponse.success("Successfully updated product", service.updateProduct(updateRequest)));
+    public ResponseEntity<ApiResponse<ProductDto>> updateProduct(
+            @RequestHeader("User-Id") Long userId,
+            @RequestBody ProductUpdateRequest updateRequest
+    ) {
+        return ResponseEntity.ok(ApiResponse.success("Successfully updated product", service.updateProduct(userId, updateRequest)));
     }
 
     @DeleteMapping("/{productId}")
-    public ResponseEntity<ApiResponse<Void>> deleteProductById(@PathVariable String productId) {
-        service.deleteProductById(productId);
+    public ResponseEntity<ApiResponse<Void>> deleteProductById(
+            @RequestHeader("User-Id") Long userId,
+            @PathVariable String productId
+    ) {
+        service.deleteProductById(userId, productId);
         return ResponseEntity.ok(ApiResponse.success("Successfully deleted product with id: " + productId, null));
     }
 
+    //TODO: fix  this error
+    //org.elasticsearch.client.ResponseException: method [POST], host [http://localhost:9200], URI [/products/_search?typed_keys=true], status line [HTTP/1.1 503 Service Unavailable]
+    //{"error":{"root_cause":[{"type":"no_shard_available_action_exception","reason":null}],"type":"search_phase_execution_exception","reason":"all shards failed","phase":"query","grouped":true,"failed_shards":[{"shard":0,"index":"products","node":null,"reason":{"type":"no_shard_available_action_exception","reason":null}}]},"status":503}
     @GetMapping("/search")
     public ResponseEntity<ApiResponse<List<ProductSearch>>> search(
             @RequestParam("q") String q,
