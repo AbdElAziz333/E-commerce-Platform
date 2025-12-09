@@ -1,0 +1,62 @@
+services:
+  product-mongo-svc:
+    container_name: product-mongo
+    image: mongo:latest
+    ports:
+      - "${MONGO_PORT}:27017"
+    networks:
+      - ecommerce-net
+    volumes:
+      - product_mongo_data:/data/db
+    secrets:
+      - mongo_password
+    environment:
+      MONGO_INITDB_DATABASE: ${MONGO_DB}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/mongo_password
+    restart: no
+
+  product-elastic-svc:
+    container_name: product-elastic
+    image: elasticsearch:9.1.5
+    ports:
+      - "${ELASTIC_HTTP_PORT}:9200"
+      - "${ELASTIC_TRANSPORT_PORT}:9300"
+    networks:
+      - ecommerce-net
+    volumes:
+      - product_elastic_data:/usr/share/elasticsearch/data
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: false
+      action.auto_create_index: true
+      ES_JAVA_OPTS: "-Xms1g -Xmx1g"
+    restart: no
+
+  product-kibana-svc:
+    container_name: product-kibana
+    image: kibana:9.1.5
+    ports:
+      - "5601:5601"
+    networks:
+      - ecommerce-net
+    environment:
+      ELASTICSEARCH_HOSTS: http://product-elastic-svc:9200
+      xpack.security.enabled: false
+    depends_on:
+      - product-elastic-svc
+    restart: no
+
+volumes:
+  product_mongo_data:
+  product_elastic_data:
+
+secrets:
+  elastic_password:
+    file: secrets/elastic_password.txt
+  mongo_password:
+    file: secrets/mongo_password.txt
+
+networks:
+  ecommerce-net:
+    external: true
