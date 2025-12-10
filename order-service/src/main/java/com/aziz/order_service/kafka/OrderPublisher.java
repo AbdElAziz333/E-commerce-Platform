@@ -2,8 +2,8 @@ package com.aziz.order_service.kafka;
 
 import com.aziz.order_service.config.KafkaConfig;
 import com.aziz.order_service.dto.OrderItemDto;
-import com.aziz.order_service.events.OrderEvent;
-import com.aziz.order_service.events.OrderEventType;
+import com.aziz.order_service.kafka.events.OrderEvent;
+import com.aziz.order_service.kafka.events.types.OrderEventType;
 import com.aziz.order_service.util.enums.OrderStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;

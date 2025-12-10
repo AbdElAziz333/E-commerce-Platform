@@ -1,7 +1,7 @@
-package com.aziz.notification_service.events;
+package com.aziz.notification_service.kafka.events;
 
 import com.aziz.notification_service.dto.OrderItemDto;
-import com.aziz.notification_service.events.types.OrderEventType;
+import com.aziz.notification_service.kafka.events.types.OrderEventType;
 import com.aziz.notification_service.util.OrderStatus;
 import lombok.*;
 

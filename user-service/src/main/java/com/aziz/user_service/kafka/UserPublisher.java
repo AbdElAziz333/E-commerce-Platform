@@ -1,7 +1,7 @@
 package com.aziz.user_service.kafka;
 
 import com.aziz.user_service.config.KafkaConfig;
-import com.aziz.user_service.events.UserEvent;
+import com.aziz.user_service.kafka.events.types.UserEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;

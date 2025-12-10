@@ -4,7 +4,7 @@ import com.aziz.order_service.dto.OrderCreationRequest;
 import com.aziz.order_service.dto.OrderDto;
 import com.aziz.order_service.dto.OrderItemCreationRequest;
 import com.aziz.order_service.dto.OrderItemDto;
-import com.aziz.order_service.events.OrderEvent;
+import com.aziz.order_service.kafka.events.OrderEvent;
 import com.aziz.order_service.model.Order;
 import com.aziz.order_service.model.OrderItem;
 import lombok.NoArgsConstructor;

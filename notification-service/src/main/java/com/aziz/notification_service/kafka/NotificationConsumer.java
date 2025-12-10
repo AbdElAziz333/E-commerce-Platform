@@ -1,8 +1,8 @@
 package com.aziz.notification_service.kafka;
 
 import com.aziz.notification_service.dto.OrderItemDto;
-import com.aziz.notification_service.events.OrderEvent;
-import com.aziz.notification_service.events.UserEvent;
+import com.aziz.notification_service.kafka.events.OrderEvent;
+import com.aziz.notification_service.kafka.events.UserEvent;
 import com.aziz.notification_service.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

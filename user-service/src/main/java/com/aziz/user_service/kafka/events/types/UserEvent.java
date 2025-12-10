@@ -1,6 +1,6 @@
-package com.aziz.notification_service.events;
+package com.aziz.user_service.kafka.events.types;
 
-import com.aziz.notification_service.events.types.UserEventType;
+import com.aziz.user_service.kafka.UserEventType;
 import lombok.*;
 
 @Getter

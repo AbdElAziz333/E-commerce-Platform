@@ -1,9 +1,8 @@
-package com.aziz.order_service.events;
+package com.aziz.order_service.kafka.events;
 
 import com.aziz.order_service.dto.OrderItemDto;
+import com.aziz.order_service.kafka.events.types.OrderEventType;
 import com.aziz.order_service.util.enums.OrderStatus;
-import com.aziz.order_service.util.enums.PaymentMethod;
-import com.aziz.order_service.util.enums.PaymentStatus;
 import lombok.*;
 
 import java.math.BigDecimal;
