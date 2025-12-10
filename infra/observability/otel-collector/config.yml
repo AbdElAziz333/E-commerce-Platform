@@ -1,0 +1,31 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+exporters:
+  prometheus:
+    endpoint: "0.0.0.0:8889"
+  loki:
+    endpoint: "http://infra-loki-svc:3100/loki/api/v1/push"
+  tempo:
+    endpoint: "http://infra-tempo-svc:3200"
+
+processors:
+  batch:
+
+service:
+  pipelines:
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [prometheus]
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [tempo]
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [loki]
