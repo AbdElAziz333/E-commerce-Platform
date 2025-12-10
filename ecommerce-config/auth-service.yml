@@ -1,0 +1,51 @@
+spring:
+  data:
+    redis:
+      host: ${LHOST}
+      port: ${REDIS_PORT}
+      timeout: 2000ms
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      default-zone: http://${LHOST}:8761/eureka/
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, prometheus
+  endpoint:
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+logging:
+  level:
+    root: INFO
+    com.aziz.auth_service: DEBUG
+  pattern:
+    console: "%d{HH:mm:ss} %-5level [%thread] %logger{36} - %msg%n"
+
+server:
+  port: 8083
+
+jwt:
+  accessToken:
+    secret: ${ACCESS_TOKEN_SECRET}
+    cookieName: access_token
+    maxAge: 900000 # 15 minutes
+    secured: false
+  refreshToken:
+    secret: ${REFRESH_TOKEN_SECRET}
+    cookieName: refresh_token
+    maxAge: 1209600000 # 15 days
+    secured: false

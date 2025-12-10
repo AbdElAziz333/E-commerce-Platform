@@ -1,0 +1,96 @@
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      server:
+        webmvc:
+          routes:
+            - id: auth-service
+              uri: lb://auth-service
+              predicates:
+                - Path=/api/v1/auth/**
+            - id: registration-service
+              uri: lb://auth-service
+              predicates:
+                - Path=/api/v1/registration/**
+            - id: user-current
+              uri: lb://auth-service
+              predicates:
+                - Path=/api/v1/user/current
+            - id: user-service
+              uri: lb://user-service
+              predicates:
+                - Path=/api/v1/users/**
+            - id: address-service
+              uri: lb://user-service
+              predicates:
+                - Path=/api/v1/addresses/**
+            - id: product-service
+              uri: lb://product-service
+              predicates:
+                - Path=/api/v1/products/**
+            - id: cart-service
+              uri: lb://cart-service
+              predicates:
+                - Path=/api/v1/carts/**
+            - id: order-service
+              uri: lb://order-service
+              predicates:
+                - Path=/api/v1/orders/**
+            - id: order-items-service
+              uri: lb://order-service
+              predicates:
+                - Path=/api/v1/order-items/**
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      default-zone: http://${LHOST}:8761/eureka/
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, prometheus
+  endpoint:
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+logging:
+  level:
+    root: INFO
+    com.aziz.api_gateway: DEBUG
+  pattern:
+    console: "%d{HH:mm:ss} %-5level [%thread] %logger{36} - %msg%n"
+
+server:
+  port: 8202
+
+jwt:
+  accessTokenSecret: ${ACCESS_TOKEN_SECRET}
+  cookieName: access_token
+
+session:
+  cookie: sessionId
+  maxAge: 7776000000 # 90 days
+  secure: false
+  headerName: Session-Id
+
+user:
+  idHeader: User-Id
+  roleHeader: User-Role
+
+web:
+  frontendUrl: http://${LHOST}:5173
