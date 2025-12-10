@@ -25,6 +25,22 @@ eureka:
     service-url:
       default-zone: http://${LHOST}:8761/eureka
 
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, prometheus
+  endpoint:
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
 logging:
   level:
     root: INFO
