@@ -1,3 +1,5 @@
 spring:
   application:
     name: payment-service
+  config:
+    import: configserver:http://${LHOST}:8203
