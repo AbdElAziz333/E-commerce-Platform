@@ -38,3 +38,5 @@ out/
 secrets/
 .gradle/
 .env
+/infra/vault/data/
+/infra/vault/logs/
