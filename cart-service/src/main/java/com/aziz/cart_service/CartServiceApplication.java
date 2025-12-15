@@ -9,9 +9,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @SpringBootApplication
 public class CartServiceApplication {
 	public static void main(String[] args) {
-        Dotenv dotenv = Dotenv.configure().directory("./cart-service").load();
-        dotenv.entries().forEach(entry -> System.setProperty(entry.getKey(), entry.getValue()));
-
-		SpringApplication.run(CartServiceApplication.class, args);
-	}
+        SpringApplication app = new SpringApplication(CartServiceApplication.class);
+        app.addInitializers(new DotenvInitializer());
+        app.run(args);	}
 }

@@ -2,20 +2,10 @@ spring:
   application:
     name: config-server
   profiles:
-    active: git, vault
+    active: git, vault, prod
   cloud:
     config:
       server:
-        vault:
-          host: ${LHOST}
-          port: 8200
-          scheme: http
-          authentication: token
-          token: ${VAULT_TOKEN}
-          kv-version: 2
-          kv:
-            enabled: true
-            backend: secret
         git:
           uri: ${GIT_CONFIG_REPOSITORY_URI}
           username: ${GIT_USERNAME}

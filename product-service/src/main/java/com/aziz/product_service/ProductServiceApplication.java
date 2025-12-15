@@ -15,9 +15,8 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @EnableElasticsearchRepositories(basePackages = "com.aziz.product_service.repository.search")
 public class ProductServiceApplication {
 	public static void main(String[] args) {
-		Dotenv dotenv = Dotenv.configure().directory("./product-service").load();
-		dotenv.entries().forEach((entry) -> System.setProperty(entry.getKey(), entry.getValue()));
-
-		SpringApplication.run(ProductServiceApplication.class, args);
+        SpringApplication app = new SpringApplication(ProductServiceApplication.class);
+        app.addInitializers(new DotenvInitializer());
+        app.run(args);
 	}
 }

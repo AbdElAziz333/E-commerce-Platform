@@ -9,9 +9,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @SpringBootApplication
 public class PaymentServiceApplication {
 	public static void main(String[] args) {
-        Dotenv dotenv = Dotenv.configure().directory("./payment-service").load();
-        dotenv.entries().forEach(entry -> System.setProperty(entry.getKey(), entry.getValue()));
-
-		SpringApplication.run(PaymentServiceApplication.class, args);
+        SpringApplication app = new SpringApplication(PaymentServiceApplication.class);
+        app.addInitializers(new DotenvInitializer());
+        app.run(args);
 	}
 }

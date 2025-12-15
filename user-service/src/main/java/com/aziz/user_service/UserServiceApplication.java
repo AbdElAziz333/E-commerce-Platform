@@ -9,9 +9,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @EnableJpaAuditing
 public class UserServiceApplication {
 	public static void main(String[] args) {
-		Dotenv dotenv = Dotenv.configure().directory("./user-service").load();
-		dotenv.entries().forEach(entry -> System.setProperty(entry.getKey(), entry.getValue()));
-
-		SpringApplication.run(UserServiceApplication.class, args);
+        SpringApplication app = new SpringApplication(UserServiceApplication.class);
+        app.addInitializers(new DotenvInitializer());
+        app.run(args);
 	}
 }

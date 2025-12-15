@@ -1,4 +1,380 @@
 services:
+#  config-server-svc:
+#    container_name: config-server
+#    image: abdelaziz333/config-server:1.0
+#    build:
+#      context: ./config-server
+#    ports:
+#      - "${CONFIG_SERVER_PORT}:${CONFIG_SERVER_PORT}"
+#    networks:
+#      - ecommerce-net
+#    environment:
+#      LHOST: ${LHOST}
+#      VAULT_TOKEN: ${VAULT_TOKEN}
+#      VAULT_SVC: ${VAULT_SVC}
+#      VAULT_PORT: ${VAULT_PORT}
+#      GIT_CONFIG_REPOSITORY_URI: ${GIT_CONFIG_REPOSITORY_URI}
+#      GIT_USERNAME: ${GIT_USERNAME}
+#      GIT_PAT: ${GIT_PAT}
+#    restart: unless-stopped
+##    depends_on:
+##      - infra-vault-svc
+#    profiles:
+#      - prod
+#    healthcheck:
+#      test: ["CMD", "wget", "-qO-", "http://localhost:8203/actuator/health"]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 10
+#      start_period: 30s
+#
+#  discovery-server-svc:
+#    container_name: discovery-server
+#    image: abdelaziz333/discovery-server:1.0
+#    build:
+#      context: ./discovery-server
+#    ports:
+#      - "${DISCOVERY_SERVER_PORT}:${DISCOVERY_SERVER_PORT}"
+#    networks:
+#      - ecommerce-net
+#    environment:
+#      LHOST: ${LHOST}
+#      CONFIG_SERVER_SVC: ${CONFIG_SERVER_SVC}
+#      CONFIG_SERVER_PORT: ${CONFIG_SERVER_PORT}
+#      DISCOVERY_SERVER_SVC: ${DISCOVERY_SERVER_SVC}
+#      DISCOVERY_SERVER_PORT: ${DISCOVERY_SERVER_PORT}
+#    restart: unless-stopped
+#    depends_on:
+#      config-server-svc:
+#        condition: service_healthy
+#    profiles:
+#      - prod
+#    healthcheck:
+#      test: [ "CMD", "wget", "-qO-", "http://localhost:8761/actuator/health" ]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 10
+#      start_period: 30s
+#
+#  auth-service-svc:
+#    container_name: auth-service
+#    image: abdelaziz333/auth-service:1.0
+#    build:
+#      context: ./auth-service
+#    ports:
+#      - "${AUTH_SERVICE_PORT}:${AUTH_SERVICE_PORT}"
+#    networks:
+#      - ecommerce-net
+#    environment:
+#      LHOST: ${LHOST}
+#      CONFIG_SERVER_SVC: ${CONFIG_SERVER_SVC}
+#      CONFIG_SERVER_PORT: ${CONFIG_SERVER_PORT}
+#      DISCOVERY_SERVER_SVC: ${DISCOVERY_SERVER_SVC}
+#      DISCOVERY_SERVER_PORT: ${DISCOVERY_SERVER_PORT}
+#      AUTH_SERVICE_SVC: ${AUTH_SERVICE_SVC}
+#      AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
+#      REDIS_SVC: ${AUTH_REDIS_SVC}
+#      REDIS_PORT: ${AUTH_REDIS_PORT}
+#    restart: unless-stopped
+#    depends_on:
+#      discovery-server-svc:
+#        condition: service_healthy
+##      auth-redis-svc:
+##        condition: service_healthy
+#    profiles:
+#      - prod
+#    healthcheck:
+#      test: [ "CMD", "wget", "-qO-", "http://localhost:8083/actuator/health"]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 10
+#      start_period: 30s
+#
+#  user-service-svc:
+#    container_name: user-service
+#    image: abdelaziz333/user-service:1.0
+#    build:
+#      context: ./user-service
+#    ports:
+#      - "${USER_SERVICE_PORT}:${USER_SERVICE_PORT}"
+#    networks:
+#      - ecommerce-net
+#    environment:
+#      LHOST: ${LHOST}
+#      CONFIG_SERVER_SVC: ${CONFIG_SERVER_SVC}
+#      CONFIG_SERVER_PORT: ${CONFIG_SERVER_PORT}
+#      DISCOVERY_SERVER_SVC: ${DISCOVERY_SERVER_SVC}
+#      DISCOVERY_SERVER_PORT: ${DISCOVERY_SERVER_PORT}
+#      USER_SERVICE_PORT: ${USER_SERVICE_PORT}
+#      POSTGRES_SVC: ${USER_POSTGRES_SVC}
+#      POSTGRES_DB: ${USER_POSTGRES_DB}
+#      POSTGRES_USER: ${USER_POSTGRES_USER}
+#      POSTGRES_PORT: ${USER_POSTGRES_PORT}
+#      POSTGRES_PASSWORD: ${USER_POSTGRES_PASSWORD}
+#      REDIS_SVC: ${USER_REDIS_SVC}
+#      REDIS_PORT: ${USER_REDIS_PORT}
+#      KAFKA_BROKER_PORT: ${KAFKA_BROKER_PORT}
+#      KAFKA_CONTROLLER_PORT: ${KAFKA_CONTROLLER_PORT}
+#    restart: unless-stopped
+#    depends_on:
+#      config-server-svc:
+#        condition: service_healthy
+#      discovery-server-svc:
+#        condition: service_healthy
+##      user-postgres-svc:
+##        condition: service_healthy
+##      user-redis-svc:
+##        condition: service_healthy
+#    profiles:
+#      - prod
+#    healthcheck:
+#      test: [ "CMD", "wget", "-qO-", "http://localhost:8080/actuator/health" ]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 10
+#      start_period: 30s
+#
+#  product-service-svc:
+#    container_name: product-service
+#    image: abdelaziz333/product-service:1.0
+#    build:
+#      context: ./product-service
+#    ports:
+#      - "${PRODUCT_SERVICE_PORT}:${PRODUCT_SERVICE_PORT}"
+#    networks:
+#      - ecommerce-net
+#    environment:
+#      LHOST: ${LHOST}
+#      CONFIG_SERVER_SVC: ${CONFIG_SERVER_SVC}
+#      CONFIG_SERVER_PORT: ${CONFIG_SERVER_PORT}
+#      DISCOVERY_SERVER_SVC: ${DISCOVERY_SERVER_SVC}
+#      DISCOVERY_SERVER_PORT: ${DISCOVERY_SERVER_PORT}
+#      PRODUCT_SERVICE_PORT: ${PRODUCT_SERVICE_PORT}
+#      MONGO_SVC: ${PRODUCT_MONGO_SVC}
+#      MONGO_DB: ${PRODUCT_MONGO_DB}
+#      MONGO_PORT: ${PRODUCT_MONGO_PORT}
+#      MONGO_USER: ${PRODUCT_MONGO_USER}
+#      MONGO_PASSWORD: ${PRODUCT_MONGO_PASSWORD}
+#      ELASTIC_USER: ${ELASTIC_USER}
+#      ELASTIC_HTTP_PORT: ${ELASTIC_HTTP_PORT}
+#      ELASTIC_TRANSPORT_PORT: ${ELASTIC_TRANSPORT_PORT}
+#      KAFKA_BROKER_PORT: ${KAFKA_BROKER_PORT}
+#      KAFKA_CONTROLLER_PORT: ${KAFKA_CONTROLLER_PORT}
+#    restart: unless-stopped
+#    depends_on:
+#      config-server-svc:
+#        condition: service_healthy
+#      discovery-server-svc:
+#        condition: service_healthy
+##      product-mongo-svc:
+##        condition: service_healthy
+##      infra-kafka-svc:
+##        condition: service_healthy
+#    profiles:
+#      - prod
+#    healthcheck:
+#      test: [ "CMD", "wget", "-qO-", "http://localhost:8081/actuator/health" ]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 10
+#      start_period: 30s
+#
+#  order-service-svc:
+#    container_name: order-service
+#    image: abdelaziz333/order-service:1.0
+#    build:
+#      context: ./order-service
+#    ports:
+#      - "${ORDER_SERVICE_PORT}:${ORDER_SERVICE_PORT}"
+#    networks:
+#      - ecommerce-net
+#    environment:
+#      LHOST: ${LHOST}
+#      CONFIG_SERVER_SVC: ${CONFIG_SERVER_SVC}
+#      CONFIG_SERVER_PORT: ${CONFIG_SERVER_PORT}
+#      DISCOVERY_SERVER_SVC: ${DISCOVERY_SERVER_SVC}
+#      DISCOVERY_SERVER_PORT: ${DISCOVERY_SERVER_PORT}
+#      ORDER_SERVICE_PORT: ${ORDER_SERVICE_PORT}
+#      POSTGRES_SVC: ${ORDER_POSTGRES_SVC}
+#      POSTGRES_DB: ${ORDER_POSTGRES_DB}
+#      POSTGRES_USER: ${ORDER_POSTGRES_USER}
+#      POSTGRES_PASSWORD: ${ORDER_POSTGRES_PASSWORD}
+#      POSTGRES_PORT: ${ORDER_POSTGRES_PORT}
+#      KAFKA_BROKER_PORT: ${KAFKA_BROKER_PORT}
+#      KAFKA_CONTROLLER_PORT: ${KAFKA_CONTROLLER_PORT}
+#    restart: unless-stopped
+#    depends_on:
+#      config-server-svc:
+#        condition: service_healthy
+#      discovery-server-svc:
+#        condition: service_healthy
+##      order-postgres-svc:
+##        condition: service_healthy
+#    profiles:
+#      - prod
+#    healthcheck:
+#      test: [ "CMD", "wget", "-qO-", "http://localhost:8082/actuator/health" ]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 10
+#      start_period: 30s
+#
+#  cart-service-svc:
+#    container_name: cart-service
+#    image: abdelaziz333/cart-service:1.0
+#    build:
+#      context: ./cart-service
+#    ports:
+#      - "${CART_SERVICE_PORT}:${CART_SERVICE_PORT}"
+#    networks:
+#      - ecommerce-net
+#    environment:
+#      LHOST: ${LHOST}
+#      CONFIG_SERVER_SVC: ${CONFIG_SERVER_SVC}
+#      CONFIG_SERVER_PORT: ${CONFIG_SERVER_PORT}
+#      DISCOVERY_SERVER_SVC: ${DISCOVERY_SERVER_SVC}
+#      DISCOVERY_SERVER_PORT: ${DISCOVERY_SERVER_PORT}
+#      CART_SERVICE_PORT: ${CART_SERVICE_PORT}
+#      POSTGRES_SVC: ${CART_POSTGRES_SVC}
+#      POSTGRES_DB: ${CART_POSTGRES_DB}
+#      POSTGRES_USER: ${CART_POSTGRES_USER}
+#      POSTGRES_PASSWORD: ${CART_POSTGRES_PASSWORD}
+#      POSTGRES_PORT: ${CART_POSTGRES_PORT}
+#      REDIS_SVC: ${CART_REDIS_SVC}
+#      REDIS_PORT: ${CART_REDIS_PORT}
+#    restart: unless-stopped
+#    depends_on:
+#      config-server-svc:
+#        condition: service_healthy
+#      discovery-server-svc:
+#        condition: service_healthy
+##      cart-postgres-svc:
+##        condition: service_healthy
+##      cart-redis-svc:
+##        condition: service_healthy
+#    profiles:
+#      - prod
+#    healthcheck:
+#      test: [ "CMD", "wget", "-qO-", "http://localhost:8084/actuator/health" ]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 10
+#      start_period: 30s
+#
+#  notification-service-svc:
+#    container_name: notification-service
+#    image: abdelaziz333/notification-service:1.0
+#    build:
+#      context: ./notification-service
+#    ports:
+#      - "${NOTIFICATION_SERVICE_PORT}:${NOTIFICATION_SERVICE_PORT}"
+#    networks:
+#      - ecommerce-net
+#    environment:
+#      LHOST: ${LHOST}
+#      CONFIG_SERVER_SVC: ${CONFIG_SERVER_SVC}
+#      CONFIG_SERVER_PORT: ${CONFIG_SERVER_PORT}
+#      DISCOVERY_SERVER_SVC: ${DISCOVERY_SERVER_SVC}
+#      DISCOVERY_SERVER_PORT: ${DISCOVERY_SERVER_PORT}
+#      NOTIFICATION_SERVICE_PORT: ${NOTIFICATION_SERVICE_PORT}
+#      CASSANDRA_SVC: ${NOTIFICATION_CASSANDRA_SVC}
+#      CASSANDRA_KEYSPACE: ${NOTIFICATION_CASSANDRA_KEYSPACE}
+#      CASSANDRA_PORT: ${NOTIFICATION_CASSANDRA_PORT}
+#      KAFKA_BROKER_PORT: ${KAFKA_BROKER_PORT}
+#      KAFKA_CONTROLLER_PORT: ${KAFKA_CONTROLLER_PORT}
+#    restart: unless-stopped
+#    depends_on:
+#      config-server-svc:
+#        condition: service_healthy
+#      discovery-server-svc:
+#        condition: service_healthy
+##      notification-cassandra-svc:
+##        condition: service_healthy
+#    profiles:
+#      - prod
+#    healthcheck:
+#      test: [ "CMD", "wget", "-qO-", "http://localhost:8085/actuator/health" ]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 10
+#      start_period: 30s
+#
+#  payment-service-svc:
+#    container_name: payment-service
+#    image: abdelaziz333/payment-service:1.0
+#    build:
+#      context: ./payment-service
+#    ports:
+#      - "${PAYMENT_SERVICE_PORT}:${PAYMENT_SERVICE_PORT}"
+#    networks:
+#      - ecommerce-net
+#    environment:
+#      LHOST: ${LHOST}
+#      CONFIG_SERVER_SVC: ${CONFIG_SERVER_SVC}
+#      CONFIG_SERVER_PORT: ${CONFIG_SERVER_PORT}
+#      DISCOVERY_SERVER_SVC: ${DISCOVERY_SERVER_SVC}
+#      DISCOVERY_SERVER_PORT: ${DISCOVERY_SERVER_PORT}
+#      PAYMENT_SERVICE_PORT: ${PAYMENT_SERVICE_PORT}
+#      POSTGRES_SVC: ${PAYMENT_POSTGRES_SVC}
+#      POSTGRES_DB: ${PAYMENT_POSTGRES_DB}
+#      POSTGRES_USER: ${PAYMENT_POSTGRES_USER}
+#      POSTGRES_PASSWORD: ${PAYMENT_POSTGRES_PASSWORD}
+#      POSTGRES_PORT: ${PAYMENT_POSTGRES_PORT}
+#      KAFKA_BROKER_PORT: ${KAFKA_BROKER_PORT}
+#      KAFKA_CONTROLLER_PORT: ${KAFKA_CONTROLLER_PORT}
+#    restart: unless-stopped
+#    depends_on:
+#      config-server-svc:
+#        condition: service_healthy
+#      discovery-server-svc:
+#        condition: service_healthy
+##      payment-postgres-svc:
+##        condition: service_healthy
+#    profiles:
+#      - prod
+#    healthcheck:
+#      test: [ "CMD", "wget", "-qO-", "http://localhost:8086/actuator/health" ]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 10
+#      start_period: 30s
+#
+#  api-gateway-svc:
+#    container_name: api-gateway
+#    image: abdelaziz333/api-gateway:1.0
+#    build:
+#      context: ./api-gateway
+#    ports:
+#      - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
+#    networks:
+#      - ecommerce-net
+#    environment:
+#      LHOST: ${LHOST}
+#      CONFIG_SERVER_SVC: ${CONFIG_SERVER_SVC}
+#      CONFIG_SERVER_PORT: ${CONFIG_SERVER_PORT}
+#      DISCOVERY_SERVER_SVC: ${DISCOVERY_SERVER_SVC}
+#      DISCOVERY_SERVER_PORT: ${DISCOVERY_SERVER_PORT}
+#    restart: unless-stopped
+#    depends_on:
+#      config-server-svc:
+#        condition: service_healthy
+#      discovery-server-svc:
+#        condition: service_healthy
+#      auth-service-svc:
+#        condition: service_healthy
+#      user-service-svc:
+#        condition: service_healthy
+#      product-service-svc:
+#        condition: service_healthy
+#      payment-service-svc:
+#        condition: service_healthy
+#      order-service-svc:
+#        condition: service_healthy
+#      cart-service-svc:
+#        condition: service_healthy
+#    profiles:
+#      - prod
+
   auth-redis-svc:
     container_name: auth-redis
     image: redis:alpine
@@ -6,13 +382,13 @@ services:
       - "${AUTH_REDIS_PORT}:6379"
     networks:
       - ecommerce-net
-    restart: no
+    restart: unless-stopped
     profiles:
       - dev
       - prod
 
   user-postgres-svc:
-    container_name: user-pg
+    container_name: user-postgres
     image: postgres:alpine
     ports:
       - "${USER_POSTGRES_PORT}:5432"
@@ -26,7 +402,7 @@ services:
       POSTGRES_DB: ${USER_POSTGRES_DB}
       POSTGRES_USER: ${USER_POSTGRES_USER}
       POSTGRES_PASSWORD_FILE: /run/secrets/user_postgres_password
-    restart: no
+    restart: unless-stopped
     profiles:
       - dev
       - prod
@@ -38,7 +414,7 @@ services:
       - "${USER_REDIS_PORT}:6379"
     networks:
       - ecommerce-net
-    restart: no
+    restart: unless-stopped
     profiles:
       - dev
       - prod
@@ -58,50 +434,13 @@ services:
       MONGO_INITDB_DATABASE: ${PRODUCT_MONGO_DB}
       MONGO_INITDB_ROOT_USERNAME: ${PRODUCT_MONGO_USER}
       MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/product_mongo_password
-    restart: no
-    profiles:
-      - dev
-      - prod
-
-  product-elastic-svc:
-    container_name: product-elastic
-    image: elasticsearch:9.1.5
-    ports:
-      - "${PRODUCT_ELASTIC_HTTP_PORT}:9200"
-      - "${PRODUCT_ELASTIC_TRANSPORT_PORT}:9300"
-    networks:
-      - ecommerce-net
-    volumes:
-      - product_elastic_data:/usr/share/elasticsearch/data
-    environment:
-      discovery.type: single-node
-      xpack.security.enabled: false
-      action.auto_create_index: true
-      ES_JAVA_OPTS: "-Xms1g -Xmx1g"
-    restart: no
-    profiles:
-      - dev
-      - prod
-
-  product-kibana-svc:
-    container_name: product-kibana
-    image: kibana:9.1.5
-    ports:
-      - "${KIBANA_PORT}:5601"
-    networks:
-      - ecommerce-net
-    environment:
-      ELASTICSEARCH_HOSTS: http://product-elastic-svc:9200
-      xpack.security.enabled: false
-    depends_on:
-      - product-elastic-svc
-    restart: no
+    restart: unless-stopped
     profiles:
       - dev
       - prod
 
   order-postgres-svc:
-    container_name: order-pg
+    container_name: order-postgres
     image: postgres:alpine
     ports:
       - "${ORDER_POSTGRES_PORT}:5432"
@@ -115,13 +454,13 @@ services:
       POSTGRES_DB: ${ORDER_POSTGRES_DB}
       POSTGRES_USER: ${ORDER_POSTGRES_USER}
       POSTGRES_PASSWORD_FILE: /run/secrets/order_postgres_password
-    restart: no
+    restart: unless-stopped
     profiles:
       - dev
       - prod
 
   cart-postgres-svc:
-    container_name: cart-pg
+    container_name: cart-postgres
     image: postgres:alpine
     ports:
       - "${CART_POSTGRES_PORT}:5432"
@@ -135,7 +474,7 @@ services:
       POSTGRES_DB: ${CART_POSTGRES_DB}
       POSTGRES_USER: ${CART_POSTGRES_USER}
       POSTGRES_PASSWORD_FILE: /run/secrets/cart_postgres_password
-    restart: no
+    restart: unless-stopped
     profiles:
       - dev
       - prod
@@ -147,13 +486,13 @@ services:
       - "${CART_REDIS_PORT}:6379"
     networks:
       - ecommerce-net
-    restart: no
+    restart: unless-stopped
     profiles:
       - dev
       - prod
 
   payment-postgres-svc:
-    container_name: payment-pg
+    container_name: payment-postgres
     image: postgres:alpine
     ports:
       - "${PAYMENT_POSTGRES_PORT}:5432"
@@ -167,7 +506,7 @@ services:
       POSTGRES_DB: ${PAYMENT_POSTGRES_DB}
       POSTGRES_USER: ${PAYMENT_POSTGRES_USER}
       POSTGRES_PASSWORD_FILE: /run/secrets/payment_postgres_password
-    restart: no
+    restart: unless-stopped
     profiles:
       - dev
       - prod
@@ -186,10 +525,10 @@ services:
       CASSANDRA_DC: dc1
       CASSANDRA_RACK: rack1
       CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
-      CASSANDRA_KEYSPACE: notification_db
+      CASSANDRA_KEYSPACE: ${NOTIFICATION_CASSANDRA_KEYSPACE}
       MAX_HEAP_SIZE: "512M"
       HEAP_NEWSIZE: "256M"
-    restart: no
+    restart: unless-stopped
     profiles:
       - dev
       - prod
@@ -210,7 +549,8 @@ services:
       KAFKA_CFG_NODE_ID: 1
       KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
-      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+#      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://${KAFKA_SVC}:9092
       KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
 
       # Required even without auth
@@ -218,7 +558,7 @@ services:
 
       # Allow insecure listener (for dev only)
       ALLOW_PLAINTEXT_LISTENER: yes
-    restart: no
+    restart: unless-stopped
     profiles:
       - dev
       - prod
@@ -237,6 +577,44 @@ services:
     command: vault server -config=/vault/config/vault.hcl
     cap_add:
       - IPC_LOCK
+    restart: unless-stopped
+    profiles:
+      - dev
+      - prod
+
+  infra-elastic-svc:
+    container_name: infra-elastic
+    image: elasticsearch:9.1.5
+    ports:
+      - "${ELASTIC_HTTP_PORT}:9200"
+      - "${ELASTIC_TRANSPORT_PORT}:9300"
+    networks:
+      - ecommerce-net
+    volumes:
+      - infra_elastic_data:/usr/share/elasticsearch/data
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: false
+      action.auto_create_index: true
+      ES_JAVA_OPTS: "-Xms1g -Xmx1g"
+    restart: unless-stopped
+    profiles:
+      - dev
+      - prod
+
+  infra-kibana-svc:
+    container_name: infra-kibana
+    image: kibana:9.1.5
+    ports:
+      - "${KIBANA_PORT}:5601"
+    networks:
+      - ecommerce-net
+    environment:
+      ELASTICSEARCH_HOSTS: http://infra-elastic-svc:9200
+      xpack.security.enabled: false
+    depends_on:
+      - infra-elastic-svc
+    restart: unless-stopped
     profiles:
       - dev
       - prod
@@ -255,6 +633,7 @@ services:
       - infra-prometheus-svc
       - infra-loki-svc
       - infra-tempo-svc
+    restart: unless-stopped
     profiles:
       - dev
       - prod
@@ -268,6 +647,7 @@ services:
       - "${PROMETHEUS_PORT}:9090"
     networks:
       - ecommerce-net
+    restart: unless-stopped
     profiles:
       - dev
       - prod
@@ -282,6 +662,7 @@ services:
     volumes:
       - ./infra/observability/loki/config.yml:/etc/loki/config.yml
     command: -config.file=./etc/loki/config.yml
+    restart: unless-stopped
     profiles:
       - dev
       - prod
@@ -296,6 +677,7 @@ services:
     volumes:
       - ./infra/observability/tempo/tempo.yml:/etc/tempo/tempo.yml
     command: -config.file=./etc/tempo/tempo.yml
+    restart: unless-stopped
     profiles:
       - dev
       - prod
@@ -308,32 +690,164 @@ services:
     networks:
       - ecommerce-net
     environment:
-      - GF_SECURITY_ADMIN=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN=${GRAFANA_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+      - GF_PATHS_PROVISIONING=/infra/observability/grafana/provisioning
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./infra/observability/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./infra/observability/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
     depends_on:
       - infra-prometheus-svc
       - infra-loki-svc
       - infra-tempo-svc
+    restart: unless-stopped
     profiles:
       - dev
       - prod
 
+  # Exporters
+
+  infra-user-postgres-exporter-svc:
+    image: prometheuscommunity/postgres-exporter:master
+    container_name: infra-user-postgres-exporter
+    ports:
+      - "9187:9187"
+    networks:
+      ecommerce-net:
+    environment:
+      DATA_SOURCE_NAME: "postgresql://${USER_POSTGRES_USER}:${USER_POSTGRES_PASSWORD}@user-postgres-svc:5432/${USER_POSTGRES_DB}?sslmode=disable"
+    depends_on:
+      - user-postgres-svc
+    restart: unless-stopped
+    profiles:
+      - dev
+      - prod
+
+  infra-order-postgres-exporter-svc:
+    image: prometheuscommunity/postgres-exporter:master
+    container_name: infra-order-postgres-exporter
+    ports:
+      - "9188:9187"
+    networks:
+      ecommerce-net:
+    environment:
+      DATA_SOURCE_NAME: "postgresql://${ORDER_POSTGRES_USER}:${ORDER_POSTGRES_PASSWORD}@order-postgres-svc:5432/${ORDER_POSTGRES_DB}?sslmode=disable"
+    depends_on:
+      - order-postgres-svc
+    restart: unless-stopped
+    profiles:
+      - dev
+      - prod
+
+  infra-cart-postgres-exporter-svc:
+    image: prometheuscommunity/postgres-exporter:master
+    container_name: infra-cart-postgres-exporter
+    ports:
+      - "9189:9187"
+    networks:
+      ecommerce-net:
+    environment:
+      DATA_SOURCE_NAME: "postgresql://${CART_POSTGRES_USER}:${CART_POSTGRES_PASSWORD}@cart-postgres-svc:5432/${CART_POSTGRES_DB}?sslmode=disable"
+    depends_on:
+      - cart-postgres-svc
+    restart: unless-stopped
+    profiles:
+      - dev
+      - prod
+
+  infra-payment-postgres-exporter-svc:
+    image: prometheuscommunity/postgres-exporter:master
+    container_name: infra-payment-postgres-exporter
+    ports:
+      - "9190:9187"
+    networks:
+      ecommerce-net:
+    environment:
+      DATA_SOURCE_NAME: "postgresql://${PAYMENT_POSTGRES_USER}:${PAYMENT_POSTGRES_PASSWORD}@payment-postgres-svc:5432/${PAYMENT_POSTGRES_DB}?sslmode=disable"
+    depends_on:
+      - payment-postgres-svc
+    restart: unless-stopped
+    profiles:
+      - dev
+      - prod
+
+  infra-user-redis-exporter-svc:
+    container_name: infra-user-redis-exporter
+    image: oliver006/redis_exporter:alpine
+    ports:
+      - "9121:9121"
+    networks:
+      ecommerce-net:
+    environment:
+      REDIS_ADDR: "user-redis-svc:6379"
+    depends_on:
+      - user-redis-svc
+    restart: unless-stopped
+    profiles:
+      - dev
+      - prod
+
+  infra-auth-redis-exporter-svc:
+    container_name: infra-auth-redis-exporter
+    image: oliver006/redis_exporter:alpine
+    ports:
+      - "9122:9121"
+    networks:
+      ecommerce-net:
+    environment:
+      REDIS_ADDR: "auth-redis-svc:6379"
+    depends_on:
+      - auth-redis-svc
+    restart: unless-stopped
+    profiles:
+      - dev
+      - prod
+
+  infra-cart-redis-exporter-svc:
+    container_name: infra-cart-redis-exporter
+    image: oliver006/redis_exporter:alpine
+    ports:
+      - "9123:9121"
+    networks:
+      ecommerce-net:
+    environment:
+      REDIS_ADDR: "cart-redis-svc:6379"
+    depends_on:
+      - cart-redis-svc
+    restart: unless-stopped
+    profiles:
+      - dev
+      - prod
+      
+  infra-product-mongo-exporter-svc:
+    container_name: infra-product-mongo-exporter
+    image: percona/mongodb_exporter:0.47.2
+    ports:
+      - "9216:9216"
+    networks:
+      ecommerce-net:
+    restart: unless-stopped
+    command:
+      - "--mongo.uri=mongodb://${PRODUCT_MONGO_USER}:${PRODUCT_MONGO_PASSWORD}@product-mongo-svc:27017"
+
 volumes:
   user_postgres_data:
   product_mongo_data:
-  product_elastic_data:
   order_postgres_data:
   notification_cassandra_data:
   cart_postgres_data:
   payment_postgres_data:
   infra_kafka_data:
+  infra_elastic_data:
   otel_data:
+  grafana_data:
 
 secrets:
   user_postgres_password:
     file: secrets/user_postgres_password.txt
-#  product_elastic_password:
-#    file: secrets/product_elastic_password.txt
+#  infra_elastic_password:
+#    file: secrets/infra_elastic_password.txt
   product_mongo_password:
     file: secrets/product_mongo_password.txt
   order_postgres_password:

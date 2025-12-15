@@ -1,0 +1,14 @@
+spring:
+  cloud:
+    config:
+      server:
+        vault:
+          host: ${VAULT_SVC}
+          port: ${VAULT_PORT}
+          scheme: http
+          authentication: token
+          token: ${VAULT_TOKEN}
+          kv-version: 2
+          kv:
+            enabled: true
+            backend: secret

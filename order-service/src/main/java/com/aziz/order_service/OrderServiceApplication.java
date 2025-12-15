@@ -11,9 +11,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @SpringBootApplication
 public class OrderServiceApplication {
 	public static void main(String[] args) {
-		Dotenv dotenv = Dotenv.configure().directory("./order-service").load();
-		dotenv.entries().forEach(entry -> System.setProperty(entry.getKey(), entry.getValue()));
-
-		SpringApplication.run(OrderServiceApplication.class, args);
+        SpringApplication app = new SpringApplication(OrderServiceApplication.class);
+        app.addInitializers(new DotenvInitializer());
+        app.run(args);
 	}
 }

@@ -1,5 +1,5 @@
 spring:
   application:
     name: cart-service
-  config:
-    import: configserver:http://${LHOST}:8203
+  profiles:
+    active: prod
