@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class InternalRegistrationService {
     private final OtpService otpService;
-//    private final MailMessageSender mailMessageSender;
     private final UserService userService;
     private final PendingUserRepository pendingUserRepository;
     private final PasswordEncoder encoder;
@@ -52,8 +51,6 @@ public class InternalRegistrationService {
 
         pendingUserRepository.save(pendingUserData);
         publisher.publishOtp(request.getEmail(), verification.getOtp());
-//        publisher.publishUserOtpVerificationNotification(new UserOtpVerificationEvent(request.getEmail(), verification.getOtp()));
-//        mailMessageSender.sendEmailVerification(request.getEmail(), verification.getOtp());
 
         log.info("User registered successfully with email: {}, verificationId: {}", request.getEmail(), verification.getVerificationId());
         return verification.getVerificationId();
@@ -92,9 +89,6 @@ public class InternalRegistrationService {
         // Clean up Redis
         pendingUserRepository.delete(request.getVerificationId());
 
-        // Send welcome email
-//        mailMessageSender.sendWelcomeEmail(email, pendingUser.getFirstName());
-//        publisher.publishWelcomeEmailNotification(new UserRegisteredEvent(email, pendingUser.getFirstName()));
         publisher.publishWelcome(email, pendingUser.getFirstName());
 
         return authUser;

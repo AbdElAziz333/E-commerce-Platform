@@ -11,5 +11,6 @@ public class CartServiceApplication {
 	public static void main(String[] args) {
         SpringApplication app = new SpringApplication(CartServiceApplication.class);
         app.addInitializers(new DotenvInitializer());
-        app.run(args);	}
+        app.run(args);
+    }
 }

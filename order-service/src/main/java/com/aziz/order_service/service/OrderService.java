@@ -97,6 +97,17 @@ public class OrderService {
                 savedOrder.getEstimatedDeliveryDate(),
                 savedOrder.getOrderItems().stream().map(mapper::orderItemToDto).toList());
 
+        publisher.publishOrderPayment(
+                email,
+                userId,
+                savedOrder.getOrderId(),
+                savedOrder.getOrderNumber(),
+                savedOrder.getOrderStatus(),
+                savedOrder.getTotalAmount(),
+                savedOrder.getPaymentMethod(),
+                savedOrder.getPaymentStatus()
+        );
+
         return mapper.orderToDto(savedOrder);
     }
 

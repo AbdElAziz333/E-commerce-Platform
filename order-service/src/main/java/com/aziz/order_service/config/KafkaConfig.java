@@ -12,12 +12,17 @@ import org.springframework.kafka.annotation.EnableKafka;
 @Setter
 @EnableKafka
 @Configuration
-@ConfigurationProperties(prefix = "kafka")
+@ConfigurationProperties(prefix = "kafka.topic")
 public class KafkaConfig {
-    private String orderEvents;
+    private String orderCreated;
+    private String orderPayment;
+
+    public NewTopic orderCreatedTopic() {
+        return new NewTopic(orderCreated, 3, (short) 1);
+    }
 
     @Bean
-    public NewTopic kafkaTopic() {
-        return new NewTopic(orderEvents, 3, (short) 1);
+    public NewTopic orderPaymentTopic() {
+        return new NewTopic(orderPayment, 3, (short) 1);
     }
 }
