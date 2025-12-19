@@ -1,385 +1,377 @@
 services:
-#  config-server-svc:
-#    container_name: config-server
-#    image: abdelaziz333/config-server:1.0
-#    build:
-#      context: ./config-server
-#    ports:
-#      - "${CONFIG_SERVER_PORT}:${CONFIG_SERVER_PORT}"
-#    networks:
-#      - ecommerce-net
-#    environment:
-#      LHOST: ${LHOST}
-#      VAULT_TOKEN: ${VAULT_TOKEN}
-#      VAULT_SVC: ${VAULT_SVC}
-#      VAULT_PORT: ${VAULT_PORT}
-#      GIT_CONFIG_REPOSITORY_URI: ${GIT_CONFIG_REPOSITORY_URI}
-#      GIT_USERNAME: ${GIT_USERNAME}
-#      GIT_PAT: ${GIT_PAT}
-#    restart: unless-stopped
-##    depends_on:
-##      - infra-vault-svc
-#    profiles:
-#      - prod
-#    healthcheck:
-#      test: ["CMD", "wget", "-qO-", "http://localhost:8203/actuator/health"]
-#      interval: 10s
-#      timeout: 5s
-#      retries: 10
-#      start_period: 30s
-#
-#  discovery-server-svc:
-#    container_name: discovery-server
-#    image: abdelaziz333/discovery-server:1.0
-#    build:
-#      context: ./discovery-server
-#    ports:
-#      - "${DISCOVERY_SERVER_PORT}:${DISCOVERY_SERVER_PORT}"
-#    networks:
-#      - ecommerce-net
-#    environment:
-#      LHOST: ${LHOST}
-#      CONFIG_SERVER_SVC: ${CONFIG_SERVER_SVC}
-#      CONFIG_SERVER_PORT: ${CONFIG_SERVER_PORT}
-#      DISCOVERY_SERVER_SVC: ${DISCOVERY_SERVER_SVC}
-#      DISCOVERY_SERVER_PORT: ${DISCOVERY_SERVER_PORT}
-#    restart: unless-stopped
-#    depends_on:
-#      config-server-svc:
+  # TODO: for production use elastic cloud for elasticsearch and kibana
+  # TODO: for postgres use AWS RDS or GCP SQL
+  # TODO: for redis use AWS MemoryDB or elasticache
+  # TODO: for cassandra use datastax astra -- https://docs.datastax.com/en/astra-cli/install.html
+  # TODO: for mongodb use mongo atlas
+  config-server-svc:
+    container_name: config-server
+    image: abdelaziz333/config-server:1.0
+    build:
+      context: ./config-server
+    ports:
+      - "8203:8203"
+    networks:
+      - ecommerce-net
+    environment:
+      LHOST: ${LHOST}
+      VAULT_TOKEN: ${VAULT_TOKEN}
+      VAULT_SVC: ${VAULT_SVC}
+      VAULT_PORT: ${VAULT_PORT}
+      GIT_CONFIG_REPOSITORY_URI: ${GIT_CONFIG_REPOSITORY_URI}
+      GIT_USERNAME: ${GIT_USERNAME}
+      GIT_PAT: ${GIT_PAT}
+    restart: unless-stopped
+    profiles:
+      - prod
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8203/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  discovery-server-svc:
+    container_name: discovery-server
+    image: abdelaziz333/discovery-server:1.0
+    build:
+      context: ./discovery-server
+    ports:
+      - "${DISCOVERY_SERVER_PORT}:${DISCOVERY_SERVER_PORT}"
+    networks:
+      - ecommerce-net
+    environment:
+      LHOST: ${LHOST}
+      CONFIG_SERVER_SVC: ${CONFIG_SERVER_SVC}
+      CONFIG_SERVER_PORT: ${CONFIG_SERVER_PORT}
+      DISCOVERY_SERVER_SVC: ${DISCOVERY_SERVER_SVC}
+      DISCOVERY_SERVER_PORT: ${DISCOVERY_SERVER_PORT}
+    restart: unless-stopped
+    depends_on:
+      config-server-svc:
+        condition: service_healthy
+    profiles:
+      - prod
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:8761/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  auth-service-svc:
+    container_name: auth-service
+    image: abdelaziz333/auth-service:1.0
+    build:
+      context: ./auth-service
+    ports:
+      - "${AUTH_SERVICE_PORT}:${AUTH_SERVICE_PORT}"
+    networks:
+      - ecommerce-net
+    environment:
+      LHOST: ${LHOST}
+      CONFIG_SERVER_SVC: ${CONFIG_SERVER_SVC}
+      CONFIG_SERVER_PORT: ${CONFIG_SERVER_PORT}
+      DISCOVERY_SERVER_SVC: ${DISCOVERY_SERVER_SVC}
+      DISCOVERY_SERVER_PORT: ${DISCOVERY_SERVER_PORT}
+      AUTH_SERVICE_SVC: ${AUTH_SERVICE_SVC}
+      AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
+      REDIS_SVC: ${AUTH_REDIS_SVC}
+      REDIS_PORT: ${AUTH_REDIS_PORT}
+    restart: unless-stopped
+    depends_on:
+      discovery-server-svc:
+        condition: service_healthy
+    profiles:
+      - prod
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:8083/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  user-service-svc:
+    container_name: user-service
+    image: abdelaziz333/user-service:1.0
+    build:
+      context: ./user-service
+    ports:
+      - "${USER_SERVICE_PORT}:${USER_SERVICE_PORT}"
+    networks:
+      - ecommerce-net
+    environment:
+      LHOST: ${LHOST}
+      CONFIG_SERVER_SVC: ${CONFIG_SERVER_SVC}
+      CONFIG_SERVER_PORT: ${CONFIG_SERVER_PORT}
+      DISCOVERY_SERVER_SVC: ${DISCOVERY_SERVER_SVC}
+      DISCOVERY_SERVER_PORT: ${DISCOVERY_SERVER_PORT}
+      USER_SERVICE_PORT: ${USER_SERVICE_PORT}
+      POSTGRES_SVC: ${USER_POSTGRES_SVC}
+      POSTGRES_DB: ${USER_POSTGRES_DB}
+      POSTGRES_USER: ${USER_POSTGRES_USER}
+      POSTGRES_PORT: ${USER_POSTGRES_PORT}
+      POSTGRES_PASSWORD: ${USER_POSTGRES_PASSWORD}
+      REDIS_SVC: ${USER_REDIS_SVC}
+      REDIS_PORT: ${USER_REDIS_PORT}
+      KAFKA_SVC: ${KAFKA_SVC}
+      KAFKA_BROKER_PORT: ${KAFKA_BROKER_PORT}
+      KAFKA_CONTROLLER_PORT: ${KAFKA_CONTROLLER_PORT}
+    restart: unless-stopped
+    depends_on:
+      config-server-svc:
+        condition: service_healthy
+      discovery-server-svc:
+        condition: service_healthy
+    profiles:
+      - prod
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:8080/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  product-service-svc:
+    container_name: product-service
+    image: abdelaziz333/product-service:1.0
+    build:
+      context: ./product-service
+    ports:
+      - "${PRODUCT_SERVICE_PORT}:${PRODUCT_SERVICE_PORT}"
+    networks:
+      - ecommerce-net
+    environment:
+      LHOST: ${LHOST}
+      CONFIG_SERVER_SVC: ${CONFIG_SERVER_SVC}
+      CONFIG_SERVER_PORT: ${CONFIG_SERVER_PORT}
+      DISCOVERY_SERVER_SVC: ${DISCOVERY_SERVER_SVC}
+      DISCOVERY_SERVER_PORT: ${DISCOVERY_SERVER_PORT}
+      PRODUCT_SERVICE_PORT: ${PRODUCT_SERVICE_PORT}
+      MONGO_SVC: ${PRODUCT_MONGO_SVC}
+      MONGO_DB: ${PRODUCT_MONGO_DB}
+      MONGO_PORT: ${PRODUCT_MONGO_PORT}
+      MONGO_USER: ${PRODUCT_MONGO_USER}
+      MONGO_PASSWORD: ${PRODUCT_MONGO_PASSWORD}
+      ELASTIC_USER: ${ELASTIC_USER}
+      ELASTIC_HTTP_PORT: ${ELASTIC_HTTP_PORT}
+      ELASTIC_TRANSPORT_PORT: ${ELASTIC_TRANSPORT_PORT}
+      KAFKA_SVC: ${KAFKA_SVC}
+      KAFKA_BROKER_PORT: ${KAFKA_BROKER_PORT}
+      KAFKA_CONTROLLER_PORT: ${KAFKA_CONTROLLER_PORT}
+    restart: unless-stopped
+    depends_on:
+      config-server-svc:
+        condition: service_healthy
+      discovery-server-svc:
+        condition: service_healthy
+    profiles:
+      - prod
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:8081/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  order-service-svc:
+    container_name: order-service
+    image: abdelaziz333/order-service:1.0
+    build:
+      context: ./order-service
+    ports:
+      - "${ORDER_SERVICE_PORT}:${ORDER_SERVICE_PORT}"
+    networks:
+      - ecommerce-net
+    environment:
+      LHOST: ${LHOST}
+      CONFIG_SERVER_SVC: ${CONFIG_SERVER_SVC}
+      CONFIG_SERVER_PORT: ${CONFIG_SERVER_PORT}
+      DISCOVERY_SERVER_SVC: ${DISCOVERY_SERVER_SVC}
+      DISCOVERY_SERVER_PORT: ${DISCOVERY_SERVER_PORT}
+      ORDER_SERVICE_PORT: ${ORDER_SERVICE_PORT}
+      POSTGRES_SVC: ${ORDER_POSTGRES_SVC}
+      POSTGRES_DB: ${ORDER_POSTGRES_DB}
+      POSTGRES_USER: ${ORDER_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${ORDER_POSTGRES_PASSWORD}
+      POSTGRES_PORT: ${ORDER_POSTGRES_PORT}
+      KAFKA_SVC: ${KAFKA_SVC}
+      KAFKA_BROKER_PORT: ${KAFKA_BROKER_PORT}
+      KAFKA_CONTROLLER_PORT: ${KAFKA_CONTROLLER_PORT}
+    restart: unless-stopped
+    depends_on:
+      config-server-svc:
+        condition: service_healthy
+      discovery-server-svc:
+        condition: service_healthy
+    profiles:
+      - prod
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:8082/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  cart-service-svc:
+    container_name: cart-service
+    image: abdelaziz333/cart-service:1.0
+    build:
+      context: ./cart-service
+    ports:
+      - "${CART_SERVICE_PORT}:${CART_SERVICE_PORT}"
+    networks:
+      - ecommerce-net
+    environment:
+      LHOST: ${LHOST}
+      CONFIG_SERVER_SVC: ${CONFIG_SERVER_SVC}
+      CONFIG_SERVER_PORT: ${CONFIG_SERVER_PORT}
+      DISCOVERY_SERVER_SVC: ${DISCOVERY_SERVER_SVC}
+      DISCOVERY_SERVER_PORT: ${DISCOVERY_SERVER_PORT}
+      CART_SERVICE_PORT: ${CART_SERVICE_PORT}
+      POSTGRES_SVC: ${CART_POSTGRES_SVC}
+      POSTGRES_DB: ${CART_POSTGRES_DB}
+      POSTGRES_USER: ${CART_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${CART_POSTGRES_PASSWORD}
+      POSTGRES_PORT: ${CART_POSTGRES_PORT}
+      REDIS_SVC: ${CART_REDIS_SVC}
+      REDIS_PORT: ${CART_REDIS_PORT}
+    restart: unless-stopped
+    depends_on:
+      config-server-svc:
+        condition: service_healthy
+      discovery-server-svc:
+        condition: service_healthy
+    profiles:
+      - prod
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:8084/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  notification-service-svc:
+    container_name: notification-service
+    image: abdelaziz333/notification-service:1.0
+    build:
+      context: ./notification-service
+    ports:
+      - "${NOTIFICATION_SERVICE_PORT}:${NOTIFICATION_SERVICE_PORT}"
+    networks:
+      - ecommerce-net
+    environment:
+      LHOST: ${LHOST}
+      CONFIG_SERVER_SVC: ${CONFIG_SERVER_SVC}
+      CONFIG_SERVER_PORT: ${CONFIG_SERVER_PORT}
+      DISCOVERY_SERVER_SVC: ${DISCOVERY_SERVER_SVC}
+      DISCOVERY_SERVER_PORT: ${DISCOVERY_SERVER_PORT}
+      NOTIFICATION_SERVICE_PORT: ${NOTIFICATION_SERVICE_PORT}
+      CASSANDRA_SVC: ${NOTIFICATION_CASSANDRA_SVC}
+      CASSANDRA_KEYSPACE: ${NOTIFICATION_CASSANDRA_KEYSPACE}
+      CASSANDRA_PORT: ${NOTIFICATION_CASSANDRA_PORT}
+      KAFKA_SVC: ${KAFKA_SVC}
+      KAFKA_BROKER_PORT: ${KAFKA_BROKER_PORT}
+      KAFKA_CONTROLLER_PORT: ${KAFKA_CONTROLLER_PORT}
+    restart: unless-stopped
+    depends_on:
+      config-server-svc:
+        condition: service_healthy
+      discovery-server-svc:
+        condition: service_healthy
+    profiles:
+      - prod
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:8085/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  payment-service-svc:
+    container_name: payment-service
+    image: abdelaziz333/payment-service:1.0
+    build:
+      context: ./payment-service
+    ports:
+      - "${PAYMENT_SERVICE_PORT}:${PAYMENT_SERVICE_PORT}"
+    networks:
+      - ecommerce-net
+    environment:
+      LHOST: ${LHOST}
+      CONFIG_SERVER_SVC: ${CONFIG_SERVER_SVC}
+      CONFIG_SERVER_PORT: ${CONFIG_SERVER_PORT}
+      DISCOVERY_SERVER_SVC: ${DISCOVERY_SERVER_SVC}
+      DISCOVERY_SERVER_PORT: ${DISCOVERY_SERVER_PORT}
+      PAYMENT_SERVICE_PORT: ${PAYMENT_SERVICE_PORT}
+      POSTGRES_SVC: ${PAYMENT_POSTGRES_SVC}
+      POSTGRES_DB: ${PAYMENT_POSTGRES_DB}
+      POSTGRES_USER: ${PAYMENT_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${PAYMENT_POSTGRES_PASSWORD}
+      POSTGRES_PORT: ${PAYMENT_POSTGRES_PORT}
+      KAFKA_SVC: ${KAFKA_SVC}
+      KAFKA_BROKER_PORT: ${KAFKA_BROKER_PORT}
+      KAFKA_CONTROLLER_PORT: ${KAFKA_CONTROLLER_PORT}
+    restart: unless-stopped
+    depends_on:
+      config-server-svc:
+        condition: service_healthy
+      discovery-server-svc:
+        condition: service_healthy
+#      payment-postgres-svc:
 #        condition: service_healthy
-#    profiles:
-#      - prod
-#    healthcheck:
-#      test: [ "CMD", "wget", "-qO-", "http://localhost:8761/actuator/health" ]
-#      interval: 10s
-#      timeout: 5s
-#      retries: 10
-#      start_period: 30s
-#
-#  auth-service-svc:
-#    container_name: auth-service
-#    image: abdelaziz333/auth-service:1.0
-#    build:
-#      context: ./auth-service
-#    ports:
-#      - "${AUTH_SERVICE_PORT}:${AUTH_SERVICE_PORT}"
-#    networks:
-#      - ecommerce-net
-#    environment:
-#      LHOST: ${LHOST}
-#      CONFIG_SERVER_SVC: ${CONFIG_SERVER_SVC}
-#      CONFIG_SERVER_PORT: ${CONFIG_SERVER_PORT}
-#      DISCOVERY_SERVER_SVC: ${DISCOVERY_SERVER_SVC}
-#      DISCOVERY_SERVER_PORT: ${DISCOVERY_SERVER_PORT}
-#      AUTH_SERVICE_SVC: ${AUTH_SERVICE_SVC}
-#      AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
-#      REDIS_SVC: ${AUTH_REDIS_SVC}
-#      REDIS_PORT: ${AUTH_REDIS_PORT}
-#    restart: unless-stopped
-#    depends_on:
-#      discovery-server-svc:
-#        condition: service_healthy
-##      auth-redis-svc:
-##        condition: service_healthy
-#    profiles:
-#      - prod
-#    healthcheck:
-#      test: [ "CMD", "wget", "-qO-", "http://localhost:8083/actuator/health"]
-#      interval: 10s
-#      timeout: 5s
-#      retries: 10
-#      start_period: 30s
-#
-#  user-service-svc:
-#    container_name: user-service
-#    image: abdelaziz333/user-service:1.0
-#    build:
-#      context: ./user-service
-#    ports:
-#      - "${USER_SERVICE_PORT}:${USER_SERVICE_PORT}"
-#    networks:
-#      - ecommerce-net
-#    environment:
-#      LHOST: ${LHOST}
-#      CONFIG_SERVER_SVC: ${CONFIG_SERVER_SVC}
-#      CONFIG_SERVER_PORT: ${CONFIG_SERVER_PORT}
-#      DISCOVERY_SERVER_SVC: ${DISCOVERY_SERVER_SVC}
-#      DISCOVERY_SERVER_PORT: ${DISCOVERY_SERVER_PORT}
-#      USER_SERVICE_PORT: ${USER_SERVICE_PORT}
-#      POSTGRES_SVC: ${USER_POSTGRES_SVC}
-#      POSTGRES_DB: ${USER_POSTGRES_DB}
-#      POSTGRES_USER: ${USER_POSTGRES_USER}
-#      POSTGRES_PORT: ${USER_POSTGRES_PORT}
-#      POSTGRES_PASSWORD: ${USER_POSTGRES_PASSWORD}
-#      REDIS_SVC: ${USER_REDIS_SVC}
-#      REDIS_PORT: ${USER_REDIS_PORT}
-#      KAFKA_BROKER_PORT: ${KAFKA_BROKER_PORT}
-#      KAFKA_CONTROLLER_PORT: ${KAFKA_CONTROLLER_PORT}
-#    restart: unless-stopped
-#    depends_on:
-#      config-server-svc:
-#        condition: service_healthy
-#      discovery-server-svc:
-#        condition: service_healthy
-##      user-postgres-svc:
-##        condition: service_healthy
-##      user-redis-svc:
-##        condition: service_healthy
-#    profiles:
-#      - prod
-#    healthcheck:
-#      test: [ "CMD", "wget", "-qO-", "http://localhost:8080/actuator/health" ]
-#      interval: 10s
-#      timeout: 5s
-#      retries: 10
-#      start_period: 30s
-#
-#  product-service-svc:
-#    container_name: product-service
-#    image: abdelaziz333/product-service:1.0
-#    build:
-#      context: ./product-service
-#    ports:
-#      - "${PRODUCT_SERVICE_PORT}:${PRODUCT_SERVICE_PORT}"
-#    networks:
-#      - ecommerce-net
-#    environment:
-#      LHOST: ${LHOST}
-#      CONFIG_SERVER_SVC: ${CONFIG_SERVER_SVC}
-#      CONFIG_SERVER_PORT: ${CONFIG_SERVER_PORT}
-#      DISCOVERY_SERVER_SVC: ${DISCOVERY_SERVER_SVC}
-#      DISCOVERY_SERVER_PORT: ${DISCOVERY_SERVER_PORT}
-#      PRODUCT_SERVICE_PORT: ${PRODUCT_SERVICE_PORT}
-#      MONGO_SVC: ${PRODUCT_MONGO_SVC}
-#      MONGO_DB: ${PRODUCT_MONGO_DB}
-#      MONGO_PORT: ${PRODUCT_MONGO_PORT}
-#      MONGO_USER: ${PRODUCT_MONGO_USER}
-#      MONGO_PASSWORD: ${PRODUCT_MONGO_PASSWORD}
-#      ELASTIC_USER: ${ELASTIC_USER}
-#      ELASTIC_HTTP_PORT: ${ELASTIC_HTTP_PORT}
-#      ELASTIC_TRANSPORT_PORT: ${ELASTIC_TRANSPORT_PORT}
-#      KAFKA_BROKER_PORT: ${KAFKA_BROKER_PORT}
-#      KAFKA_CONTROLLER_PORT: ${KAFKA_CONTROLLER_PORT}
-#    restart: unless-stopped
-#    depends_on:
-#      config-server-svc:
-#        condition: service_healthy
-#      discovery-server-svc:
-#        condition: service_healthy
-##      product-mongo-svc:
-##        condition: service_healthy
-##      infra-kafka-svc:
-##        condition: service_healthy
-#    profiles:
-#      - prod
-#    healthcheck:
-#      test: [ "CMD", "wget", "-qO-", "http://localhost:8081/actuator/health" ]
-#      interval: 10s
-#      timeout: 5s
-#      retries: 10
-#      start_period: 30s
-#
-#  order-service-svc:
-#    container_name: order-service
-#    image: abdelaziz333/order-service:1.0
-#    build:
-#      context: ./order-service
-#    ports:
-#      - "${ORDER_SERVICE_PORT}:${ORDER_SERVICE_PORT}"
-#    networks:
-#      - ecommerce-net
-#    environment:
-#      LHOST: ${LHOST}
-#      CONFIG_SERVER_SVC: ${CONFIG_SERVER_SVC}
-#      CONFIG_SERVER_PORT: ${CONFIG_SERVER_PORT}
-#      DISCOVERY_SERVER_SVC: ${DISCOVERY_SERVER_SVC}
-#      DISCOVERY_SERVER_PORT: ${DISCOVERY_SERVER_PORT}
-#      ORDER_SERVICE_PORT: ${ORDER_SERVICE_PORT}
-#      POSTGRES_SVC: ${ORDER_POSTGRES_SVC}
-#      POSTGRES_DB: ${ORDER_POSTGRES_DB}
-#      POSTGRES_USER: ${ORDER_POSTGRES_USER}
-#      POSTGRES_PASSWORD: ${ORDER_POSTGRES_PASSWORD}
-#      POSTGRES_PORT: ${ORDER_POSTGRES_PORT}
-#      KAFKA_BROKER_PORT: ${KAFKA_BROKER_PORT}
-#      KAFKA_CONTROLLER_PORT: ${KAFKA_CONTROLLER_PORT}
-#    restart: unless-stopped
-#    depends_on:
-#      config-server-svc:
-#        condition: service_healthy
-#      discovery-server-svc:
-#        condition: service_healthy
-##      order-postgres-svc:
-##        condition: service_healthy
-#    profiles:
-#      - prod
-#    healthcheck:
-#      test: [ "CMD", "wget", "-qO-", "http://localhost:8082/actuator/health" ]
-#      interval: 10s
-#      timeout: 5s
-#      retries: 10
-#      start_period: 30s
-#
-#  cart-service-svc:
-#    container_name: cart-service
-#    image: abdelaziz333/cart-service:1.0
-#    build:
-#      context: ./cart-service
-#    ports:
-#      - "${CART_SERVICE_PORT}:${CART_SERVICE_PORT}"
-#    networks:
-#      - ecommerce-net
-#    environment:
-#      LHOST: ${LHOST}
-#      CONFIG_SERVER_SVC: ${CONFIG_SERVER_SVC}
-#      CONFIG_SERVER_PORT: ${CONFIG_SERVER_PORT}
-#      DISCOVERY_SERVER_SVC: ${DISCOVERY_SERVER_SVC}
-#      DISCOVERY_SERVER_PORT: ${DISCOVERY_SERVER_PORT}
-#      CART_SERVICE_PORT: ${CART_SERVICE_PORT}
-#      POSTGRES_SVC: ${CART_POSTGRES_SVC}
-#      POSTGRES_DB: ${CART_POSTGRES_DB}
-#      POSTGRES_USER: ${CART_POSTGRES_USER}
-#      POSTGRES_PASSWORD: ${CART_POSTGRES_PASSWORD}
-#      POSTGRES_PORT: ${CART_POSTGRES_PORT}
-#      REDIS_SVC: ${CART_REDIS_SVC}
-#      REDIS_PORT: ${CART_REDIS_PORT}
-#    restart: unless-stopped
-#    depends_on:
-#      config-server-svc:
-#        condition: service_healthy
-#      discovery-server-svc:
-#        condition: service_healthy
-##      cart-postgres-svc:
-##        condition: service_healthy
-##      cart-redis-svc:
-##        condition: service_healthy
-#    profiles:
-#      - prod
-#    healthcheck:
-#      test: [ "CMD", "wget", "-qO-", "http://localhost:8084/actuator/health" ]
-#      interval: 10s
-#      timeout: 5s
-#      retries: 10
-#      start_period: 30s
-#
-#  notification-service-svc:
-#    container_name: notification-service
-#    image: abdelaziz333/notification-service:1.0
-#    build:
-#      context: ./notification-service
-#    ports:
-#      - "${NOTIFICATION_SERVICE_PORT}:${NOTIFICATION_SERVICE_PORT}"
-#    networks:
-#      - ecommerce-net
-#    environment:
-#      LHOST: ${LHOST}
-#      CONFIG_SERVER_SVC: ${CONFIG_SERVER_SVC}
-#      CONFIG_SERVER_PORT: ${CONFIG_SERVER_PORT}
-#      DISCOVERY_SERVER_SVC: ${DISCOVERY_SERVER_SVC}
-#      DISCOVERY_SERVER_PORT: ${DISCOVERY_SERVER_PORT}
-#      NOTIFICATION_SERVICE_PORT: ${NOTIFICATION_SERVICE_PORT}
-#      CASSANDRA_SVC: ${NOTIFICATION_CASSANDRA_SVC}
-#      CASSANDRA_KEYSPACE: ${NOTIFICATION_CASSANDRA_KEYSPACE}
-#      CASSANDRA_PORT: ${NOTIFICATION_CASSANDRA_PORT}
-#      KAFKA_BROKER_PORT: ${KAFKA_BROKER_PORT}
-#      KAFKA_CONTROLLER_PORT: ${KAFKA_CONTROLLER_PORT}
-#    restart: unless-stopped
-#    depends_on:
-#      config-server-svc:
-#        condition: service_healthy
-#      discovery-server-svc:
-#        condition: service_healthy
-##      notification-cassandra-svc:
-##        condition: service_healthy
-#    profiles:
-#      - prod
-#    healthcheck:
-#      test: [ "CMD", "wget", "-qO-", "http://localhost:8085/actuator/health" ]
-#      interval: 10s
-#      timeout: 5s
-#      retries: 10
-#      start_period: 30s
-#
-#  payment-service-svc:
-#    container_name: payment-service
-#    image: abdelaziz333/payment-service:1.0
-#    build:
-#      context: ./payment-service
-#    ports:
-#      - "${PAYMENT_SERVICE_PORT}:${PAYMENT_SERVICE_PORT}"
-#    networks:
-#      - ecommerce-net
-#    environment:
-#      LHOST: ${LHOST}
-#      CONFIG_SERVER_SVC: ${CONFIG_SERVER_SVC}
-#      CONFIG_SERVER_PORT: ${CONFIG_SERVER_PORT}
-#      DISCOVERY_SERVER_SVC: ${DISCOVERY_SERVER_SVC}
-#      DISCOVERY_SERVER_PORT: ${DISCOVERY_SERVER_PORT}
-#      PAYMENT_SERVICE_PORT: ${PAYMENT_SERVICE_PORT}
-#      POSTGRES_SVC: ${PAYMENT_POSTGRES_SVC}
-#      POSTGRES_DB: ${PAYMENT_POSTGRES_DB}
-#      POSTGRES_USER: ${PAYMENT_POSTGRES_USER}
-#      POSTGRES_PASSWORD: ${PAYMENT_POSTGRES_PASSWORD}
-#      POSTGRES_PORT: ${PAYMENT_POSTGRES_PORT}
-#      KAFKA_BROKER_PORT: ${KAFKA_BROKER_PORT}
-#      KAFKA_CONTROLLER_PORT: ${KAFKA_CONTROLLER_PORT}
-#    restart: unless-stopped
-#    depends_on:
-#      config-server-svc:
-#        condition: service_healthy
-#      discovery-server-svc:
-#        condition: service_healthy
-##      payment-postgres-svc:
-##        condition: service_healthy
-#    profiles:
-#      - prod
-#    healthcheck:
-#      test: [ "CMD", "wget", "-qO-", "http://localhost:8086/actuator/health" ]
-#      interval: 10s
-#      timeout: 5s
-#      retries: 10
-#      start_period: 30s
-#
-#  api-gateway-svc:
-#    container_name: api-gateway
-#    image: abdelaziz333/api-gateway:1.0
-#    build:
-#      context: ./api-gateway
-#    ports:
-#      - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
-#    networks:
-#      - ecommerce-net
-#    environment:
-#      LHOST: ${LHOST}
-#      CONFIG_SERVER_SVC: ${CONFIG_SERVER_SVC}
-#      CONFIG_SERVER_PORT: ${CONFIG_SERVER_PORT}
-#      DISCOVERY_SERVER_SVC: ${DISCOVERY_SERVER_SVC}
-#      DISCOVERY_SERVER_PORT: ${DISCOVERY_SERVER_PORT}
-#    restart: unless-stopped
-#    depends_on:
-#      config-server-svc:
-#        condition: service_healthy
-#      discovery-server-svc:
-#        condition: service_healthy
-#      auth-service-svc:
-#        condition: service_healthy
-#      user-service-svc:
-#        condition: service_healthy
-#      product-service-svc:
-#        condition: service_healthy
-#      payment-service-svc:
-#        condition: service_healthy
-#      order-service-svc:
-#        condition: service_healthy
-#      cart-service-svc:
-#        condition: service_healthy
-#    profiles:
-#      - prod
+    profiles:
+      - prod
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:8086/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  api-gateway-svc:
+    container_name: api-gateway
+    image: abdelaziz333/api-gateway:1.0
+    build:
+      context: ./api-gateway
+    ports:
+      - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
+    networks:
+      - ecommerce-net
+    environment:
+      LHOST: ${LHOST}
+      CONFIG_SERVER_SVC: ${CONFIG_SERVER_SVC}
+      CONFIG_SERVER_PORT: ${CONFIG_SERVER_PORT}
+      DISCOVERY_SERVER_SVC: ${DISCOVERY_SERVER_SVC}
+      DISCOVERY_SERVER_PORT: ${DISCOVERY_SERVER_PORT}
+    restart: unless-stopped
+    depends_on:
+      config-server-svc:
+        condition: service_healthy
+      discovery-server-svc:
+        condition: service_healthy
+      auth-service-svc:
+        condition: service_healthy
+      user-service-svc:
+        condition: service_healthy
+      notification-service-svc:
+        condition: service_healthy
+      product-service-svc:
+        condition: service_healthy
+      payment-service-svc:
+        condition: service_healthy
+      order-service-svc:
+        condition: service_healthy
+      cart-service-svc:
+        condition: service_healthy
+    profiles:
+      - prod
 
   auth-redis-svc:
     container_name: auth-redis
     image: redis:alpine
     ports:
-      - "${AUTH_REDIS_PORT}:6379"
+      - "6380:6379"
     networks:
       - ecommerce-net
     restart: unless-stopped
@@ -391,7 +383,7 @@ services:
     container_name: user-postgres
     image: postgres:alpine
     ports:
-      - "${USER_POSTGRES_PORT}:5432"
+      - "5432:5432"
     networks:
       - ecommerce-net
     volumes:
@@ -411,7 +403,7 @@ services:
     container_name: user-redis
     image: redis:alpine
     ports:
-      - "${USER_REDIS_PORT}:6379"
+      - "6379:6379"
     networks:
       - ecommerce-net
     restart: unless-stopped
@@ -423,7 +415,7 @@ services:
     container_name: product-mongo
     image: mongo:latest
     ports:
-      - "${PRODUCT_MONGO_PORT}:27017"
+      - "27017:27017"
     networks:
       - ecommerce-net
     volumes:
@@ -443,7 +435,7 @@ services:
     container_name: order-postgres
     image: postgres:alpine
     ports:
-      - "${ORDER_POSTGRES_PORT}:5432"
+      - "5434:5432"
     networks:
       - ecommerce-net
     volumes:
@@ -463,7 +455,7 @@ services:
     container_name: cart-postgres
     image: postgres:alpine
     ports:
-      - "${CART_POSTGRES_PORT}:5432"
+      - "5433:5432"
     networks:
       - ecommerce-net
     volumes:
@@ -483,7 +475,7 @@ services:
     container_name: cart-redis
     image: redis:alpine
     ports:
-      - "${CART_REDIS_PORT}:6379"
+      - "6381:6379"
     networks:
       - ecommerce-net
     restart: unless-stopped
@@ -495,7 +487,7 @@ services:
     container_name: payment-postgres
     image: postgres:alpine
     ports:
-      - "${PAYMENT_POSTGRES_PORT}:5432"
+      - "5435:5432"
     networks:
       - ecommerce-net
     volumes:
@@ -515,11 +507,13 @@ services:
     container_name: notification-cassandra
     image: cassandra:4.1
     ports:
-      - "${NOTIFICATION_CASSANDRA_PORT}:9042"
+      - "9042:9042"
     networks:
       - ecommerce-net
     volumes:
       - notification_cassandra_data:/var/lib/cassandra
+      - ./cassandra/init/cassandra-init.sh:/cassandra-init.sh
+    entrypoint: ["/bin/bash", "/cassandra-init.sh"]
     environment:
       CASSANDRA_CLUSTER_NAME: ${NOTIFICATION_CASSANDRA_CLUSTER_NAME}
       CASSANDRA_DC: dc1
@@ -537,37 +531,32 @@ services:
     container_name: infra-kafka
     image: bitnami/kafka:latest
     ports:
-      - "${KAFKA_BROKER_PORT}:9092"
-      - "${KAFKA_CONTROLLER_PORT}:9093"
+      - "9092:9092"
+      - "9093:9093"
     networks:
       - ecommerce-net
     volumes:
       - infra_kafka_data:/bitnami/kafka
     environment:
-      # Enable KRaft mode (no Zookeeper)
       KAFKA_CFG_PROCESS_ROLES: controller,broker
       KAFKA_CFG_NODE_ID: 1
       KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
-#      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
-      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://${KAFKA_SVC}:9092
-      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://infra-kafka-svc:9092
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 1@infra-kafka-svc:9093
 
-      # Required even without auth
       KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
-
-      # Allow insecure listener (for dev only)
       ALLOW_PLAINTEXT_LISTENER: yes
     restart: unless-stopped
     profiles:
-      - dev
       - prod
+      - dev
 
   infra-vault-svc:
     container_name: infra-vault
     image: hashicorp/vault:latest
     ports:
-      - "${VAULT_PORT}:8200"
+      - "8200:8200"
     networks:
       - ecommerce-net
     volumes:
@@ -586,8 +575,8 @@ services:
     container_name: infra-elastic
     image: elasticsearch:9.1.5
     ports:
-      - "${ELASTIC_HTTP_PORT}:9200"
-      - "${ELASTIC_TRANSPORT_PORT}:9300"
+      - "9200:9200"
+      - "9300:9300"
     networks:
       - ecommerce-net
     volumes:
@@ -597,6 +586,8 @@ services:
       xpack.security.enabled: false
       action.auto_create_index: true
       ES_JAVA_OPTS: "-Xms1g -Xmx1g"
+      cluster.routing.allocation.disk.threshold_enabled: false
+      number_of_replicas: 0
     restart: unless-stopped
     profiles:
       - dev
@@ -606,7 +597,7 @@ services:
     container_name: infra-kibana
     image: kibana:9.1.5
     ports:
-      - "${KIBANA_PORT}:5601"
+      - "5601:5601"
     networks:
       - ecommerce-net
     environment:
@@ -623,8 +614,8 @@ services:
     container_name: infra-otel
     image: otel/opentelemetry-collector:latest
     ports:
-      - "${OTLP_GRPC_RECEIVER_PORT}:4317" # OTLP gRPC receiver
-      - "${OTLP_HTTP_RECEIVER_PORT}:4318" # OTLP http receiver
+      - "4317:4317" # OTLP gRPC receiver
+      - "4318:4318" # OTLP http receiver
     networks:
       - ecommerce-net
     volumes:
@@ -644,7 +635,7 @@ services:
     volumes:
       - ./infra/observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
-      - "${PROMETHEUS_PORT}:9090"
+      - "9090:9090"
     networks:
       - ecommerce-net
     restart: unless-stopped
@@ -656,7 +647,7 @@ services:
     container_name: infra-loki
     image: grafana/loki:latest
     ports:
-      - "${LOKI_PORT}:3100"
+      - "3100:3100"
     networks:
       - ecommerce-net
     volumes:
@@ -671,7 +662,7 @@ services:
     container_name: infra-tempo
     image: grafana/tempo:latest
     ports:
-      - "${TEMPO_PORT}:3200"
+      - "3200:3200"
     networks:
       - ecommerce-net
     volumes:
@@ -686,7 +677,7 @@ services:
     container_name: infra-grafana
     image: grafana/grafana:latest
     ports:
-      - "${GRAFANA_PORT}:3000"
+      - "3000:3000"
     networks:
       - ecommerce-net
     environment:

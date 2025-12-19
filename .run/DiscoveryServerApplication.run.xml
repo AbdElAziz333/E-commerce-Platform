@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="DiscoveryServerApplication" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="com.aziz.discovery_server.DiscoveryServerApplication" />
+    <module name="discovery-server.main" />
+    <option name="PROGRAM_PARAMETERS" value="--spring.profiles.active=dev" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
