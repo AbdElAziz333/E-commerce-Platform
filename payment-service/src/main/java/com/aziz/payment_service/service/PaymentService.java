@@ -20,7 +20,7 @@ public class PaymentService {
     private final PaymentRepository repository;
     private final PaymentMapper mapper;
     private final PaymentPublisher publisher;
-    private final RestTemplate restTemplate;
+//    private final RestTemplate restTemplate;
     private final PaymobConfig paymobConfig;
 
     public void sendAndSavePayment(OrderPaymentEvent event) {

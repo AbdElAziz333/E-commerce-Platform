@@ -74,7 +74,7 @@ public class ProductService {
 
         event.setType(ProductEventType.CREATE);
 
-        kafkaTemplate.send(kafkaConfig.getTopic(), product.getProductId(), event);
+        kafkaTemplate.send(kafkaConfig.getProductCreated(), product.getProductId(), event);
         return mapper.productToDto(product);
     }
 
@@ -100,7 +100,7 @@ public class ProductService {
 
         ProductEvent event = mapper.productToEvent(product);
         event.setType(ProductEventType.UPDATE);
-        kafkaTemplate.send(kafkaConfig.getTopic(), product.getProductId(), event);
+        kafkaTemplate.send(kafkaConfig.getProductCreated(), product.getProductId(), event);
 
         return mapper.productToDto(product);
     }
@@ -123,7 +123,7 @@ public class ProductService {
                 .productId(id)
                 .build();
 
-        kafkaTemplate.send(kafkaConfig.getTopic(), id, event);
+        kafkaTemplate.send(kafkaConfig.getProductCreated(), id, event);
     }
 
     @Transactional(readOnly = true)

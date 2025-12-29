@@ -1,6 +1,6 @@
 package com.aziz.payment_service.dto;
 
-import com.aziz.payment_service.kafka.events.types.OrderStatus;
+import com.aziz.payment_service.util.enums.OrderStatus;
 import com.aziz.payment_service.util.enums.PaymentMethod;
 import com.aziz.payment_service.util.enums.PaymentStatus;
 import lombok.Builder;

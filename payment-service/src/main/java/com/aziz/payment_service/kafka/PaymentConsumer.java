@@ -1,6 +1,6 @@
 package com.aziz.payment_service.kafka;
 
-import com.aziz.payment_service.kafka.events.PaymentEvent;
+import com.aziz.payment_service.kafka.events.OrderPaymentEvent;
 import com.aziz.payment_service.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +14,7 @@ public class PaymentConsumer {
     private final PaymentService service;
 
     @KafkaListener(topics = "${kafka.topic.order-payment}")
-    public void consumeOrderPayment(PaymentEvent event) {
+    public void consumeOrderPayment(OrderPaymentEvent event) {
             service.sendAndSavePayment(event);
     }
 }

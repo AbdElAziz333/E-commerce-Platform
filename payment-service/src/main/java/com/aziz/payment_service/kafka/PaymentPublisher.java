@@ -21,6 +21,7 @@ public class PaymentPublisher {
      * */
     public void publishPaymentCompleted(String email, String orderNumber, PaymentMethod paymentMethod) {
         PaymentSuccessEvent event = new PaymentSuccessEvent(
+                email,
                 orderNumber,
                 paymentMethod,
                 PaymentStatus.SUCCESS
@@ -35,6 +36,7 @@ public class PaymentPublisher {
      * */
     public void publishPaymentFailed(String email, String orderNumber, PaymentMethod paymentMethod) {
         PaymentFailedEvent event = new PaymentFailedEvent(
+                email,
                 orderNumber,
                 paymentMethod,
                 PaymentStatus.FAILED
