@@ -70,12 +70,6 @@ public class NotificationConsumer {
         service.sendAndSaveNotification(event.getEmail(), "Payment Success", msg);
     }
 
-    @KafkaListener(topics = "${kafka.topic.payment-failed}", groupId = "${spring.kafka.consumer.group-id}")
-    public void consumePaymentFailedEvent(PaymentFailedEvent event) {
-        String msg = "";
-        service.sendAndSaveNotification(event.getEmail(), "Payment Failed", msg);
-    }
-
     private static StringBuilder getStringBuilder(OrderCreationEvent event) {
         StringBuilder itemDetails = new StringBuilder();
 

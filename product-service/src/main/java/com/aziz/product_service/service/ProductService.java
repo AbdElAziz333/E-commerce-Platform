@@ -1,18 +1,14 @@
 package com.aziz.product_service.service;
 
-import com.aziz.product_service.config.KafkaConfig;
 import com.aziz.product_service.dto.ProductCreationRequest;
 import com.aziz.product_service.dto.ProductDto;
 import com.aziz.product_service.dto.ProductUpdateRequest;
-import com.aziz.product_service.kafka.ProductEvent;
 import com.aziz.product_service.mapper.ProductMapper;
 import com.aziz.product_service.model.Product;
-import com.aziz.product_service.repository.mongo.ProductMongoRepository;
-import com.aziz.product_service.util.ProductEventType;
+import com.aziz.product_service.repository.ProductRepository;
 import com.aziz.product_service.util.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,12 +18,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ProductService {
-    private final ProductMongoRepository mongoRepository;
-
-    private final KafkaTemplate<String, ProductEvent> kafkaTemplate;
+    private final ProductRepository mongoRepository;
 
     private final ProductMapper mapper;
-    private final KafkaConfig kafkaConfig;
 
     //TODO: needs pagination
     @Transactional(readOnly = true)
@@ -61,20 +54,6 @@ public class ProductService {
         Product savedProduct = mongoRepository.save(product);
         log.info("Product successfully created with id: {}, for user with id: {}", savedProduct.getProductId(), savedProduct.getUserId());
 
-        ProductEvent event = ProductEvent.builder()
-                .productId(product.getProductId())
-                .name(product.getName())
-                .description(product.getDescription())
-                .shortDescription(product.getShortDescription())
-                .sku(product.getSku())
-                .slug(product.getSlug())
-                .price(product.getPrice())
-                .stockQuantity(product.getStockQuantity())
-                .build();
-
-        event.setType(ProductEventType.CREATE);
-
-        kafkaTemplate.send(kafkaConfig.getProductCreated(), product.getProductId(), event);
         return mapper.productToDto(product);
     }
 
@@ -98,10 +77,6 @@ public class ProductService {
         mongoRepository.save(product);
         log.info("Product updated successfully with id: {}", request.getProductId());
 
-        ProductEvent event = mapper.productToEvent(product);
-        event.setType(ProductEventType.UPDATE);
-        kafkaTemplate.send(kafkaConfig.getProductCreated(), product.getProductId(), event);
-
         return mapper.productToDto(product);
     }
 
@@ -117,13 +92,6 @@ public class ProductService {
 
         mongoRepository.deleteById(id);
         log.info("Product deleted successfully with id: {}", id);
-
-        ProductEvent event = ProductEvent.builder()
-                .type(ProductEventType.DELETE)
-                .productId(id)
-                .build();
-
-        kafkaTemplate.send(kafkaConfig.getProductCreated(), id, event);
     }
 
     @Transactional(readOnly = true)

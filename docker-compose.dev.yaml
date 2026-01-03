@@ -1,0 +1,240 @@
+x-common-service: &common-service
+  networks:
+    ecommerce-net:
+  restart: unless-stopped
+
+services:
+  user-postgres:
+    image: postgres:alpine
+    ports:
+      - "5432:5432"
+    volumes:
+      - user_postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: user
+      POSTGRES_USER: aziz
+      POSTGRES_PASSWORD: aziz333
+    <<:  *common-service
+
+  user-redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    <<:  *common-service
+
+  auth-redis:
+    image: redis:alpine
+    ports:
+      - "6380:6379"
+    <<:  *common-service
+
+  product-mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - product_mongo_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: product
+      MONGO_INITDB_ROOT_USERNAME: aziz
+      MONGO_INITDB_ROOT_PASSWORD: aziz333
+    <<:  *common-service
+
+  cart-postgres:
+    image: postgres:alpine
+    ports:
+      - "5433:5432"
+    volumes:
+      - cart_postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: cart
+      POSTGRES_USER: aziz
+      POSTGRES_PASSWORD: aziz333
+    <<:  *common-service
+
+  cart-redis:
+    image: redis:alpine
+    ports:
+      - "6381:6379"
+    <<:  *common-service
+
+  order-postgres:
+    image: postgres:alpine
+    ports:
+      - "5434:5432"
+    volumes:
+      - order_postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: order
+      POSTGRES_USER: aziz
+      POSTGRES_PASSWORD: aziz333
+    <<:  *common-service
+
+  payment-postgres:
+    image: postgres:alpine
+    ports:
+      - "5435:5432"
+    volumes:
+      - payment_postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: payment
+      POSTGRES_USER: aziz
+      POSTGRES_PASSWORD: aziz333
+    <<:  *common-service
+
+  notification-cassandra:
+    image: cassandra:4.1
+    ports:
+      - "9042:9042"
+    volumes:
+      - notification_cassandra_data:/var/lib/cassandra
+      - ./cassandra/init/cassandra-init.sh:/cassandra-init.sh
+    entrypoint: ["/bin/bash", "/cassandra-init.sh"]
+    environment:
+      CASSANDRA_CLUSTER_NAME: ecommerce-prod
+      CASSANDRA_DC: dc1
+      CASSANDRA_RACK: rack1
+      CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
+      CASSANDRA_KEYSPACE: notification
+      MAX_HEAP_SIZE: "512M"
+      HEAP_NEWSIZE: "256M"
+    <<:  *common-service
+
+  # Infrastructure
+
+  infra-kafka:
+    image: bitnami/kafka:latest
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    volumes:
+      - infra_kafka_data:/bitnami/kafka
+    environment:
+      KAFKA_CFG_PROCESS_ROLES: controller,broker
+      KAFKA_CFG_NODE_ID: 1
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      ALLOW_PLAINTEXT_LISTENER: yes
+    <<:  *common-service
+
+  infra-prometheus:
+    image: prom/prometheus:main
+    volumes:
+      - ./infra/observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    <<:  *common-service
+
+  infra-grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN=aziz
+      - GF_SECURITY_ADMIN_PASSWORD=aziz333
+      - GF_PATHS_PROVISIONING=/infra/observability/grafana/provisioning
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./infra/observability/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./infra/observability/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+    depends_on:
+      - infra-prometheus
+    <<:  *common-service
+
+  # Exporters
+
+  user-postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:master
+    ports:
+      - "9187:9187"
+    environment:
+      DATA_SOURCE_NAME: "postgresql://aziz:aziz333@user-postgres:5432/user?sslmode=disable"
+    depends_on:
+      - user-postgres
+    <<:  *common-service
+
+  order-postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:master
+    ports:
+      - "9188:9187"
+    environment:
+      DATA_SOURCE_NAME: "postgresql://aziz:aziz333@order-postgres:5432/order?sslmode=disable"
+    depends_on:
+      - order-postgres
+    <<:  *common-service
+
+  cart-postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:master
+    ports:
+      - "9189:9187"
+    environment:
+      DATA_SOURCE_NAME: "postgresql://aziz:aziz333@cart-postgres:5432/cart?sslmode=disable"
+    depends_on:
+      - cart-postgres
+    <<:  *common-service
+
+  payment-postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:master
+    ports:
+      - "9190:9187"
+    environment:
+      DATA_SOURCE_NAME: "postgresql://aziz:aziz333@payment-postgres:5432/payment?sslmode=disable"
+    depends_on:
+      - payment-postgres
+    <<:  *common-service
+
+  user-redis-exporter:
+    image: oliver006/redis_exporter:alpine
+    ports:
+      - "9121:9121"
+    environment:
+      REDIS_ADDR: "user-redis:6379"
+    depends_on:
+      - user-redis
+    <<:  *common-service
+
+  auth-redis-exporter:
+    image: oliver006/redis_exporter:alpine
+    ports:
+      - "9122:9121"
+    environment:
+      REDIS_ADDR: "auth-redis:6379"
+    depends_on:
+      - auth-redis
+    <<:  *common-service
+
+  cart-redis-exporter:
+    image: oliver006/redis_exporter:alpine
+    ports:
+      - "9123:9121"
+    environment:
+      REDIS_ADDR: "cart-redis:6379"
+    depends_on:
+      - cart-redis
+    <<:  *common-service
+
+  product-mongo-exporter:
+    image: percona/mongodb_exporter:0.47.2
+    ports:
+      - "9216:9216"
+    command:
+      - "--mongo.uri=mongodb://aziz:aziz333@product-mongo:27017"
+    <<:  *common-service
+
+volumes:
+  user_postgres_data:
+  product_mongo_data:
+  order_postgres_data:
+  cart_postgres_data:
+  payment_postgres_data:
+  notification_cassandra_data:
+  infra_kafka_data:
+  grafana_data:
+
+networks:
+  ecommerce-net:
+    external: true

@@ -1,16 +1,14 @@
 run-dev:
-	docker compose --profile dev up
+	docker compose -f docker-compose.dev.yaml up
 down-dev:
-	docker compose --profile dev down
+	docker compose -f docker-compose.dev.yaml down
 clear-dev:
-	docker compose --profile dev down -v
-status:
-	docker compose ps
+	docker compose -f docker-compose.dev.yaml down -v
 run-prod:
-	docker compose --profile prod up
+	docker compose -f docker-compose.prod.yaml up
 down-prod:
-	docker compose --profile prod down
+	docker compose -f docker-compose.prod.yaml down
 clear-prod:
-	docker compose --profile prod down -v
+	docker compose -f docker-compose.prod.yaml down -v
 build:
-	docker compose --profile prod build config-server-svc discovery-server-svc auth-service-svc user-service-svc product-service-svc order-service-svc cart-service-svc notification-service-svc payment-service-svc api-gateway-svc
+	docker compose --profile prod build config-server discovery-server auth-service user-service product-service order-service cart-service payment-service notification-service api-gateway

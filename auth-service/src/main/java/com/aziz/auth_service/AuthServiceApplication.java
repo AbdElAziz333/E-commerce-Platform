@@ -9,7 +9,6 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 public class AuthServiceApplication {
 	public static void main(String[] args) {
         SpringApplication app = new SpringApplication(AuthServiceApplication.class);
-        app.addInitializers(new DotenvInitializer());
         app.run(args);
 	}
 }

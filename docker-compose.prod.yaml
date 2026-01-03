@@ -1,0 +1,301 @@
+x-common-env: &common-env
+  CONFIG_SERVER: config-server
+  CONFIG_SERVER_PORT: ${CONFIG_SERVER_PORT}
+  DISCOVERY_SERVER: discovery-server
+  DISCOVERY_SERVER_PORT: ${DISCOVERY_SERVER_PORT}
+
+x-common-kafka-env: &common-kafka-env
+  KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
+  KAFKA_PORT: ${KAFKA_PORT}
+  KAFKA_CA_PEM: /run/secrets/kafka_ca_pem
+  KAFKA_SERVICE_CERT: /run/secrets/kafka_service_cert
+  KAFKA_SERVICE_KEY: /run/secrets/kafka_service_key
+
+x-common-healthcheck: &common-healthcheck
+  interval: 10s
+  timeout: 5s
+  retries: 10
+  start_period: 30s
+
+x-simple-service: &simple-service
+  networks:
+    ecommerce-net:
+  restart: unless-stopped
+
+x-app-service: &app-service
+  networks:
+    - ecommerce-net
+  restart: unless-stopped
+  depends_on:
+    config-server:
+      condition: service_healthy
+    discovery-server:
+      condition: service_healthy
+
+services:
+  config-server:
+    image: abdelaziz333/config-server:1.0
+    build:
+      context: ./config-server
+    ports:
+      - "${CONFIG_SERVER_PORT}:${CONFIG_SERVER_PORT}"
+    secrets:
+      - config_server_git_pat
+    environment:
+      PORT: ${CONFIG_SERVER_PORT}
+      GIT_CONFIG_REPOSITORY_URI: ${GIT_CONFIG_REPOSITORY_URI}
+      GIT_USERNAME: ${GIT_USERNAME}
+      GIT_PAT_FILE: /run/secrets/config_server_git_pat
+    <<:  *simple-service
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:${CONFIG_SERVER_PORT}/actuator/health"]
+      <<: *common-healthcheck
+
+  discovery-server:
+    image: abdelaziz333/discovery-server:1.0
+    build:
+      context: ./discovery-server
+    ports:
+      - "${DISCOVERY_SERVER_PORT}:${DISCOVERY_SERVER_PORT}"
+    environment:
+      <<: *common-env
+    <<:  *simple-service
+    depends_on:
+      config-server:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:${DISCOVERY_SERVER_PORT}/actuator/health" ]
+      <<: *common-healthcheck
+
+  user-service:
+    image: abdelaziz333/user-service:1.0
+    build:
+      context: ./user-service
+    ports:
+      - "${USER_SERVICE_PORT}:${USER_SERVICE_PORT}"
+    secrets:
+      - user_postgres_password
+      - user_redis_password
+      - kafka_ca_pem
+      - kafka_service_cert
+      - kafka_service_key
+    environment:
+      <<: *common-env
+      <<: *common-kafka-env
+      PORT: ${USER_SERVICE_PORT}
+      POSTGRES_HOST: ${USER_POSTGRES_HOST}
+      POSTGRES_DATABASE: ${USER_POSTGRES_DATABASE}
+      POSTGRES_PORT: ${USER_POSTGRES_PORT}
+      POSTGRES_USER: ${USER_POSTGRES_USER}
+      POSTGRES_PASSWORD_FILE: /run/secrets/user_postgres_password
+      REDIS_URL: ${USER_REDIS_URL}
+      REDIS_PORT: ${USER_REDIS_PORT}
+      REDIS_USERNAME: ${USER_REDIS_USERNAME}
+      REDIS_PASSWORD_FILE: /run/secrets/user_redis_password
+    <<: *app-service
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:${USER_SERVICE_PORT}/actuator/health" ]
+      <<: *common-healthcheck
+
+  auth-service:
+    image: abdelaziz333/auth-service:1.0
+    build:
+      context: ./auth-service
+    ports:
+      - "${AUTH_SERVICE_PORT}:${AUTH_SERVICE_PORT}"
+    secrets:
+      - auth_redis_password
+    environment:
+      <<: *common-env
+      PORT: ${AUTH_SERVICE_PORT}
+      REDIS_URL: ${AUTH_REDIS_URL}
+      REDIS_PORT: ${AUTH_REDIS_PORT}
+      REDIS_USERNAME: ${AUTH_REDIS_USERNAME}
+      REDIS_PASSWORD_FILE: /run/secrets/auth_redis_password
+      ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET}
+      REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET}
+    <<: *app-service
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:${AUTH_SERVICE_PORT}/actuator/health"]
+      <<: *common-healthcheck
+
+  product-service:
+    image: abdelaziz333/product-service:1.0
+    build:
+      context: ./product-service
+    ports:
+      - "${PRODUCT_SERVICE_PORT}:${PRODUCT_SERVICE_PORT}"
+    secrets:
+      - product_mongo_password
+    environment:
+      <<: *common-env
+      PORT: ${PRODUCT_SERVICE_PORT}
+      MONGO_URL: ${PRODUCT_MONGO_URL}
+      MONGO_DATABASE: ${PRODUCT_MONGO_DATABASE}
+      MONGO_HOST: ${PRODUCT_MONGO_HOST}
+      MONGO_USER: ${PRODUCT_MONGO_USER}
+      MONGO_PASSWORD_FILE: /run/secrets/product_mongo_password
+    <<: *app-service
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:${PRODUCT_SERVICE_PORT}/actuator/health" ]
+      <<: *common-healthcheck
+
+  cart-service:
+    image: abdelaziz333/cart-service:1.0
+    build:
+      context: ./cart-service
+    ports:
+      - "${CART_SERVICE_PORT}:${CART_SERVICE_PORT}"
+    secrets:
+      - cart_postgres_password
+      - cart_redis_password
+    environment:
+      <<: *common-env
+      PORT: ${CART_SERVICE_PORT}
+      POSTGRES_HOST: ${CART_POSTGRES_HOST}
+      POSTGRES_DATABASE: ${CART_POSTGRES_DATABASE}
+      POSTGRES_PORT: ${CART_POSTGRES_PORT}
+      POSTGRES_USER: ${CART_POSTGRES_USER}
+      POSTGRES_PASSWORD_FILE: /run/secrets/cart_postgres_password
+      REDIS_URL: ${CART_REDIS_URL}
+      REDIS_PORT: ${CART_REDIS_PORT}
+      REDIS_USERNAME: ${CART_REDIS_USERNAME}
+      REDIS_PASSWORD_FILE: /run/secrets/cart_redis_password
+    <<: *app-service
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:${CART_SERVICE_PORT}/actuator/health" ]
+      <<: *common-healthcheck
+
+  order-service:
+    image: abdelaziz333/order-service:1.0
+    build:
+      context: ./order-service
+    ports:
+      - "${ORDER_SERVICE_PORT}:${ORDER_SERVICE_PORT}"
+    secrets:
+      - order_postgres_password
+      - kafka_ca_pem
+      - kafka_service_cert
+      - kafka_service_key
+    environment:
+      <<: *common-env
+      <<: *common-kafka-env
+      PORT: ${ORDER_SERVICE_PORT}
+      POSTGRES_HOST: ${ORDER_POSTGRES_HOST}
+      POSTGRES_DATABASE: ${ORDER_POSTGRES_DATABASE}
+      POSTGRES_PORT: ${ORDER_POSTGRES_PORT}
+      POSTGRES_USER: ${ORDER_POSTGRES_USER}
+      POSTGRES_PASSWORD_FILE: /run/secrets/order_postgres_password
+    <<: *app-service
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:${ORDER_SERVICE_PORT}/actuator/health" ]
+      <<: *common-healthcheck
+
+  payment-service:
+    image: abdelaziz333/payment-service:1.0
+    build:
+      context: ./payment-service
+    ports:
+      - "${PAYMENT_SERVICE_PORT}:${PAYMENT_SERVICE_PORT}"
+    secrets:
+      - payment_postgres_password
+      - kafka_ca_pem
+      - kafka_service_cert
+      - kafka_service_key
+    environment:
+      <<: *common-env
+      <<: *common-kafka-env
+      PORT: ${PAYMENT_SERVICE_PORT}
+      POSTGRES_HOST: ${PAYMENT_POSTGRES_HOST}
+      POSTGRES_DATABASE: ${PAYMENT_POSTGRES_DATABASE}
+      POSTGRES_PORT: ${PAYMENT_POSTGRES_PORT}
+      POSTGRES_USER: ${PAYMENT_POSTGRES_USER}
+      POSTGRES_PASSWORD_FILE: /run/secrets/payment_postgres_password
+    <<: *app-service
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:${PAYMENT_SERVICE_PORT}/actuator/health" ]
+      <<: *common-healthcheck
+
+  notification-service:
+    image: abdelaziz333/notification-service:1.0
+    build:
+      context: ./notification-service
+    ports:
+      - "${NOTIFICATION_SERVICE_PORT}:${NOTIFICATION_SERVICE_PORT}"
+    secrets:
+      - notification_cassandra_password
+      - kafka_ca_pem
+      - kafka_service_cert
+      - kafka_service_key
+    environment:
+      <<: *common-env
+      <<: *common-kafka-env
+      PORT: ${NOTIFICATION_SERVICE_PORT}
+      CASSANDRA_KEYSPACE: ${NOTIFICATION_CASSANDRA_KEYSPACE}
+      CASSANDRA_USER: ${NOTIFICATION_CASSANDRA_USER}
+      CASSANDRA_PASSWORD_FILE: /run/secrets/notification_cassandra_password
+    <<: *app-service
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:${NOTIFICATION_SERVICE_PORT}/actuator/health" ]
+      <<: *common-healthcheck
+
+  api-gateway:
+    image: abdelaziz333/api-gateway:1.0
+    build:
+      context: ./api-gateway
+    ports:
+      - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
+    environment:
+      <<: *common-env
+    restart: unless-stopped
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+      auth-service:
+        condition: service_healthy
+      user-service:
+        condition: service_healthy
+      notification-service:
+        condition: service_healthy
+      product-service:
+        condition: service_healthy
+      payment-service:
+        condition: service_healthy
+      order-service:
+        condition: service_healthy
+      cart-service:
+        condition: service_healthy
+
+networks:
+  ecommerce-net:
+    external: true
+
+secrets:
+  config_server_git_pat:
+    file: secrets/git_pat.txt
+  user_postgres_password:
+    file: secrets/user_postgres_password.txt
+  user_redis_password:
+    file: secrets/user_redis_password.txt
+  auth_redis_password:
+    file: secrets/auth_redis_password.txt
+  product_mongo_password:
+    file: secrets/product_mongo_password.txt
+  cart_postgres_password:
+    file: secrets/cart_postgres_password.txt
+  cart_redis_password:
+    file: secrets/cart_redis_password.txt
+  order_postgres_password:
+    file: secrets/order_postgres_password.txt
+  payment_postgres_password:
+    file: secrets/payment_postgres_password.txt
+  notification_cassandra_password:
+    file: secrets/notification_cassandra_password.txt
+  kafka_ca_pem:
+    file: secrets/kafka/ca.pem
+  kafka_service_cert:
+    file: secrets/kafka/service.cert
+  kafka_service_key:
+    file: secrets/kafka/service.key
