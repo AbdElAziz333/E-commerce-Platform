@@ -16,5 +16,5 @@ FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
 COPY --from=build /home/gradle/project/build/libs/*.jar app.jar
-EXPOSE 8084
+EXPOSE 8085
 ENTRYPOINT ["java", "-jar", "app.jar"]
