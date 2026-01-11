@@ -21,7 +21,7 @@ CREATE TABLE address (
     is_default_shipping BOOLEAN NOT NULL,
     created_at DATE NOT NULL,
     last_modified_at DATE NOT NULL,
-    user_id BIGINT NOT NULL UNIQUE,
+    user_id BIGINT NOT NULL,
     CONSTRAINT fk_address_user FOREIGN KEY (user_id)
     REFERENCES users(user_id) ON DELETE CASCADE
 );
