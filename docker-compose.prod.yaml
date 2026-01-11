@@ -67,11 +67,12 @@ services:
       PORT: ${USER_SERVICE_PORT}
       POSTGRES_HOST: user-postgres
       POSTGRES_DB: ${USER_POSTGRES_DB}
-      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_PORT: 5432
       POSTGRES_USER: ${USER_POSTGRES_USER}
       POSTGRES_PASSWORD: ${USER_POSTGRES_PASSWORD}
       REDIS_HOST: user-redis
-      REDIS_PORT: ${REDIS_PORT}
+      REDIS_PORT: 6379
+      REDIS_USER: ${USER_REDIS_USER}
       REDIS_PASSWORD: ${USER_REDIS_PASSWORD}
       KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
       KAFKA_PORT: ${KAFKA_PORT}
@@ -101,7 +102,8 @@ services:
       <<: *common-env
       PORT: ${AUTH_SERVICE_PORT}
       REDIS_HOST: auth-redis
-      REDIS_PORT: ${REDIS_PORT}
+      REDIS_PORT: 6379
+      REDIS_USER: ${AUTH_REDIS_USER}
       REDIS_PASSWORD: ${AUTH_REDIS_PASSWORD}
       ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET}
       REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET}
@@ -155,9 +157,10 @@ services:
       POSTGRES_DB: ${CART_POSTGRES_DB}
       POSTGRES_USER: ${CART_POSTGRES_USER}
       POSTGRES_PASSWORD: ${CART_POSTGRES_PASSWORD}
-      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_PORT: 5432
       REDIS_HOST: cart-redis
-      REDIS_PORT: ${REDIS_PORT}
+      REDIS_PORT: 6379
+      REDIS_USER: ${CART_REDIS_USER}
       REDIS_PASSWORD: ${CART_REDIS_PASSWORD}
     <<: *common-service
     depends_on:
@@ -184,7 +187,7 @@ services:
       PORT: ${ORDER_SERVICE_PORT}
       POSTGRES_HOST: order-postgres
       POSTGRES_DB: ${ORDER_POSTGRES_DB}
-      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_PORT: 5432
       POSTGRES_USER: ${ORDER_POSTGRES_USER}
       POSTGRES_PASSWORD: ${ORDER_POSTGRES_PASSWORD}
       KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
@@ -216,7 +219,7 @@ services:
       POSTGRES_DB: ${PAYMENT_POSTGRES_DB}
       POSTGRES_USER: ${PAYMENT_POSTGRES_USER}
       POSTGRES_PASSWORD: ${PAYMENT_POSTGRES_PASSWORD}
-      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_PORT: 5432
       KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
       KAFKA_PORT: ${KAFKA_PORT}
     <<: *common-service
@@ -312,19 +315,31 @@ services:
       <<: *database-healthcheck
 
   user-redis:
-    image: redis:alpine
-    command: ["redis-server", "--requirepass", "${USER_REDIS_PASSWORD}"]
+    image: redis:8.4.0-alpine
+    environment:
+      REDISCLI_USER: ${USER_REDIS_USER}
+      REDISCLI_PASSWORD: ${USER_REDIS_PASSWORD}
+    volumes:
+      - user_redis_data:/data
+      - ./config/redis/user_redis.conf:/usr/local/etc/redis/redis.conf
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
     <<: *common-service
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${USER_REDIS_PASSWORD}", "PING"]
+      test: ["CMD", "redis-cli", "PING"]
       <<: *database-healthcheck
 
   auth-redis:
-    image: redis:alpine
-    command: ["redis-server", "--requirepass", "${AUTH_REDIS_PASSWORD}"]
+    image: redis:8.4.0-alpine
+    environment:
+      REDISCLI_USER: ${AUTH_REDIS_USER}
+      REDISCLI_PASSWORD: ${AUTH_REDIS_PASSWORD}
+    volumes:
+      - auth_redis_data:/data
+      - ./config/redis/auth_redis.conf:/usr/local/etc/redis/redis.conf
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
     <<: *common-service
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${AUTH_REDIS_PASSWORD}", "PING"]
+      test: ["CMD", "redis-cli", "PING"]
       <<: *database-healthcheck
 
   product-mongo:
@@ -354,11 +369,17 @@ services:
       <<: *database-healthcheck
 
   cart-redis:
-    image: redis:alpine
-    command: [ "redis-server", "--requirepass", "${CART_REDIS_PASSWORD}" ]
+    image: redis:8.4.0-alpine
+    environment:
+      REDISCLI_USER: ${CART_REDIS_USER}
+      REDISCLI_PASSWORD: ${CART_REDIS_PASSWORD}
+    volumes:
+      - cart_redis_data:/data
+      - ./config/redis/cart_redis.conf:/usr/local/etc/redis/redis.conf
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
     <<: *common-service
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${CART_REDIS_PASSWORD}", "PING"]
+      test: ["CMD", "redis-cli", "PING"]
       <<: *database-healthcheck
 
   order-postgres:
@@ -549,7 +570,7 @@ services:
   user-redis-exporter:
     image: oliver006/redis_exporter:alpine
     environment:
-      REDIS_ADDR: "redis://:${USER_REDIS_PASSWORD}@user-redis:${REDIS_PORT}"
+      REDIS_ADDR: "redis://${EXPORTER_REDIS_USER}:${EXPORTER_REDIS_PASSWORD}@user-redis:6379"
     <<: *common-service
     depends_on:
       user-redis:
@@ -558,7 +579,7 @@ services:
   auth-redis-exporter:
     image: oliver006/redis_exporter:alpine
     environment:
-      REDIS_ADDR: "redis://:${AUTH_REDIS_PASSWORD}@auth-redis:${REDIS_PORT}"
+      REDIS_ADDR: "redis://${EXPORTER_REDIS_USER}:${EXPORTER_REDIS_PASSWORD}@auth-redis:6379"
     <<: *common-service
     depends_on:
       auth-redis:
@@ -567,7 +588,7 @@ services:
   cart-redis-exporter:
     image: oliver006/redis_exporter:alpine
     environment:
-      REDIS_ADDR: "redis://:${CART_REDIS_PASSWORD}@cart-redis:${REDIS_PORT}"
+      REDIS_ADDR: "redis://${EXPORTER_REDIS_USER}:${EXPORTER_REDIS_PASSWORD}@cart-redis:6379"
     <<: *common-service
     depends_on:
       cart-redis:
@@ -594,9 +615,12 @@ services:
 
 volumes:
   user_postgres_data:
+  user_redis_data:
+  auth_redis_data:
   product_mongo_data:
   order_postgres_data:
   cart_postgres_data:
+  cart_redis_data:
   payment_postgres_data:
   notification_cassandra_data:
   infra_kafka_data:
