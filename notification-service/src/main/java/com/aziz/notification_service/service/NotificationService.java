@@ -3,7 +3,6 @@ package com.aziz.notification_service.service;
 import com.aziz.notification_service.mail.MailMessageSender;
 import com.aziz.notification_service.mapper.NotificationMapper;
 import com.aziz.notification_service.model.Notification;
-import com.aziz.notification_service.repository.NotificationRepository;
 import com.aziz.notification_service.util.enums.NotificationStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,11 +16,10 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
-    private final NotificationRepository repository;
     private final MailMessageSender mailSender;
     private final NotificationMapper mapper;
 
-    public void sendAndSaveNotification(String email, String title, String message) {
+    public void sendNotification(String email, String title, String message) {
         Notification notification = Notification.builder()
                 .notificationId(UUID.randomUUID())
                 .email(email)
@@ -42,7 +40,6 @@ public class NotificationService {
             notification.setErrorMessage(e.getMessage());
         }
 
-        repository.save(notification);
         log.info("Notification saved with status: {} for email: {}", notification.getStatus(), notification.getEmail());
     }
 }

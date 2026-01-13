@@ -20,7 +20,7 @@ public class NotificationConsumer {
                 Halo %s, thanks for verifying the OTP and using our services! <3
                 """, event.getFirstName());
 
-        service.sendAndSaveNotification(event.getEmail(), "Welcome!", msg);
+        service.sendNotification(event.getEmail(), "Welcome!", msg);
     }
 
     @KafkaListener(topics = "${kafka.topic.otp-verification}", groupId = "${spring.kafka.consumer.group-id}")
@@ -30,7 +30,7 @@ public class NotificationConsumer {
             It will expire after some time, please don't share it with anyone.
             """, event.getOtp());
 
-        service.sendAndSaveNotification(event.getEmail(), "OTP Verification", msg);
+        service.sendNotification(event.getEmail(), "OTP Verification", msg);
     }
 
     @KafkaListener(topics = "${kafka.topic.order-created}", groupId = "${spring.kafka.consumer.group-id}")
@@ -61,13 +61,13 @@ public class NotificationConsumer {
                         event.getShippingAddressId()
                 );
 
-        service.sendAndSaveNotification(event.getEmail(), "Order Created", msg);
+        service.sendNotification(event.getEmail(), "Order Created", msg);
     }
 
     @KafkaListener(topics = "${kafka.topic.payment-completed}", groupId = "${spring.kafka.consumer.group-id}")
     public void consumePaymentCompletedEvent(PaymentSuccessEvent event) {
         String msg = "";
-        service.sendAndSaveNotification(event.getEmail(), "Payment Success", msg);
+        service.sendNotification(event.getEmail(), "Payment Success", msg);
     }
 
     private static StringBuilder getStringBuilder(OrderCreationEvent event) {

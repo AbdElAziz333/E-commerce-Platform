@@ -247,12 +247,6 @@ services:
       PORT: ${NOTIFICATION_SERVICE_PORT}
       MAIL_USER: ${MAIL_USER}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
-      CASSANDRA_HOST: ${NOTIFICATION_CASSANDRA_HOST}
-      CASSANDRA_PORT: ${CASSANDRA_PORT}
-      CASSANDRA_KEYSPACE: ${NOTIFICATION_CASSANDRA_KEYSPACE}
-      CASSANDRA_DATACENTER: ${NOTIFICATION_CASSANDRA_DATACENTER}
-      CASSANDRA_USER: ${NOTIFICATION_CASSANDRA_USER}
-      CASSANDRA_PASSWORD: ${NOTIFICATION_CASSANDRA_PASSWORD}
       KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
       KAFKA_PORT: ${KAFKA_PORT}
     <<: *common-service
@@ -260,8 +254,6 @@ services:
       config-server:
         condition: service_healthy
       discovery-server:
-        condition: service_healthy
-      notification-cassandra:
         condition: service_healthy
       infra-kafka:
         condition: service_healthy
@@ -407,30 +399,6 @@ services:
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${PAYMENT_POSTGRES_USER} -d ${PAYMENT_POSTGRES_DB}" ]
       <<: *database-healthcheck
-
-  notification-cassandra:
-    image: cassandra:4.1
-    volumes:
-      - notification_cassandra_data:/var/lib/cassandra
-      - ./cassandra/init/cassandra-init.sh:/cassandra-init.sh
-    entrypoint: [ "/bin/bash", "/cassandra-init.sh" ]
-    environment:
-      CASSANDRA_CLUSTER_NAME: ecommerce-prod
-      CASSANDRA_DC: ${NOTIFICATION_CASSANDRA_DATACENTER}
-      CASSANDRA_RACK: ${NOTIFICATION_CASSANDRA_RACK}
-      CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
-      CASSANDRA_KEYSPACE: ${NOTIFICATION_CASSANDRA_KEYSPACE}
-      MAX_HEAP_SIZE: "512M"
-      HEAP_NEWSIZE: "256M"
-      PASSWORD_AUTHENTICATOR: PasswordAuthenticator
-      CASSANDRA_PASSWORD: ${NOTIFICATION_CASSANDRA_PASSWORD}
-    <<: *common-service
-    healthcheck:
-      test: [ "CMD-SHELL", "cqlsh -u ${NOTIFICATION_CASSANDRA_USER} -p ${NOTIFICATION_CASSANDRA_PASSWORD} -e 'describe cluster' || exit 1" ]
-      interval: 15s
-      timeout: 10s
-      retries: 10
-      start_period: 60s
 
   # Infrastructure
 
@@ -622,7 +590,6 @@ volumes:
   cart_postgres_data:
   cart_redis_data:
   payment_postgres_data:
-  notification_cassandra_data:
   infra_kafka_data:
   grafana_data:
 
