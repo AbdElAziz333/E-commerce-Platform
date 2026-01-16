@@ -57,7 +57,7 @@ public class InternalAuthService {
                 .email(user.getEmail())
                 .phoneNumber(user.getPhoneNumber())
                 .preferredLanguage(user.getPreferredLanguage())
-                .addresses(addressMapper.addressesToDtos(user.getAddress()))
+                .addresses(addressMapper.addressesToDtos(user.getAddresses()))
                 .build();
     }
 
