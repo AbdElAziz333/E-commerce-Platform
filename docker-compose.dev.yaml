@@ -204,7 +204,7 @@ services:
     ports:
       - "9216:9216"
     command:
-      - "--mongo.uri=mongodb://aziz:aziz333@product-mongo:27017"
+      - "--mongodb.uri=mongodb://aziz:aziz333@product-mongo:27017"
     <<:  *common-service
 
 volumes:
