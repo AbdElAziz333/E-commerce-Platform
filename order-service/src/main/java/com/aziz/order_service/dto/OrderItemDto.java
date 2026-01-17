@@ -1,5 +1,8 @@
 package com.aziz.order_service.dto;
 
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -10,18 +13,18 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderItemDto {
-//    private Long orderItemId;
+    @NotNull
     private String productNameSnapshot;
-//    private String skuSnapshot;
+
+    @NotNull
+    @Min(1)
     private Integer quantity;
+
+    @NotNull
+    @DecimalMin(value = "0.01")
     private BigDecimal unitPrice;
-//    private BigDecimal taxAmount;
+
+    @NotNull
+    @DecimalMin(value = "0.01")
     private BigDecimal totalPrice;
-
-// TODO: we have to add variantAttributes
-//    private List<String> variantAttributes;
-//    private Integer returnedQuantity;
-
-    private OrderDto order;
-//    private String productId;
 }

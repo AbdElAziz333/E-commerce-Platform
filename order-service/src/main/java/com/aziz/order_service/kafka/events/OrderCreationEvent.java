@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -22,6 +21,5 @@ public class OrderCreationEvent {
     private BigDecimal shippingAmount;
     private BigDecimal totalAmount;
     private Long shippingAddressId;
-    private LocalDate estimatedDeliveryDate;
     private List<OrderItemDto> orderItems;
 }

@@ -10,7 +10,6 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -41,15 +40,6 @@ public class Order {
 
     @Column(nullable = false)
     private BigDecimal totalAmount;
-
-    @Column(nullable = false, updatable = false)
-    private String trackingNumber;
-
-    @Column(nullable = false)
-    private LocalDate estimatedDeliveryDate;
-
-    @Column
-    private LocalDate deliveredAt;
 
     @Column
     private String notes;

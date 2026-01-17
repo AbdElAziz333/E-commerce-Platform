@@ -1,5 +1,5 @@
 CREATE TYPE o_status AS ENUM ('PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELED');
-CREATE TYPE p_status AS ENUM ('PENDING', 'PAID', 'REFUNDED');
+CREATE TYPE p_status AS ENUM ('PENDING', 'PAID', 'FAILED', 'REFUNDED');
 CREATE TYPE p_method AS ENUM ('VISA', 'VODAFONE_CASH');
 
 CREATE TABLE orders (
@@ -8,9 +8,6 @@ CREATE TABLE orders (
     order_status o_status NOT NULL,
     shipping_amount NUMERIC(12, 2) NOT NULL,
     total_amount NUMERIC(12, 2) NOT NULL,
-    tracking_number VARCHAR(50),
-    estimated_delivery_date TIMESTAMPTZ NOT NULL,
-    delivered_at TIMESTAMPTZ NOT NULL,
     notes TEXT,
     payment_status p_status NOT NULL,
     payment_method p_method NOT NULL,
