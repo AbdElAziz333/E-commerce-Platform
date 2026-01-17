@@ -3,21 +3,24 @@ package com.aziz.order_service.model;
 import com.aziz.order_service.util.enums.*;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-@Entity
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 @Table(name = "orders")
 @EntityListeners(AuditingEntityListener.class)
 public class Order {
@@ -29,6 +32,7 @@ public class Order {
     private String orderNumber;
 
     @Column(nullable = false)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
@@ -38,23 +42,25 @@ public class Order {
     @Column(nullable = false)
     private BigDecimal totalAmount;
 
-//    @Column(nullable = false)
-//    @Enumerated(EnumType.STRING)
-//    private Carrier carrier;
-
+    @Column(nullable = false, updatable = false)
     private String trackingNumber;
 
+    @Column(nullable = false)
     private LocalDate estimatedDeliveryDate;
 
+    @Column
     private LocalDate deliveredAt;
 
+    @Column
     private String notes;
 
     @CreatedDate
-    private LocalDate createdAt;
+    @Column(updatable = false,  nullable = false)
+    private LocalDateTime createdAt;
 
     @LastModifiedDate
-    private LocalDate updatedAt;
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
 
     @Column(nullable = false)
     private Long userId;
@@ -62,28 +68,16 @@ public class Order {
     @Column(nullable = false)
     private Long shippingAddressId;
 
-//    @Column(nullable = false)
-//    private Long transactionId;
-
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(nullable = false)
     private PaymentStatus paymentStatus;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(nullable = false)
     private PaymentMethod paymentMethod;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems;
-
-    @PrePersist
-    public void onCreate() {
-        this.createdAt = LocalDate.now();
-        this.updatedAt = LocalDate.now();
-    }
-
-    @PreUpdate
-    public void onUpdate() {
-        this.updatedAt = LocalDate.now();
-    }
 }
