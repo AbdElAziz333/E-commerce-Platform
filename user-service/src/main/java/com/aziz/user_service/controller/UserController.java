@@ -5,10 +5,9 @@ import com.aziz.user_service.dto.UserUpdateRequest;
 import com.aziz.user_service.service.UserService;
 import com.aziz.user_service.util.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -17,8 +16,8 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<UserDto>>> getAllUsers() {
-        return ResponseEntity.ok(ApiResponse.success("Fetched all users", userService.getAllUsers()));
+    public ResponseEntity<ApiResponse<Page<UserDto>>> getUsersPage(@RequestParam(defaultValue = "0") int page) {
+        return ResponseEntity.ok(ApiResponse.success("Fetched users for page " + page, userService.getUsersPage(page)));
     }
 
     @GetMapping("/{id}")
