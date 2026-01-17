@@ -1,12 +1,17 @@
+CREATE TYPE p_method AS ENUM ('VISA', 'VODAFONE_CASH');
+CREATE TYPE p_currency AS ENUM ('EGP', 'USD', 'EUR', 'RUB');
+CREATE TYPE p_status AS ENUM ('PENDING', 'SUCCESS', 'FAILED', 'REFUNDED', 'CANCELLED');
+
 CREATE TABLE payment (
-    payment_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    order_id TEXT NOT NULL,
+    payment_id UUID PRIMARY KEY,
+    order_id UUID NOT NULL,
+    order_number VARCHAR(100) NOT NULL,
     user_id BIGINT NOT NULL,
-    amount NUMERIC(12,2) NOT NULL,
-    method VARCHAR(30) NOT NULL CHECK (method IN ('VISA', 'VODAFONE_CASH')),
-    currency VARCHAR(30) NOT NULL CHECK (currency IN ('EGP', 'USD', 'EUR', 'RUB')),
-    status VARCHAR(30) NOT NULL CHECK (status IN ('PENDING', 'SUCCESS', 'FAILED', 'REFUNDED', 'CANCELLED')),
-    provider_transaction_id VARCHAR(150),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    totalAmount NUMERIC(12,2) NOT NULL,
+    method p_method NOT NULL,
+    currency p_currency NOT NULL,
+    status p_status NOT NULL DEFAULT 'PENDING',
+    provider_transaction_id VARCHAR(150) NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
