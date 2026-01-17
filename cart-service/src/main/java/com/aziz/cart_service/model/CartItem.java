@@ -11,12 +11,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Entity
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 @EntityListeners(AuditingEntityListener.class)
 public class CartItem {
     @Id
