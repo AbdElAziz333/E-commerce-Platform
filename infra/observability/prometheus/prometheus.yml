@@ -2,17 +2,73 @@ global:
   scrape_interval: 10s
 
 scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets:
+          - 'localhost:9090'
   - job_name: 'microservices'
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets:
-          - 'config-server:8203'
-          - 'discovery-server:8761'
-          - 'api-gateway:8202'
-          - 'user-service:8080'
-          - 'product-service:8081'
-          - 'order-service:8082'
-          - 'auth-service:8083'
-          - 'cart-service:8084'
-          - 'notification-service:8085'
-          - 'payment-service:8086'
+          - 'localhost:8203'
+          - 'localhost:8761'
+          - 'localhost:8202'
+          - 'localhost:8080'
+          - 'localhost:8081'
+          - 'localhost:8082'
+          - 'localhost:8083'
+          - 'localhost:8084'
+          - 'localhost:8085'
+          - 'localhost:8086'
+#      - targets:
+#          - 'config-server:8203'
+#          - 'discovery-server:8761'
+#          - 'api-gateway:8202'
+#          - 'user-service:8080'
+#          - 'product-service:8081'
+#          - 'order-service:8082'
+#          - 'auth-service:8083'
+#          - 'cart-service:8084'
+#          - 'notification-service:8085'
+#          - 'payment-service:8086'
+  - job_name: 'postgres'
+    static_configs:
+      - targets:
+          - 'infra-user-postgres-exporter-svc:9187'
+        labels:
+          database: 'user-postgres'
+      - targets:
+          - 'infra-order-postgres-exporter-svc:9188'
+        labels:
+          database: 'order-postgres'
+      - targets:
+          - 'infra-cart-postgres-exporter-svc:9189'
+        labels:
+          database: 'cart-postgres'
+      - targets:
+          - 'infra-payment-postgres-exporter-svc:9190'
+        labels:
+          database: 'payment-postgres'
+
+  - job_name: 'redis'
+    static_configs:
+      - targets:
+          - 'infra-user-redis-exporter-svc:9121'
+        labels:
+          database: 'user-redis'
+      - targets:
+          - 'infra-auth-redis-exporter-svc:9122'
+        labels:
+          database: 'auth-redis'
+      - targets:
+          - 'infra-cart-redis-exporter-svc:9123'
+        labels:
+          database: 'cart-redis'
+
+  - job_name: 'mongo'
+    static_configs:
+      - targets:
+          - 'infra-product-mongo-exporter-svc:9216'
+        labels:
+          database: 'product-mongo'
+

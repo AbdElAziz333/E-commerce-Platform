@@ -9,11 +9,13 @@ import com.aziz.user_service.util.exceptions.*;
 import com.aziz.user_service.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -23,12 +25,12 @@ public class UserService {
     private final UserMapper mapper;
     private final PasswordEncoder encoder;
 
-    //TODO: needs pagination
     @Transactional(readOnly = true)
-    public List<UserDto> getAllUsers() {
-        log.debug("Fetching all users");
-        List<UserDto> users = repository.findAll().stream().map(mapper::userToDto).toList();
-        log.info("Fetched {} user", users.size());
+    public Page<UserDto> getUsersPage(int page) {
+        log.debug("Fetching users for the page: {}", page);
+        Pageable pageable = PageRequest.of(page, 100, Sort.by("createdAt").ascending());
+        Page<UserDto> users = repository.findAll(pageable).map(mapper::userToDto);
+        log.info("Fetched {} users for page: {}", users.getNumberOfElements(), page);
         return users;
     }
 

@@ -38,3 +38,7 @@ out/
 secrets/
 .gradle/
 .env
+infra/vault/data/
+infra/vault/logs/
+/notification-service/src/main/resources/secure-connect.zip
+config/redis/*

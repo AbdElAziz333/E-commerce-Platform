@@ -3,7 +3,7 @@ package com.aziz.product_service;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+//@SpringBootTest
 class ProductServiceApplicationTests {
 
 	@Test

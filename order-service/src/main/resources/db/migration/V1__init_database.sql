@@ -1,34 +1,30 @@
-CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+CREATE TYPE o_status AS ENUM ('PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELED');
+CREATE TYPE p_status AS ENUM ('PENDING', 'PAID', 'FAILED', 'REFUNDED');
+CREATE TYPE p_method AS ENUM ('VISA', 'VODAFONE_CASH');
 
 CREATE TABLE orders (
-    order_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    order_id UUID PRIMARY KEY,
     order_number VARCHAR(50) NOT NULL,
-    order_status VARCHAR(30) NOT NULL CHECK (order_status IN ('PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELED')),
-    shipping_amount NUMERIC NOT NULL,
-    total_amount NUMERIC NOT NULL,
---    carrier VARCHAR(30) NOT NULL CHECK (carrier IN ('FedEx', 'Aramex')),
-    tracking_number VARCHAR(50),
-    estimated_delivery_date DATE,
-    delivered_at DATE,
+    order_status o_status NOT NULL,
+    shipping_amount NUMERIC(12, 2) NOT NULL,
+    total_amount NUMERIC(12, 2) NOT NULL,
     notes TEXT,
-    payment_status VARCHAR(20) NOT NULL CHECK (payment_status IN ('PENDING', 'PAID', 'REFUNDED')),
-    payment_method VARCHAR(20) NOT NULL CHECK (payment_method IN ('VISA', 'VODAFONE_CASH', 'PAYPAL')),
-    created_at DATE NOT NULL,
-    updated_at DATE NOT NULL,
+    payment_status p_status NOT NULL,
+    payment_method p_method NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     user_id BIGINT NOT NULL,
     shipping_address_id BIGINT NOT NULL
---    transaction_id BIGINT NOT NULL
 );
 
 CREATE TABLE order_item (
-    order_item_id SERIAL PRIMARY KEY,
+    order_item_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    order_id UUID NOT NULL,
     product_name_snapshot VARCHAR(30) NOT NULL,
     sku_snapshot VARCHAR(30) NOT NULL,
     quantity INT NOT NULL,
-    unit_price NUMERIC NOT NULL,
---    tax_amount NUMERIC NOT NULL,
-    total_price NUMERIC NOT NULL,
---    variant_attributes JSONB NOT NULL,
-    order_id UUID NOT NULL,
-    CONSTRAINT fk_order_item_order FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE
+    unit_price NUMERIC(12, 2) NOT NULL,
+    total_price NUMERIC(12, 2) NOT NULL,
+    CONSTRAINT fk_order_item_order FOREIGN KEY (order_id)
+        REFERENCES orders(order_id) ON DELETE CASCADE
 );

@@ -8,6 +8,7 @@ import com.aziz.user_service.util.enums.PreferredLanguage;
 import com.aziz.user_service.util.enums.Role;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class TestDataUtility {
@@ -19,8 +20,8 @@ public class TestDataUtility {
     private static final String PHONE_NUMBER = "01211111111";
     private static final Role ROLE = Role.ROLE_USER;
     private static final PreferredLanguage PREFERRED_LANGUAGE = PreferredLanguage.ARABIC;
-    private static final LocalDate CREATED_AT = LocalDate.of(2005, 12, 11);
-    private static final LocalDate LAST_MODIFIED_AT = LocalDate.of(2005, 12, 11);
+    private static final LocalDateTime CREATED_AT = LocalDateTime.of(2005, 12, 11, 2, 45, 23);
+    private static final LocalDateTime LAST_MODIFIED_AT = LocalDateTime.of(2005, 12, 11, 3, 12, 45);
 
     // Address
     private static final Long ADDRESS_ID = 1L;
@@ -30,8 +31,8 @@ public class TestDataUtility {
     private static final String STATE = "Kafr-El Draw";
     private static final String POSTAL_CODE = "22621";
     private static final boolean IS_DEFAULT_SHIPPING = true;
-    private static final LocalDate ADDRESS_CREATED_AT = LocalDate.of(2025, 11, 13);
-    private static final LocalDate ADDRESS_LAST_MODIFIED_AT = LocalDate.of(2025, 11, 13);
+    private static final LocalDateTime ADDRESS_CREATED_AT = LocalDateTime.of(2005, 12, 13, 2, 45, 23);;
+    private static final LocalDateTime ADDRESS_LAST_MODIFIED_AT = LocalDateTime.of(2005, 12, 13, 3, 12, 45);
 
     public static User createUser() {
         return User.builder()
@@ -45,7 +46,7 @@ public class TestDataUtility {
                 .preferredLanguage(PREFERRED_LANGUAGE)
                 .createdAt(CREATED_AT)
                 .lastModifiedAt(LAST_MODIFIED_AT)
-                .address(List.of(createAddress(), createAddress()))
+                .addresses(List.of(createAddress(), createAddress()))
                 .build();
     }
 
@@ -67,7 +68,8 @@ public class TestDataUtility {
     }
 
     public static UserUpdateRequest createUserUpdateRequest() {
-        return new UserUpdateRequest(USER_ID, "Ramadan", "Karim", "ramadankarim123", "01233333333");
+//        return new UserUpdateRequest(USER_ID, "Ramadan", "Karim", "ramadankarim123", "01233333333");
+        return new UserUpdateRequest("Ramadan", "Karim", "ramadankarim123", "01233333333");
     }
 
     public static AddressDto createAddressDto() {

@@ -1,27 +1,31 @@
+CREATE TYPE user_role AS ENUM ('ROLE_USER', 'ROLE_VENDOR', 'ROLE_ADMIN');
+CREATE TYPE language_preference AS ENUM ('ARABIC', 'ENGLISH', 'RUSSIAN', 'FRENCH');
+CREATE TYPE egypt_city AS ENUM ('ALEXANDRIA', 'EL_BEHEIRA', 'CAIRO', 'TANTA');
+
 CREATE TABLE users (
-    user_id SERIAL PRIMARY KEY,
+    user_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     first_name VARCHAR(30) NOT NULL,
     last_name VARCHAR(30) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     phone_number VARCHAR(13) NOT NULL,
-    role VARCHAR(30) NOT NULL CHECK (role IN ('ROLE_USER', 'ROLE_VENDOR', 'ROLE_ADMIN')),
-    preferred_language VARCHAR(30) NOT NULL CHECK (preferred_language IN ('ARABIC', 'ENGLISH', 'RUSSIAN')),
-    created_at DATE NOT NULL,
-    last_modified_at DATE NOT NULL
+    role user_role NOT NULL DEFAULT 'ROLE_USER',
+    preferred_language language_preference NOT NULL DEFAULT 'ARABIC',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE address (
-    address_id SERIAL PRIMARY KEY,
+    address_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id BIGINT NOT NULL,
     street_line1 VARCHAR(150) NOT NULL,
     street_line2 VARCHAR(150),
-    city VARCHAR(30) NOT NULL CHECK (city IN ('CAIRO', 'EL_BEHEIRA', 'ALEXANDRIA', 'TANTA')),
+    city egypt_city NOT NULL,
     state VARCHAR(100) NOT NULL,
     postal_code VARCHAR(20) NOT NULL,
-    is_default_shipping BOOLEAN NOT NULL,
-    created_at DATE NOT NULL,
-    last_modified_at DATE NOT NULL,
-    user_id BIGINT NOT NULL UNIQUE,
+    is_default_shipping BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_modified_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_address_user FOREIGN KEY (user_id)
-    REFERENCES users(user_id) ON DELETE CASCADE
+        REFERENCES users(user_id) ON DELETE CASCADE
 );

@@ -1,45 +1,44 @@
 package com.aziz.order_service.kafka;
 
 import com.aziz.order_service.config.KafkaConfig;
-import com.aziz.order_service.dto.OrderItemDto;
-import com.aziz.order_service.kafka.events.OrderEvent;
-import com.aziz.order_service.kafka.events.types.OrderEventType;
-import com.aziz.order_service.util.enums.OrderStatus;
+import com.aziz.order_service.kafka.events.OrderCreationEvent;
+import com.aziz.order_service.kafka.events.OrderPaymentEvent;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class OrderPublisher {
-    private final KafkaTemplate<String, OrderEvent> kafkaTemplate;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
     private final KafkaConfig config;
 
-    public void publishOrder(
-            String email,
-            String orderNumber,
-            OrderStatus orderStatus,
-            BigDecimal shippingAmount,
-            BigDecimal totalAmount,
-            Long shippingAddressId,
-            LocalDate estimatedDeliveryDate,
-            List<OrderItemDto> orderItems
-    ) {
-        OrderEvent event = new OrderEvent(
-                OrderEventType.ORDER_CREATED,
-                email,
-                orderNumber,
-                orderStatus,
-                shippingAmount,
-                totalAmount,
-                shippingAddressId,
-                estimatedDeliveryDate,
-                orderItems
-        );
-        kafkaTemplate.send(config.getOrderEvents(), event.getEmail(), event);
+    /**
+     * publishes an event to the notification-service to send notifications to user's mail.
+     * @author Aziz
+     * */
+    public void publish(OrderCreationEvent event) {
+        send(config.getOrderCreated(), event.getEmail(), event);
+    }
+
+    /**
+     * publishes an event to the payment-service to continue payment business logic.
+     * @author Aziz
+     * */
+    public void publish(OrderPaymentEvent event) {
+        send(config.getOrderPayment(), event.getEmail(), event);
+    }
+
+    private void send(String topic, String key, Object event) {
+        kafkaTemplate.send(topic, key, event)
+                .whenComplete((result, ex) -> {
+                    if (ex != null) {
+                        log.error("Failed to publish to topic {} event {}", topic, event, ex);
+                    } else {
+                        log.debug("Published to topic {} offset={}", topic, result.getRecordMetadata().offset());
+                    }
+                });
     }
 }

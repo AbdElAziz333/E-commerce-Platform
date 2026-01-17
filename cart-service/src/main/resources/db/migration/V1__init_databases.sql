@@ -3,8 +3,8 @@ CREATE TABLE cart (
     user_id BIGINT,
     session_id VARCHAR(255),
     status TEXT NOT NULL DEFAULT 'ACTIVE',
-    created_at TIMESTAMP NOT NULL DEFAULT now(),
-    updated_at TIMESTAMP NOT NULL DEFAULT now()
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE cart_item (
@@ -16,5 +16,7 @@ CREATE TABLE cart_item (
     quantity INT NOT NULL CHECK (quantity > 0),
     unit_price_snapshot NUMERIC(19, 4) NOT NULL,
     total_price NUMERIC(19, 4) NOT NULL,
-    added_at TIMESTAMP NOT NULL
+    added_at TIMESTAMPTZ NOT NULL,
+    CONSTRAINT fk_cart_item_cart FOREIGN KEY (cart_id)
+        REFERENCES cart(cart_id) ON DELETE CASCADE
 );

@@ -1,19 +1,20 @@
 package com.aziz.order_service.dto;
 
 import com.aziz.order_service.util.enums.OrderStatus;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 
-import java.time.LocalDate;
 import java.util.UUID;
 
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class OrderUpdateRequest {
+    @NotNull
     private UUID orderId;
+
+    @NotNull
     private OrderStatus orderStatus;
-    private LocalDate estimatedDeliveryDate;
-    private LocalDate deliveredAt;
 }

@@ -3,11 +3,14 @@ package com.aziz.user_service.model;
 import com.aziz.user_service.util.enums.City;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Builder
 @NoArgsConstructor
@@ -28,7 +31,8 @@ public class Address {
     private String streetLine2;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 30)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(nullable = false)
     private City city;
 
     @Column(nullable = false, length = 100)
@@ -42,13 +46,13 @@ public class Address {
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 
     @LastModifiedDate
-    @Column(nullable = false, updatable = false)
-    private LocalDate lastModifiedAt;
+    @Column(nullable = false)
+    private LocalDateTime lastModifiedAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 }
