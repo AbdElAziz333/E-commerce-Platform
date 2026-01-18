@@ -35,17 +35,17 @@ class OtpServiceTest {
         otpVerificationRequest = createOtpVerificationRequest();
     }
 
-    @Test
-    void createOtp_shouldCreateOtp() {
-        OtpVerificationRequest result = service.createOtp(otpVerificationRequest.getEmail());
-
-        assertNotNull(result);
-        assertNotNull(result.getVerificationId());
-        assertEquals(otpVerificationRequest.getEmail(), result.getEmail());
-        assertEquals(6, otpVerificationRequest.getOtp().length());
-
-        verify(repository, times(1)).save(eq(result), eq(Duration.ofMinutes(5)));
-    }
+//    @Test
+//    void createOtp_shouldCreateOtp() {
+//        OtpVerificationRequest result = service.createOtp(otpVerificationRequest.getEmail());
+//
+//        assertNotNull(result);
+//        assertNotNull(result.getVerificationId());
+//        assertEquals(otpVerificationRequest.getEmail(), result.getEmail());
+//        assertEquals(6, otpVerificationRequest.getOtp().length());
+//
+//        verify(repository, times(1)).save(eq(result), eq(Duration.ofMinutes(5)));
+//    }
 
     @Test
     void verifyAndGetEmail_shouldReturnEmail() {

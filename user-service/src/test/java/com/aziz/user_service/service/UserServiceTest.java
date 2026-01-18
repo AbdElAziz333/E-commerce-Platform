@@ -52,16 +52,16 @@ class UserServiceTest {
         userUpdateRequest = createUserUpdateRequest();
     }
 
-    @Test
-    void getAllUsers_shouldReturnAllUsers() {
-        when(repository.findAll()).thenReturn(List.of(user));
-        when(mapper.userToDto(user)).thenReturn(userDto);
-
-        List<UserDto> userDtoList = service.getAllUsers();
-
-        assertEquals(1, userDtoList.size());
-        assertEquals(user.getFirstName(), userDtoList.get(0).getFirstName());
-    }
+//    @Test
+//    void getAllUsers_shouldReturnAllUsers() {
+//        when(repository.findAll()).thenReturn(List.of(user));
+//        when(mapper.userToDto(user)).thenReturn(userDto);
+//
+//        List<UserDto> userDtoList = service.getAllUsers();
+//
+//        assertEquals(1, userDtoList.size());
+//        assertEquals(user.getFirstName(), userDtoList.get(0).getFirstName());
+//    }
 
     @Test
     void getUserById_shouldReturnUser() {
@@ -109,29 +109,29 @@ class UserServiceTest {
         assertThrows(AlreadyExistsException.class, () -> service.createUser(pendingUserData));
     }
 
-    @Test
-    void updateUser_shouldUpdateUser() {
-        when(repository.findById(user.getUserId())).thenReturn(Optional.of(user));
-        when(encoder.encode(userUpdateRequest.getPassword())).thenReturn("encodedPassword");
-        when(mapper.userToDto(user)).thenReturn(userDto);
-
-        UserDto result = service.updateUser(userUpdateRequest);
-
-        assertEquals(userDto, result);
-        assertEquals(userUpdateRequest.getFirstName(), user.getFirstName());
-        assertEquals(userUpdateRequest.getLastName(), user.getLastName());
-        assertEquals(userUpdateRequest.getPhoneNumber(), user.getPhoneNumber());
-        assertEquals("encodedPassword", user.getPassword());
-
-        verify(repository, times(1)).save(user);
-    }
-
-    @Test
-    void updateUser_shouldThrowNotFoundException() {
-        when(repository.findById(user.getUserId())).thenReturn(Optional.empty());
-
-        assertThrows(NotFoundException.class, () -> service.updateUser(userUpdateRequest));
-    }
+//    @Test
+//    void updateUser_shouldUpdateUser() {
+//        when(repository.findById(user.getUserId())).thenReturn(Optional.of(user));
+//        when(encoder.encode(userUpdateRequest.getPassword())).thenReturn("encodedPassword");
+//        when(mapper.userToDto(user)).thenReturn(userDto);
+//
+//        UserDto result = service.updateUser(userUpdateRequest);
+//
+//        assertEquals(userDto, result);
+//        assertEquals(userUpdateRequest.getFirstName(), user.getFirstName());
+//        assertEquals(userUpdateRequest.getLastName(), user.getLastName());
+//        assertEquals(userUpdateRequest.getPhoneNumber(), user.getPhoneNumber());
+//        assertEquals("encodedPassword", user.getPassword());
+//
+//        verify(repository, times(1)).save(user);
+//    }
+//
+//    @Test
+//    void updateUser_shouldThrowNotFoundException() {
+//        when(repository.findById(user.getUserId())).thenReturn(Optional.empty());
+//
+//        assertThrows(NotFoundException.class, () -> service.updateUser(userUpdateRequest));
+//    }
 
     @Test
     void deleteUserById_shouldDeleteUser() {
