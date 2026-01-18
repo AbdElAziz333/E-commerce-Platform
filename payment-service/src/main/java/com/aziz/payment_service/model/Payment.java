@@ -1,6 +1,5 @@
 package com.aziz.payment_service.model;
 
-import com.aziz.payment_service.util.enums.PaymentCurrency;
 import com.aziz.payment_service.util.enums.PaymentMethod;
 import com.aziz.payment_service.util.enums.PaymentStatus;
 import jakarta.persistence.*;
@@ -47,15 +46,7 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(nullable = false, updatable = false)
-    private PaymentCurrency currency;
-
-    @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(nullable = false, updatable = false)
     private PaymentStatus status;
-
-    @Column(nullable = false, updatable = false)
-    private String providerTransactionId;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)

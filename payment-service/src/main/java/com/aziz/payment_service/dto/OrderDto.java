@@ -22,8 +22,6 @@ public class OrderDto {
     private BigDecimal shippingAmount;
     private BigDecimal totalAmount;
     private Long shippingAddressId;
-    private LocalDate estimatedDeliveryDate;
-    private LocalDate deliveredAt;
     private PaymentStatus paymentStatus;
     private PaymentMethod paymentMethod;
 
