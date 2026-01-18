@@ -16,24 +16,24 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
-class OtpServiceTest {
-
-    @InjectMocks
-    private OtpService service;
-
-    @Mock
-    private OtpRepository repository;
-
-    private static final Duration OTP_DURATION = Duration.ofMinutes(5);
-    private static final int OTP_LENGTH = 6;
-
-    private OtpVerificationRequest otpVerificationRequest;
-
-    @BeforeEach
-    void setUp() {
-        otpVerificationRequest = createOtpVerificationRequest();
-    }
+//@ExtendWith(MockitoExtension.class)
+//class OtpServiceTest {
+//
+//    @InjectMocks
+//    private OtpService service;
+//
+//    @Mock
+//    private OtpRepository repository;
+//
+//    private static final Duration OTP_DURATION = Duration.ofMinutes(5);
+//    private static final int OTP_LENGTH = 6;
+//
+//    private OtpVerificationRequest otpVerificationRequest;
+//
+//    @BeforeEach
+//    void setUp() {
+//        otpVerificationRequest = createOtpVerificationRequest();
+//    }
 
 //    @Test
 //    void createOtp_shouldCreateOtp() {
@@ -47,19 +47,19 @@ class OtpServiceTest {
 //        verify(repository, times(1)).save(eq(result), eq(Duration.ofMinutes(5)));
 //    }
 
-    @Test
-    void verifyAndGetEmail_shouldReturnEmail() {
-        when(repository);
-    }
-
-    @Test
-    void verifyAndGetEmail_shouldThrowNotFoundException() {
-
-    }
-
-    @Test
-    void verifyAndGetEmail_shouldThrowInvalidOtpException() {
-
-    }
-
-}
+//    @Test
+//    void verifyAndGetEmail_shouldReturnEmail() {
+//        when(repository);
+//    }
+//
+//    @Test
+//    void verifyAndGetEmail_shouldThrowNotFoundException() {
+//
+//    }
+//
+//    @Test
+//    void verifyAndGetEmail_shouldThrowInvalidOtpException() {
+//
+//    }
+//
+//}

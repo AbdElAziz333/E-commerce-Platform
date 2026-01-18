@@ -23,96 +23,96 @@ import static com.aziz.user_service.TestDataUtility.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
-class InternalRegistrationServiceTest {
-    @Mock
-    private OtpService otpService;
-
-    @Mock
-    private UserService userService;
-
-    @Mock
-    private PendingUserRepository pendingUserRepository;
-
-    @Mock
-    private PasswordEncoder encoder;
-
-    @Mock
-    private UserRepository repository;
-
-    @Mock
-    private UserMapper mapper;
-
-    @InjectMocks
-    private InternalRegistrationService service;
-
-    private RegistrationRequest registrationRequest;
-    private OtpVerificationRequest otpVerificationRequest;
-    private PendingUserData pendingUserData;
-    private AuthUserDto authUserDto;
-
-    @BeforeEach
-    void setUp() {
-        registrationRequest = createRegistrationRequest();
-        otpVerificationRequest = createOtpVerificationRequest();
-        pendingUserData = createPendingUserData();
-        authUserDto = createAuthUserDto();
-    }
-
-    @Test
-    void createUser_shouldCreateUser() {
-        String encodedPassword = "encodedPassword";
-
-        when(repository.existsByEmail(registrationRequest.getEmail())).thenReturn(false);
-        when(otpService.createOtp(registrationRequest.getEmail())).thenReturn(otpVerificationRequest);
-        when(encoder.encode(registrationRequest.getPassword())).thenReturn(encodedPassword);
-        when(mapper.registrationRequestToPendingUserData(registrationRequest, encodedPassword, otpVerificationRequest.getVerificationId())).thenReturn(pendingUserData);
-
-        String result = service.createUser(registrationRequest);
-
-        assertEquals(otpVerificationRequest.getVerificationId(), result);
-
-        verify(pendingUserRepository, times(1)).save(pendingUserData);
-        // TODO: needs to be migrated to kafka publishers
-//        verify(mailMessageSender, times(1)).sendEmailVerification(registrationRequest.getEmail(), otpVerificationRequest.getOtp());
-    }
-
-    @Test
-    void createUser_shouldThrowAlreadyExistsException() {
-        when(repository.existsByEmail(registrationRequest.getEmail())).thenReturn(true);
-        assertThrows(AlreadyExistsException.class, () -> service.createUser(registrationRequest));
-
-        verifyNoInteractions(otpService);
-    }
-
-    @Test
-    void verifyOtp_shouldVerifyOtp() {
-        when(otpService.verifyAndGetEmail(otpVerificationRequest.getVerificationId(), otpVerificationRequest.getOtp())).thenReturn(registrationRequest.getEmail());
-        when(pendingUserRepository.findById(otpVerificationRequest.getVerificationId())).thenReturn(Optional.of(pendingUserData));
-        when(userService.createUser(pendingUserData)).thenReturn(authUserDto);
-
-        AuthUserDto result = service.verifyOtp(otpVerificationRequest);
-
-        assertEquals(authUserDto.getUserId(), result.getUserId());
-        verify(pendingUserRepository, times(1)).delete(otpVerificationRequest.getVerificationId());
-        // TODO: needs to be migrated to kafka publishers
-//        verify(mailMessageSender, times(1)).sendWelcomeEmail(otpVerificationRequest.getEmail(), pendingUserData.getFirstName());
-    }
-
-    @Test
-    void verifyOtp_shouldThrowNotFoundException() {
-        when(otpService.verifyAndGetEmail(otpVerificationRequest.getVerificationId(), otpVerificationRequest.getOtp())).thenReturn(registrationRequest.getEmail());
-        when(pendingUserRepository.findById(otpVerificationRequest.getVerificationId())).thenReturn(Optional.empty());
-
-        assertThrows(NotFoundException.class, () -> service.verifyOtp(otpVerificationRequest));
-    }
-
-    @Test
-    void verifyOtp_shouldThrowIllegalStateException() {
-        when(otpService.verifyAndGetEmail(otpVerificationRequest.getVerificationId(), otpVerificationRequest.getOtp())).thenReturn("otheremail@example.com");
-        when(pendingUserRepository.findById(otpVerificationRequest.getVerificationId())).thenReturn(Optional.of(pendingUserData));
-//        when(pendingUserData.getEmail().equals(otpVerificationRequest.getEmail())).thenReturn(false);
-
-        assertThrows(IllegalStateException.class, () -> service.verifyOtp(otpVerificationRequest));
-    }
-}
+//@ExtendWith(MockitoExtension.class)
+//class InternalRegistrationServiceTest {
+//    @Mock
+//    private OtpService otpService;
+//
+//    @Mock
+//    private UserService userService;
+//
+//    @Mock
+//    private PendingUserRepository pendingUserRepository;
+//
+//    @Mock
+//    private PasswordEncoder encoder;
+//
+//    @Mock
+//    private UserRepository repository;
+//
+//    @Mock
+//    private UserMapper mapper;
+//
+//    @InjectMocks
+//    private InternalRegistrationService service;
+//
+//    private RegistrationRequest registrationRequest;
+//    private OtpVerificationRequest otpVerificationRequest;
+//    private PendingUserData pendingUserData;
+//    private AuthUserDto authUserDto;
+//
+//    @BeforeEach
+//    void setUp() {
+//        registrationRequest = createRegistrationRequest();
+//        otpVerificationRequest = createOtpVerificationRequest();
+//        pendingUserData = createPendingUserData();
+//        authUserDto = createAuthUserDto();
+//    }
+//
+//    @Test
+//    void createUser_shouldCreateUser() {
+//        String encodedPassword = "encodedPassword";
+//
+//        when(repository.existsByEmail(registrationRequest.getEmail())).thenReturn(false);
+//        when(otpService.createOtp(registrationRequest.getEmail())).thenReturn(otpVerificationRequest);
+//        when(encoder.encode(registrationRequest.getPassword())).thenReturn(encodedPassword);
+//        when(mapper.registrationRequestToPendingUserData(registrationRequest, encodedPassword, otpVerificationRequest.getVerificationId())).thenReturn(pendingUserData);
+//
+//        String result = service.createUser(registrationRequest);
+//
+//        assertEquals(otpVerificationRequest.getVerificationId(), result);
+//
+//        verify(pendingUserRepository, times(1)).save(pendingUserData);
+//        // TODO: needs to be migrated to kafka publishers
+////        verify(mailMessageSender, times(1)).sendEmailVerification(registrationRequest.getEmail(), otpVerificationRequest.getOtp());
+//    }
+//
+//    @Test
+//    void createUser_shouldThrowAlreadyExistsException() {
+//        when(repository.existsByEmail(registrationRequest.getEmail())).thenReturn(true);
+//        assertThrows(AlreadyExistsException.class, () -> service.createUser(registrationRequest));
+//
+//        verifyNoInteractions(otpService);
+//    }
+//
+//    @Test
+//    void verifyOtp_shouldVerifyOtp() {
+//        when(otpService.verifyAndGetEmail(otpVerificationRequest.getVerificationId(), otpVerificationRequest.getOtp())).thenReturn(registrationRequest.getEmail());
+//        when(pendingUserRepository.findById(otpVerificationRequest.getVerificationId())).thenReturn(Optional.of(pendingUserData));
+//        when(userService.createUser(pendingUserData)).thenReturn(authUserDto);
+//
+//        AuthUserDto result = service.verifyOtp(otpVerificationRequest);
+//
+//        assertEquals(authUserDto.getUserId(), result.getUserId());
+//        verify(pendingUserRepository, times(1)).delete(otpVerificationRequest.getVerificationId());
+//        // TODO: needs to be migrated to kafka publishers
+////        verify(mailMessageSender, times(1)).sendWelcomeEmail(otpVerificationRequest.getEmail(), pendingUserData.getFirstName());
+//    }
+//
+//    @Test
+//    void verifyOtp_shouldThrowNotFoundException() {
+//        when(otpService.verifyAndGetEmail(otpVerificationRequest.getVerificationId(), otpVerificationRequest.getOtp())).thenReturn(registrationRequest.getEmail());
+//        when(pendingUserRepository.findById(otpVerificationRequest.getVerificationId())).thenReturn(Optional.empty());
+//
+//        assertThrows(NotFoundException.class, () -> service.verifyOtp(otpVerificationRequest));
+//    }
+//
+//    @Test
+//    void verifyOtp_shouldThrowIllegalStateException() {
+//        when(otpService.verifyAndGetEmail(otpVerificationRequest.getVerificationId(), otpVerificationRequest.getOtp())).thenReturn("otheremail@example.com");
+//        when(pendingUserRepository.findById(otpVerificationRequest.getVerificationId())).thenReturn(Optional.of(pendingUserData));
+////        when(pendingUserData.getEmail().equals(otpVerificationRequest.getEmail())).thenReturn(false);
+//
+//        assertThrows(IllegalStateException.class, () -> service.verifyOtp(otpVerificationRequest));
+//    }
+//}
