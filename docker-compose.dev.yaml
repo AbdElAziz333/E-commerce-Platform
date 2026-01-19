@@ -4,28 +4,22 @@ x-common-service: &common-service
   restart: unless-stopped
 
 services:
-  user-postgres:
+  auth-postgres:
     image: postgres:alpine
     ports:
       - "5432:5432"
     volumes:
-      - user_postgres_data:/var/lib/postgresql/data
+      - auth_postgres_data:/var/lib/postgresql/data
     environment:
-      POSTGRES_DB: user
+      POSTGRES_DB: auth
       POSTGRES_USER: aziz
       POSTGRES_PASSWORD: aziz333
-    <<:  *common-service
-
-  user-redis:
-    image: redis:alpine
-    ports:
-      - "6379:6379"
     <<:  *common-service
 
   auth-redis:
     image: redis:alpine
     ports:
-      - "6380:6379"
+      - "6379:6379"
     <<:  *common-service
 
   product-mongo:
@@ -55,7 +49,7 @@ services:
   cart-redis:
     image: redis:alpine
     ports:
-      - "6381:6379"
+      - "6380:6379"
     <<:  *common-service
 
   order-postgres:
@@ -129,14 +123,14 @@ services:
 
   # Exporters
 
-  user-postgres-exporter:
+  auth-postgres-exporter:
     image: prometheuscommunity/postgres-exporter:master
     ports:
       - "9187:9187"
     environment:
-      DATA_SOURCE_NAME: "postgresql://aziz:aziz333@user-postgres:5432/user?sslmode=disable"
+      DATA_SOURCE_NAME: "postgresql://aziz:aziz333@auth-postgres:5432/auth?sslmode=disable"
     depends_on:
-      - user-postgres
+      - auth-postgres
     <<:  *common-service
 
   order-postgres-exporter:
@@ -169,20 +163,10 @@ services:
       - payment-postgres
     <<:  *common-service
 
-  user-redis-exporter:
-    image: oliver006/redis_exporter:alpine
-    ports:
-      - "9121:9121"
-    environment:
-      REDIS_ADDR: "user-redis:6379"
-    depends_on:
-      - user-redis
-    <<:  *common-service
-
   auth-redis-exporter:
     image: oliver006/redis_exporter:alpine
     ports:
-      - "9122:9121"
+      - "9121:9121"
     environment:
       REDIS_ADDR: "auth-redis:6379"
     depends_on:
@@ -192,7 +176,7 @@ services:
   cart-redis-exporter:
     image: oliver006/redis_exporter:alpine
     ports:
-      - "9123:9121"
+      - "9122:9121"
     environment:
       REDIS_ADDR: "cart-redis:6379"
     depends_on:
@@ -208,7 +192,7 @@ services:
     <<:  *common-service
 
 volumes:
-  user_postgres_data:
+  auth_postgres_data:
   product_mongo_data:
   order_postgres_data:
   cart_postgres_data:

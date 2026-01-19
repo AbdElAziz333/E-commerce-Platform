@@ -1,6 +1,6 @@
 package com.aziz.auth_service.dto;
 
-import com.aziz.auth_service.util.Role;
+import com.aziz.auth_service.util.enums.Role;
 import lombok.*;
 
 @Getter

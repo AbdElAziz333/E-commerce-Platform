@@ -56,42 +56,6 @@ services:
       test: [ "CMD-SHELL", "wget -qO- http://localhost:${DISCOVERY_SERVER_PORT}/actuator/health" ]
       <<: *common-healthcheck
 
-  user-service:
-    image: abdelaziz333/user-service:1.0
-    build:
-      context: ./user-service
-    ports:
-      - "${USER_SERVICE_PORT}:${USER_SERVICE_PORT}"
-    environment:
-      <<: *common-env
-      PORT: ${USER_SERVICE_PORT}
-      POSTGRES_HOST: user-postgres
-      POSTGRES_DB: ${USER_POSTGRES_DB}
-      POSTGRES_PORT: 5432
-      POSTGRES_USER: ${USER_POSTGRES_USER}
-      POSTGRES_PASSWORD: ${USER_POSTGRES_PASSWORD}
-      REDIS_HOST: user-redis
-      REDIS_PORT: 6379
-      REDIS_USER: ${USER_REDIS_USER}
-      REDIS_PASSWORD: ${USER_REDIS_PASSWORD}
-      KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
-      KAFKA_PORT: ${KAFKA_PORT}
-    <<: *common-service
-    depends_on:
-      config-server:
-        condition: service_healthy
-      discovery-server:
-        condition: service_healthy
-      user-postgres:
-        condition: service_healthy
-      user-redis:
-        condition: service_healthy
-      infra-kafka:
-        condition: service_healthy
-    healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:${USER_SERVICE_PORT}/actuator/health" ]
-      <<: *common-healthcheck
-
   auth-service:
     image: abdelaziz333/auth-service:1.0
     build:
@@ -100,11 +64,18 @@ services:
       - "${AUTH_SERVICE_PORT}:${AUTH_SERVICE_PORT}"
     environment:
       <<: *common-env
-      PORT: ${AUTH_SERVICE_PORT}
+      PORT: ${USER_SERVICE_PORT}
+      POSTGRES_HOST: auth-postgres
+      POSTGRES_DB: ${USER_POSTGRES_DB}
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: ${USER_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${USER_POSTGRES_PASSWORD}
       REDIS_HOST: auth-redis
       REDIS_PORT: 6379
       REDIS_USER: ${AUTH_REDIS_USER}
       REDIS_PASSWORD: ${AUTH_REDIS_PASSWORD}
+      KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
+      KAFKA_PORT: ${KAFKA_PORT}
       ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET}
       REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET}
     <<: *common-service
@@ -113,7 +84,11 @@ services:
         condition: service_healthy
       discovery-server:
         condition: service_healthy
+      auth-postgres:
+        condition: service_healthy
       auth-redis:
+        condition: service_healthy
+      infra-kafka:
         condition: service_healthy
     healthcheck:
       test: [ "CMD-SHELL", "wget -qO- http://localhost:${AUTH_SERVICE_PORT}/actuator/health" ]
@@ -277,8 +252,6 @@ services:
         condition: service_healthy
       auth-service:
         condition: service_healthy
-      user-service:
-        condition: service_healthy
       notification-service:
         condition: service_healthy
       product-service:
@@ -293,7 +266,7 @@ services:
       test: [ "CMD-SHELL", "wget -qO- http://localhost:${API_GATEWAY_PORT}/actuator/health" ]
       <<: *common-healthcheck
 
-  user-postgres:
+  auth-postgres:
     image: postgres:16-alpine
     volumes:
       - user_postgres_data:/var/lib/postgresql/data
@@ -304,20 +277,6 @@ services:
     <<: *common-service
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${USER_POSTGRES_USER} -d ${USER_POSTGRES_DB}"]
-      <<: *database-healthcheck
-
-  user-redis:
-    image: redis:8.4.0-alpine
-    environment:
-      REDISCLI_USER: ${USER_REDIS_USER}
-      REDISCLI_PASSWORD: ${USER_REDIS_PASSWORD}
-    volumes:
-      - user_redis_data:/data
-      - ./config/redis/user_redis.conf:/usr/local/etc/redis/redis.conf
-    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
-    <<: *common-service
-    healthcheck:
-      test: ["CMD", "redis-cli", "PING"]
       <<: *database-healthcheck
 
   auth-redis:
@@ -499,13 +458,13 @@ services:
 
   # Exporters
 
-  user-postgres-exporter:
+  auth-postgres-exporter:
     image: prometheuscommunity/postgres-exporter:latest
     environment:
-      DATA_SOURCE_NAME: "postgresql://${USER_POSTGRES_USER}:${USER_POSTGRES_PASSWORD}@user-postgres:5432/${USER_POSTGRES_DB}?sslmode=disable"
+      DATA_SOURCE_NAME: "postgresql://${AUTH_POSTGRES_USER}:${AUTH_POSTGRES_PASSWORD}@auth-postgres:5432/${AUTH_POSTGRES_DB}?sslmode=disable"
     <<: *common-service
     depends_on:
-      user-postgres:
+      auth-postgres:
         condition: service_healthy
 
   cart-postgres-exporter:
@@ -533,15 +492,6 @@ services:
     <<: *common-service
     depends_on:
       payment-postgres:
-        condition: service_healthy
-
-  user-redis-exporter:
-    image: oliver006/redis_exporter:alpine
-    environment:
-      REDIS_ADDR: "redis://${EXPORTER_REDIS_USER}:${EXPORTER_REDIS_PASSWORD}@user-redis:6379"
-    <<: *common-service
-    depends_on:
-      user-redis:
         condition: service_healthy
 
   auth-redis-exporter:
@@ -582,8 +532,7 @@ services:
         condition: service_healthy
 
 volumes:
-  user_postgres_data:
-  user_redis_data:
+  auth_postgres_data:
   auth_redis_data:
   product_mongo_data:
   order_postgres_data:

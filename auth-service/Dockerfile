@@ -1,4 +1,4 @@
-# Build Strage
+# Build Stage
 
 FROM gradle:8.14.3-jdk17 AS build
 WORKDIR /home/gradle/project
@@ -16,5 +16,5 @@ FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
 COPY --from=build /home/gradle/project/build/libs/*.jar app.jar
-EXPOSE 8083
+EXPOSE 8082
 ENTRYPOINT ["java", "-jar", "app.jar"]
