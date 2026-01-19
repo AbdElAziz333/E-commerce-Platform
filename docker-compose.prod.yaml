@@ -294,7 +294,7 @@ services:
       <<: *common-healthcheck
 
   user-postgres:
-    image: postgres:alpine
+    image: postgres:16-alpine
     volumes:
       - user_postgres_data:/var/lib/postgresql/data
     environment:
@@ -348,7 +348,7 @@ services:
       <<: *database-healthcheck
 
   cart-postgres:
-    image: postgres:alpine
+    image: postgres:16-alpine
     volumes:
       - cart_postgres_data:/var/lib/postgresql/data
     environment:
@@ -375,7 +375,7 @@ services:
       <<: *database-healthcheck
 
   order-postgres:
-    image: postgres:alpine
+    image: postgres:16-alpine
     volumes:
       - order_postgres_data:/var/lib/postgresql/data
     environment:
@@ -388,7 +388,7 @@ services:
       <<: *database-healthcheck
 
   payment-postgres:
-    image: postgres:alpine
+    image: postgres:16-alpine
     volumes:
       - payment_postgres_data:/var/lib/postgresql/data
     environment:
