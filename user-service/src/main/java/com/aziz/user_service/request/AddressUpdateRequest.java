@@ -1,34 +1,30 @@
-package com.aziz.user_service.dto;
+package com.aziz.user_service.request;
 
 import com.aziz.user_service.util.enums.City;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
-public class AddressRegisterRequest {
-    @NotEmpty
+public class AddressUpdateRequest {
+    @NotNull
+    private Long id;
+
     @NotBlank
     private String streetLine1;
 
-    @NotBlank
     private String streetLine2;
 
     @NotNull
     private City city;
 
-    @NotEmpty
     @NotBlank
     private String state;
 
-    @NotEmpty
     @NotBlank
     private String postalCode;
 

@@ -1,6 +1,6 @@
 package com.aziz.user_service.repository;
 
-import com.aziz.user_service.dto.OtpVerificationRequest;
+import com.aziz.user_service.request.OtpVerificationRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;

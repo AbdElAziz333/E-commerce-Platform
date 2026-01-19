@@ -2,7 +2,7 @@ package com.aziz.user_service.controller;
 
 import com.aziz.user_service.dto.AuthUserDto;
 import com.aziz.user_service.dto.CurrentUserDto;
-import com.aziz.user_service.dto.LoginRequest;
+import com.aziz.user_service.request.LoginRequest;
 import com.aziz.user_service.service.InternalAuthService;
 import com.aziz.user_service.util.ApiResponse;
 import lombok.RequiredArgsConstructor;

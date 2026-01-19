@@ -41,8 +41,6 @@ public class OrderService {
      * */
     @Transactional(readOnly = true)
     public Page<OrderDto> getOrders(Long userId, Pageable pageable) {
-        checkAuthenticated(userId);
-
         log.debug("Fetching orders for user: {}", userId);
 
         Page<Order> page = repository.findByUserId(userId, pageable);
@@ -60,8 +58,6 @@ public class OrderService {
      * */
     @Transactional(readOnly = true)
     public OrderDto getOrderById(Long userId, UUID id) {
-        checkAuthenticated(userId);
-
         log.debug("Fetching order: {} for user: {}", id, userId);
 
         Order order = getOrderForUser(id, userId);
@@ -71,8 +67,6 @@ public class OrderService {
 
     @Transactional
     public OrderDto createOrder(Long userId, OrderCreationRequest request) {
-        checkAuthenticated(userId);
-
         log.debug("Creating order for user: {}", userId);
 
         validateOrderAmounts(request);
@@ -120,8 +114,6 @@ public class OrderService {
 
     @Transactional
     public OrderDto updateOrder(Long userId, OrderUpdateRequest request) {
-        checkAuthenticated(userId);
-
         log.debug("Updating order with id: {} for user: {}", request.getOrderId(), userId);
 
         Order order = getOrderForUser(request.getOrderId(), userId);
@@ -133,8 +125,6 @@ public class OrderService {
     }
 
     public void deleteOrder(Long userId, UUID id) {
-        checkAuthenticated(userId);
-
         log.debug("Deleting order with id: {} for user: {}", id, userId);
 
         Order order = getOrderForUser(id, userId);
@@ -163,17 +153,6 @@ public class OrderService {
         byte[] bytes = new byte[16];
         new SecureRandom().nextBytes(bytes);
         return prefix + Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
-    }
-
-    /**
-     * Checks if user is logged in by checking user id cookie
-     * @throws UnauthorizedException if user id cookie is not found
-     * @author Aziz
-     * */
-    private void checkAuthenticated(Long userId) {
-        if (userId == null) {
-            throw new UnauthorizedException("Please login first");
-        }
     }
 
     /**

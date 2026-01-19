@@ -15,7 +15,6 @@ public class UserPublisher {
 
     /**
      * Publish OTP Verification event to notification-service
-     * @author Aziz
      * */
     public void publishOtp(String email, String otp) {
         OtpVerificationEvent event = new OtpVerificationEvent(email, otp);
@@ -24,7 +23,6 @@ public class UserPublisher {
 
     /**
      * Publish user registered event to notification-service
-     * @author Aziz
      * */
     public void publishWelcome(String email, String firstName) {
         UserRegisteredEvent event = new UserRegisteredEvent(email, firstName);

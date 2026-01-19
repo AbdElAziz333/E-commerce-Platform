@@ -1,15 +1,20 @@
 package com.aziz.user_service.controller;
 
 import com.aziz.user_service.dto.AddressDto;
-import com.aziz.user_service.dto.AddressRegisterRequest;
+import com.aziz.user_service.request.AddressRegisterRequest;
+import com.aziz.user_service.request.AddressUpdateRequest;
 import com.aziz.user_service.service.AddressService;
 import com.aziz.user_service.util.ApiResponse;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
+@Validated
 @RestController
 @RequestMapping("/api/v1/addresses")
 @RequiredArgsConstructor
@@ -17,41 +22,47 @@ public class AddressController {
     private final AddressService service;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<AddressDto>>> getAllAddresses() {
-        return ResponseEntity.ok(ApiResponse.success("Fetched all addresses", service.getAllAddresses()));
+    public ResponseEntity<ApiResponse<Page<AddressDto>>> getAddresses(
+            @RequestHeader("User-Id") Long userId,
+            @RequestParam(defaultValue = "0") @Min(0) int page
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(String.format("Fetched addresses page %s for user: %s", page, userId), service.getPaginatedAddresses(userId, page)));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<AddressDto>> getAddressById(@PathVariable Long id) {
-        return ResponseEntity.ok(ApiResponse.success(String.format("Address with id %s fetched successfully", id), service.getAddressById(id)));
-    }
-
-    @GetMapping("/u/{userId}")
-    public ResponseEntity<ApiResponse<List<AddressDto>>> getAllAddressesByUserId(@PathVariable Long userId) {
-        return ResponseEntity.ok(
-                ApiResponse.success(String.format("All addresses for user with id: %s fetched successfully", userId),
-                service.getAllAddressesByUserId(userId)));
+    @GetMapping("/{addressId}")
+    public ResponseEntity<ApiResponse<AddressDto>> getAddressById(
+            @RequestHeader("User-Id") Long userId,
+            @PathVariable Long addressId
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(String.format("Address with id %s fetched successfully", addressId), service.getAddressById(userId, addressId)));
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<AddressDto>> addAddress(@RequestBody AddressRegisterRequest request, @RequestHeader("User-Id") Long userId) {
-        return ResponseEntity.ok(
-                ApiResponse.success("Address Registered Successfully", service.addAddress(request, userId))
-        );
+    public ResponseEntity<ApiResponse<AddressDto>> addAddress(
+            @RequestHeader("User-Id") Long userId,
+            @RequestBody @Valid AddressRegisterRequest request
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success("Address Registered Successfully", service.addAddress(userId, request)));
     }
 
     @PatchMapping
-    public ResponseEntity<ApiResponse<AddressDto>> updateAddress(@RequestBody AddressDto dto) {
+    public ResponseEntity<ApiResponse<AddressDto>> updateAddress(
+            @RequestHeader("User-Id") Long userId,
+            @RequestBody @Valid AddressUpdateRequest request
+    ) {
         return ResponseEntity.ok(
-                ApiResponse.success(String.format("Address with id %s updated successfully", dto.getAddressId()), service.updateAddress(dto))
+                ApiResponse.success(String.format("Address with id %s updated successfully", request.getId()),
+                        service.updateAddress(userId, request))
         );
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteAddress(@PathVariable Long id) {
-        service.deleteAddress(id);
-        return ResponseEntity.ok(
-                ApiResponse.success(String.format("Address with id: %s deleted successfully", id), null)
-        );
+    @DeleteMapping("/{addressId}")
+    public ResponseEntity<ApiResponse<Void>> deleteAddress(
+            @RequestHeader("User-Id") Long userId,
+            @PathVariable Long addressId
+    ) {
+        service.deleteAddress(userId, addressId);
+        return ResponseEntity.noContent().build();
     }
 }

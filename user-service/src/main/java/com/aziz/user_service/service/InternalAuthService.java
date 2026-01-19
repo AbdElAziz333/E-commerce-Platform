@@ -2,7 +2,7 @@ package com.aziz.user_service.service;
 
 import com.aziz.user_service.dto.AuthUserDto;
 import com.aziz.user_service.dto.CurrentUserDto;
-import com.aziz.user_service.dto.LoginRequest;
+import com.aziz.user_service.request.LoginRequest;
 import com.aziz.user_service.mapper.AddressMapper;
 import com.aziz.user_service.model.User;
 import com.aziz.user_service.repository.UserRepository;
@@ -40,7 +40,7 @@ public class InternalAuthService {
         }
 
         log.info("User with email: {}, successfully verified credentials and logged in", request.getEmail());
-        return new AuthUserDto(user.getUserId(), user.getRole());
+        return new AuthUserDto(user.getId(), user.getRole());
     }
 
     @Transactional(readOnly = true)
@@ -51,7 +51,7 @@ public class InternalAuthService {
                 () -> new NotFoundException("User not found with id: " + userId));
 
         return CurrentUserDto.builder()
-                .userId(user.getUserId())
+                .userId(user.getId())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .email(user.getEmail())
@@ -64,6 +64,5 @@ public class InternalAuthService {
     @Transactional(readOnly = true)
     public String getCurrentUserEmail(Long userId) {
         return repository.findEmailById(userId).orElseThrow(() -> new NotFoundException("Current user's email not found!"));
-
     }
 }

@@ -1,6 +1,6 @@
 package com.aziz.user_service.service;
 
-import com.aziz.user_service.dto.OtpVerificationRequest;
+import com.aziz.user_service.request.OtpVerificationRequest;
 import com.aziz.user_service.repository.OtpRepository;
 import com.aziz.user_service.util.exceptions.InvalidOtpException;
 import com.aziz.user_service.util.exceptions.NotFoundException;
@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
-import java.time.Duration;
 import java.util.Base64;
 import java.util.stream.Collectors;
 
@@ -27,7 +26,6 @@ public class OtpService {
     /**
      *
      * @param email user's email to register
-     * @author Aziz
      * */
     public OtpVerificationRequest createOtp(String email) {
         String otp = generateOtp();
@@ -43,7 +41,6 @@ public class OtpService {
      *
      * @param verificationId The verificationId
      * @param otp the OTP
-     * @author Aziz
      * */
     public String verifyAndGetEmail(String verificationId, String otp) {
         log.debug("Attempting to verify OTP with OTP: {}", otp);
@@ -66,7 +63,6 @@ public class OtpService {
 
     /**
      * Generates OTP consists of 6 chars length, securely with SecureRandom instead of Random.
-     * @author Aziz
      * */
     private String generateOtp() {
         return new SecureRandom().ints(OTP_LENGTH, 0, 10)
@@ -76,7 +72,6 @@ public class OtpService {
 
     /**
      * Generates random 16 character long verification id.
-     * @author Aziz
      * */
     private String generateVerificationId() {
         byte[] bytes = new byte[16];
