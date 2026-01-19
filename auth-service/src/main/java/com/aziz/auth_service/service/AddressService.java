@@ -5,8 +5,8 @@ import com.aziz.auth_service.mapper.AddressMapper;
 import com.aziz.auth_service.model.Address;
 import com.aziz.auth_service.model.User;
 import com.aziz.auth_service.repository.AddressRepository;
-import com.aziz.auth_service.request.AddressRegisterRequest;
-import com.aziz.auth_service.request.AddressUpdateRequest;
+import com.aziz.auth_service.request.CreateAddressRequest;
+import com.aziz.auth_service.request.UpdateAddressRequest;
 import com.aziz.auth_service.util.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +53,7 @@ public class AddressService {
     }
 
     @Transactional
-    public AddressDto addAddress(Long userId, AddressRegisterRequest request) {
+    public AddressDto addAddress(Long userId, CreateAddressRequest request) {
         log.debug("Attempting to add a new address with user id: {}", userId);
 
         User user = userService.getUserEntityById(userId);
@@ -66,7 +66,7 @@ public class AddressService {
     }
 
     @Transactional
-    public AddressDto updateAddress(Long userId, AddressUpdateRequest request) {
+    public AddressDto updateAddress(Long userId, UpdateAddressRequest request) {
         log.debug("Attempting to update address with id: {}", request.getId());
 
         Address address = repository.findByIdAndUserId(request.getId(), userId)
@@ -80,8 +80,6 @@ public class AddressService {
         address.setCity(request.getCity());
         address.setState(request.getState());
         address.setIsDefaultShipping(request.getIsDefaultShipping());
-
-//        repository.save(address);
 
         log.info("Address with id: {} successfully updated", request.getId());
         return mapper.addressToDto(address);

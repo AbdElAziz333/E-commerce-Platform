@@ -1,8 +1,8 @@
 package com.aziz.auth_service.controller;
 
 import com.aziz.auth_service.dto.AddressDto;
-import com.aziz.auth_service.request.AddressRegisterRequest;
-import com.aziz.auth_service.request.AddressUpdateRequest;
+import com.aziz.auth_service.request.CreateAddressRequest;
+import com.aziz.auth_service.request.UpdateAddressRequest;
 import com.aziz.auth_service.service.AddressService;
 import com.aziz.auth_service.util.ApiResponse;
 import jakarta.validation.Valid;
@@ -40,7 +40,7 @@ public class AddressController {
     @PostMapping
     public ResponseEntity<ApiResponse<AddressDto>> addAddress(
             @RequestHeader("User-Id") Long userId,
-            @RequestBody @Valid AddressRegisterRequest request
+            @RequestBody @Valid CreateAddressRequest request
     ) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Address Registered Successfully", service.addAddress(userId, request)));
@@ -49,7 +49,7 @@ public class AddressController {
     @PatchMapping("/{userId}")
     public ResponseEntity<ApiResponse<AddressDto>> updateAddress(
             @PathVariable Long userId,
-            @RequestBody @Valid AddressUpdateRequest request
+            @RequestBody @Valid UpdateAddressRequest request
     ) {
         return ResponseEntity.ok(
                 ApiResponse.success(String.format("Address with id %s updated successfully", request.getId()),

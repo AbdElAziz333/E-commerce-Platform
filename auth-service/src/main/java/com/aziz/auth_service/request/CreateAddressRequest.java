@@ -10,10 +10,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AddressUpdateRequest {
-    @NotNull
-    private Long id;
-
+public class CreateAddressRequest {
     @NotBlank
     private String streetLine1;
 

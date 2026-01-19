@@ -2,7 +2,7 @@ package com.aziz.auth_service.mapper;
 
 import com.aziz.auth_service.dto.AddressDto;
 import com.aziz.auth_service.model.Address;
-import com.aziz.auth_service.request.AddressRegisterRequest;
+import com.aziz.auth_service.request.CreateAddressRequest;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -27,7 +27,7 @@ public class AddressMapper {
                 .toList();
     }
 
-    public Address registerRequestToAddress(AddressRegisterRequest request) {
+    public Address registerRequestToAddress(CreateAddressRequest request) {
         return Address.builder()
                 .streetLine1(request.getStreetLine1())
                 .streetLine2(request.getStreetLine2())
