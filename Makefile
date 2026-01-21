@@ -11,4 +11,4 @@ down-prod:
 clear-prod:
 	docker compose -f docker-compose.prod.yaml down -v
 build:
-	docker compose -f docker-compose.prod.yaml build config-server discovery-server user-service auth-service product-service cart-service order-service payment-service notification-service api-gateway
+	docker compose -f docker-compose.prod.yaml build config-server discovery-server auth-service product-service cart-service order-service payment-service notification-service api-gateway
