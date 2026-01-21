@@ -39,10 +39,6 @@ jobs:
         working-directory: ./discovery-server
         run: ./gradlew build
 
-      - name: Build user-service
-        working-directory: ./user-service
-        run: ./gradlew build
-
       - name: Build auth-service
         working-directory: ./auth-service
         run: ./gradlew build
@@ -67,6 +63,17 @@ jobs:
         working-directory: ./notification-service
         run: ./gradlew build
 
-      - name: Build api-gateway
-        working-directory: ./api-gateway
-        run: ./gradlew build
+  dependency-submission:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    - name: Generate and submit dependency graph
+      uses: gradle/actions/dependency-submission@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
