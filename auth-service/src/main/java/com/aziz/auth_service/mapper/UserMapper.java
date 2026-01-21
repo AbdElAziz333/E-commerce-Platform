@@ -1,9 +1,8 @@
 package com.aziz.auth_service.mapper;
 
-import com.aziz.auth_service.dto.PendingUserData;
 import com.aziz.auth_service.dto.UserDto;
+import com.aziz.auth_service.model.RegistrationSession;
 import com.aziz.auth_service.model.User;
-import com.aziz.auth_service.request.RegistrationRequest;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -12,24 +11,13 @@ public class UserMapper {
         return new UserDto(user.getId(), user.getFirstName(), user.getLastName());
     }
 
-    public User pendingUserDataToUser(PendingUserData data) {
+    public User registrationSessionToUser(RegistrationSession session) {
         return User.builder()
-                .firstName(data.getFirstName())
-                .lastName(data.getLastName())
-                .email(data.getEmail())
-                .password(data.getPassword())
-                .phoneNumber(data.getPhoneNumber())
-                .build();
-    }
-
-    public PendingUserData registrationRequestToPendingUserData(RegistrationRequest request, String encodedPassword, String verificationId) {
-        return PendingUserData.builder()
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .email(request.getEmail())
-                .password(encodedPassword)
-                .phoneNumber(request.getPhoneNumber())
-                .verificationId(verificationId)
+                .firstName(session.getFirstName())
+                .lastName(session.getLastName())
+                .email(session.getEmail())
+                .password(session.getPassword())
+                .phoneNumber(session.getPhoneNumber())
                 .build();
     }
 }

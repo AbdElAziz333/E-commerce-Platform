@@ -1,5 +1,6 @@
 package com.aziz.auth_service.request;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
@@ -8,13 +9,14 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class OtpVerificationRequest {
+public class VerifyOtpRequest {
     @NotBlank
     private String verificationId;
 
     @NotBlank
-    private String email;
-
-    @NotBlank
     private String otp;
+
+    @Email
+    @NotBlank
+    private String email;
 }

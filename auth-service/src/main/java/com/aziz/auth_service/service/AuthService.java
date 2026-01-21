@@ -7,10 +7,7 @@ import com.aziz.auth_service.repository.RefreshTokenRepository;
 import com.aziz.auth_service.repository.UserRepository;
 import com.aziz.auth_service.request.LoginRequest;
 import com.aziz.auth_service.util.TokenEncryptor;
-import com.aziz.auth_service.util.exceptions.BadCredentialsException;
-import com.aziz.auth_service.util.exceptions.NotFoundException;
-import com.aziz.auth_service.util.exceptions.UnauthorizedException;
-import com.aziz.auth_service.util.exceptions.UsernameNotFoundException;
+import com.aziz.auth_service.util.exceptions.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +37,7 @@ public class AuthService {
                 .orElseThrow(() -> new UsernameNotFoundException("Cannot verify credentials for user with email: {}, user not found"));
 
         if (!encoder.matches(request.getPassword(), user.getPassword())) {
-            throw new BadCredentialsException("Password are wrong, please enter a valid one");
+            throw new InvalidCredentialsException("Password are wrong, please enter a valid one");
         }
 
         String accessToken = jwtService.generateAccessToken(user.getId(), user.getRole().name());

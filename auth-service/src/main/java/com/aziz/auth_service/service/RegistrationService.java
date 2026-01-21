@@ -2,15 +2,15 @@ package com.aziz.auth_service.service;
 
 import com.aziz.auth_service.config.JwtConfig;
 import com.aziz.auth_service.dto.AuthUserDto;
-import com.aziz.auth_service.dto.PendingUserData;
 import com.aziz.auth_service.kafka.AuthPublisher;
-import com.aziz.auth_service.mapper.UserMapper;
-import com.aziz.auth_service.repository.PendingUserRepository;
+import com.aziz.auth_service.model.RegistrationSession;
 import com.aziz.auth_service.repository.RefreshTokenRepository;
+import com.aziz.auth_service.repository.RegistrationSessionRepository;
 import com.aziz.auth_service.repository.UserRepository;
-import com.aziz.auth_service.request.OtpVerificationRequest;
+import com.aziz.auth_service.request.VerifyOtpRequest;
 import com.aziz.auth_service.request.RegistrationRequest;
 import com.aziz.auth_service.util.exceptions.AlreadyExistsException;
+import com.aziz.auth_service.util.exceptions.BadRequestException;
 import com.aziz.auth_service.util.exceptions.NotFoundException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -19,86 +19,101 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.SecureRandom;
 import java.time.Instant;
+import java.util.Base64;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class RegistrationService {
+    private final RegistrationSessionRepository repository;
     private final JwtService jwtService;
-    private final RefreshTokenRepository refreshTokenRepository;
     private final JwtConfig jwtConfig;
-    private final OtpService otpService;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final UserService userService;
-    private final PendingUserRepository pendingUserRepository;
+    private final UserRepository userRepository;
     private final PasswordEncoder encoder;
-    private final UserRepository repository;
-    private final UserMapper mapper;
     private final AuthPublisher publisher;
+
+    private static final int OTP_LENGTH = 6;
+    private static final int VERIFICATION_ID_LENGTH = 16;
+    private final SecureRandom sRandom = new SecureRandom();
 
     @Transactional
     public String signup(RegistrationRequest request) {
         log.debug("Attempting to register new user with email: {}", request.getEmail());
 
-        if (repository.existsByEmail(request.getEmail())) {
+        if (userRepository.existsByEmail(request.getEmail())) {
             log.warn("Cannot register user with email: {}, user already exists.", request.getEmail());
             throw new AlreadyExistsException("User already exists with email: " + request.getEmail());
         }
 
-        // Generate OTP
-        OtpVerificationRequest verification = otpService.createOtp(request.getEmail());
+        String otp = generateOtp();
+        String verificationId = generateVerificationId();
 
-        // Map to pending user
-        PendingUserData pendingUserData = mapper
-                .registrationRequestToPendingUserData(
-                        request,
-                        encoder.encode(request.getPassword()),
-                        verification.getVerificationId()
-                );
+        RegistrationSession session = RegistrationSession.builder()
+                .id(verificationId)
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .email(request.getEmail())
+                .password(encoder.encode(request.getPassword()))
+                .phoneNumber(request.getPhoneNumber())
+                .otp(otp)
+                .build();
 
-        pendingUserRepository.save(pendingUserData);
-        publisher.publishOtp(request.getEmail(), verification.getOtp());
+        repository.save(session);
+        publisher.publishOtp(request.getEmail(), otp);
 
-        log.info("User registered successfully with email: {}, verificationId: {}", request.getEmail(), verification.getVerificationId());
-        return verification.getVerificationId();
+        log.info("Registration session created for email: {}", request.getEmail());
+        return verificationId;
     }
 
     @Transactional
-    public void verifyOtp(OtpVerificationRequest request, HttpServletResponse httpResponse) {
-        log.debug("Attempting to verify OTP for user with email: {}, verificationId: {}", request.getEmail(), request.getVerificationId());
+    public void verifyOtp(VerifyOtpRequest request, HttpServletResponse httpResponse) {
+        log.debug("Verifying OTP for verificationId: {}", request.getVerificationId());
 
-        // Verify OTP first
-        String email = otpService.verifyAndGetEmail(request.getVerificationId(), request.getOtp());
+        RegistrationSession registrationSession = repository
+                .findById(request.getVerificationId())
+                .orElseThrow(() -> new NotFoundException("Registration Session Expired"));
 
-        PendingUserData pendingUser = pendingUserRepository.findById(request.getVerificationId())
-                .orElseThrow(() -> {
-                    log.warn("Cannot verify OTP for user with email: {}, verificationId: {}, OTP not found", request.getEmail(), request.getVerificationId());
-                    return new NotFoundException("Registration session expired or not found");
-                });
-
-        // Verify email matches
-        if (!pendingUser.getEmail().equals(email)) {
-            log.warn("Cannot verify OTP for user with email: {}, email mismatch", request.getEmail());
-            throw new IllegalStateException("Email mismatch in verification");
+        if (!registrationSession.getEmail().equals(request.getEmail())) {
+            throw new BadRequestException("Invalid Email");
         }
 
-        // Create actual user in database
-        AuthUserDto authUser = userService.createUser(pendingUser);
-        log.info("User verified OTP successfully with email: {}", request.getEmail());
+        if (!registrationSession.getOtp().equals(request.getOtp())) {
+            throw new BadRequestException("Invalid OTP");
+        }
 
-        // Clean up Redis
-        pendingUserRepository.delete(request.getVerificationId());
+        AuthUserDto authUser = userService.createUser(registrationSession);
 
-        publisher.publishWelcome(email, pendingUser.getFirstName());
+        repository.deleteById(request.getVerificationId());
 
-        String accessToken = jwtService.generateAccessToken(authUser.getUserId(), authUser.getRole().name());
-        String refreshToken = jwtService.generateRefreshToken(authUser.getUserId());
+        issueTokens(authUser, httpResponse);
+        publisher.publishWelcome(registrationSession.getEmail(), registrationSession.getFirstName());
+    }
 
+    private void issueTokens(AuthUserDto user, HttpServletResponse response) {
+        String accessToken = jwtService.generateAccessToken(user.getUserId(), user.getRole().name());
+        String refreshToken = jwtService.generateRefreshToken(user.getUserId());
         String tokenId = jwtService.getJtiFromJwt(refreshToken);
 
-        jwtService.addAccessTokenToCookie(accessToken, httpResponse);
-        jwtService.addRefreshTokenToCookie(refreshToken, httpResponse);
+        jwtService.addAccessTokenToCookie(accessToken, response);
+        jwtService.addRefreshTokenToCookie(refreshToken, response);
 
-        refreshTokenRepository.saveToken(authUser.getUserId(), tokenId, refreshToken, Instant.now().plusMillis(jwtConfig.getRefreshToken().getMaxAge()));
+        refreshTokenRepository.saveToken(user.getUserId(), tokenId, refreshToken, Instant.now().plusMillis(jwtConfig.getRefreshToken().getMaxAge()));
+    }
+
+    public String generateOtp() {
+        return sRandom.ints(OTP_LENGTH, 0, 10)
+                .mapToObj(String::valueOf)
+                .collect(Collectors.joining());
+    }
+
+    public String generateVerificationId() {
+        byte[] bytes = new byte[VERIFICATION_ID_LENGTH];
+        sRandom.nextBytes(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 }

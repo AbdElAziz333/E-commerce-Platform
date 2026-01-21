@@ -1,10 +1,11 @@
 package com.aziz.auth_service.controller;
 
-import com.aziz.auth_service.request.OtpVerificationRequest;
+import com.aziz.auth_service.request.VerifyOtpRequest;
 import com.aziz.auth_service.request.RegistrationRequest;
 import com.aziz.auth_service.service.RegistrationService;
 import com.aziz.auth_service.util.ApiResponse;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -21,16 +22,25 @@ public class RegistrationController {
     private final RegistrationService service;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<String>> register(@RequestBody RegistrationRequest request) {
+    public ResponseEntity<ApiResponse<String>> register(
+            @RequestBody @Valid RegistrationRequest request
+    ) {
         String verificationId = service.signup(request);
 
-        return ResponseEntity.ok(ApiResponse.success(
-                "Successfully registered, please check your email and verify the otp", verificationId));
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                "Registration successful. Please check your email for the OTP.",
+                        verificationId
+                )
+        );
     }
 
     @PostMapping("/verify-otp")
-    public ResponseEntity<ApiResponse<Void>> verifyOtp(@RequestBody OtpVerificationRequest request, HttpServletResponse response) {
+    public ResponseEntity<ApiResponse<Void>> verifyOtp(
+            @RequestBody @Valid VerifyOtpRequest request,
+            HttpServletResponse response
+    ) {
         service.verifyOtp(request, response);
-        return ResponseEntity.ok(ApiResponse.success("Successfully verified OTP, now you can login!", null));
+        return ResponseEntity.ok(ApiResponse.success("OTP verified successfully. You can login.", null));
     }
 }

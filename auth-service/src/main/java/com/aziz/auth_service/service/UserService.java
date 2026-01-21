@@ -2,10 +2,10 @@ package com.aziz.auth_service.service;
 
 import com.aziz.auth_service.dto.AuthUserDto;
 import com.aziz.auth_service.dto.CurrentUserDto;
-import com.aziz.auth_service.dto.PendingUserData;
 import com.aziz.auth_service.dto.UserDto;
 import com.aziz.auth_service.mapper.AddressMapper;
 import com.aziz.auth_service.mapper.UserMapper;
+import com.aziz.auth_service.model.RegistrationSession;
 import com.aziz.auth_service.model.User;
 import com.aziz.auth_service.repository.UserRepository;
 import com.aziz.auth_service.request.UserUpdateRequest;
@@ -22,7 +22,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 @Slf4j
 @Service
@@ -60,15 +59,15 @@ public class UserService {
     }
 
     @Transactional
-    public AuthUserDto createUser(PendingUserData data) {
-        log.debug("Attempting to create a new user with email: {}", data.getEmail());
+    public AuthUserDto createUser(RegistrationSession session) {
+        log.debug("Attempting to create a new user with email: {}", session.getEmail());
 
-        if (repository.existsByEmail(data.getEmail())) {
-            log.warn("Cannot create user with email: {}, user already exists", data.getEmail());
-            throw new AlreadyExistsException("User already exists with email: " + data.getEmail());
+        if (repository.existsByEmail(session.getEmail())) {
+            log.warn("Cannot create user with email: {}, user already exists", session.getEmail());
+            throw new AlreadyExistsException("User already exists with email: " + session.getEmail());
         }
 
-        User user = mapper.pendingUserDataToUser(data);
+        User user = mapper.registrationSessionToUser(session);
         user.setRole(Role.ROLE_USER);
         user.setPreferredLanguage(PreferredLanguage.ARABIC);
 
