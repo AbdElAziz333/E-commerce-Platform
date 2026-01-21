@@ -26,7 +26,7 @@ public class AddressController {
             @RequestHeader("User-Id") Long userId,
             @RequestParam(defaultValue = "0") @Min(0) int page
     ) {
-        return ResponseEntity.ok(ApiResponse.success(String.format("Fetched addresses page %s for user: %s", page, userId), service.getPaginatedAddresses(userId, page)));
+        return ResponseEntity.ok(ApiResponse.success("Addresses fetched successfully", service.getAddresses(userId, page)));
     }
 
     @GetMapping("/{addressId}")
@@ -34,7 +34,7 @@ public class AddressController {
             @RequestHeader("User-Id") Long userId,
             @PathVariable Long addressId
     ) {
-        return ResponseEntity.ok(ApiResponse.success(String.format("Address with id %s fetched successfully", addressId), service.getAddressById(userId, addressId)));
+        return ResponseEntity.ok(ApiResponse.success("Address fetched successfully", service.getAddressById(userId, addressId)));
     }
 
     @PostMapping

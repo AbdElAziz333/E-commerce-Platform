@@ -7,6 +7,7 @@ import com.aziz.auth_service.model.User;
 import com.aziz.auth_service.repository.AddressRepository;
 import com.aziz.auth_service.request.CreateAddressRequest;
 import com.aziz.auth_service.request.UpdateAddressRequest;
+import com.aziz.auth_service.util.exceptions.AddressAccessDeniedException;
 import com.aziz.auth_service.util.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,53 +28,33 @@ public class AddressService {
     private final UserService userService;
 
     @Transactional(readOnly = true)
-    public Page<AddressDto> getPaginatedAddresses(Long userId, int page) {
-        log.debug("Fetching addresses page {} for user: {}", page, userId);
-
+    public Page<AddressDto> getAddresses(Long userId, int page) {
         Pageable pageable = PageRequest.of(page, 100, Sort.by("createdAt").ascending());
-        Page<AddressDto> addresses = repository.findAllByUserId(userId, pageable).map(mapper::addressToDto);
-
-        log.info("Fetched {} addresses for user: {}", addresses.getNumberOfElements(), userId);
-        return addresses;
+        return repository.findAllByUserId(userId, pageable).map(mapper::addressToDto);
     }
 
     @Transactional(readOnly = true)
-    public AddressDto getAddressById(Long userId, Long id) {
-        log.debug("Fetching address with id: {}", id);
-
-        return repository.findByIdAndUserId(id, userId)
-                .map(address -> {
-                    log.info("Successfully fetched address with id: {}", id);
-                    return mapper.addressToDto(address);
-                })
-                .orElseThrow(() -> {
-                    log.warn("Cannot fetch address with id: {}, address not found", id);
-                    return new NotFoundException("Address not found with id: " + id);
-                });
+    public AddressDto getAddressById(Long userId, Long addressId) {
+        log.debug("Fetching address: {}", addressId);
+        return mapper.addressToDto(getAddressForUser(userId, addressId));
     }
 
     @Transactional
     public AddressDto addAddress(Long userId, CreateAddressRequest request) {
-        log.debug("Attempting to add a new address with user id: {}", userId);
+        log.debug("Creating address for user: {}", userId);
 
         User user = userService.getUserEntityById(userId);
         Address address = mapper.registerRequestToAddress(request);
         address.setUser(user);
 
         repository.save(address);
-        log.info("Address successfully created with id: {}", address.getId());
+        log.info("Address {} created successfully for user {}", address.getId(), userId);
         return mapper.addressToDto(address);
     }
 
     @Transactional
     public AddressDto updateAddress(Long userId, UpdateAddressRequest request) {
-        log.debug("Attempting to update address with id: {}", request.getId());
-
-        Address address = repository.findByIdAndUserId(request.getId(), userId)
-                .orElseThrow(() -> {
-                    log.warn("Cannot update address with id: {}, address not found", request.getId());
-                    return new NotFoundException("Address not found with id: " + request.getId());
-                });
+        Address address = getAddressForUser(userId, request.getId());
 
         address.setStreetLine1(request.getStreetLine1());
         address.setStreetLine2(request.getStreetLine2());
@@ -86,16 +67,19 @@ public class AddressService {
     }
 
     @Transactional
-    public void deleteAddress(Long userId, Long id) {
-        log.debug("Attempting to delete address with id: {}", id);
+    public void deleteAddress(Long userId, Long addressId) {
+        repository.delete(getAddressForUser(userId, addressId));
+        log.info("Address: {} deleted for user {}", addressId, userId);
+    }
 
-        Address address = repository.findByIdAndUserId(id, userId)
-                .orElseThrow(() -> {
-                    log.warn("Cannot delete address with id: {}, address not found", id);
-                    return new NotFoundException("Address not found with id: " + id);
-                });
+    private Address getAddressForUser(Long userId, Long addressId) {
+        Address address = repository.findByIdAndUserId(addressId, userId)
+                .orElseThrow(() -> new NotFoundException("Address not found" + addressId));
 
-        repository.delete(address);
-        log.info("Address with id: {} successfully deleted", id);
+        if (!address.getUser().getId().equals(userId)) {
+            throw new AddressAccessDeniedException("Access denied for address: " + addressId);
+        }
+
+        return address;
     }
 }
