@@ -38,22 +38,23 @@ public class AddressController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<AddressDto>> addAddress(
+    public ResponseEntity<ApiResponse<AddressDto>> createAddress(
             @RequestHeader("User-Id") Long userId,
             @RequestBody @Valid CreateAddressRequest request
     ) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success("Address Registered Successfully", service.addAddress(userId, request)));
+                .body(ApiResponse.success("Address Created Successfully", service.addAddress(userId, request)));
     }
 
-    @PatchMapping("/{userId}")
+    @PatchMapping("/{addressId}")
     public ResponseEntity<ApiResponse<AddressDto>> updateAddress(
-            @PathVariable Long userId,
+            @RequestHeader("User-Id") Long userId,
+            @PathVariable Long addressId,
             @RequestBody @Valid UpdateAddressRequest request
     ) {
         return ResponseEntity.ok(
-                ApiResponse.success(String.format("Address with id %s updated successfully", request.getId()),
-                        service.updateAddress(userId, request))
+                ApiResponse.success("Address updated successfully",
+                        service.updateAddress(userId, addressId, request))
         );
     }
 

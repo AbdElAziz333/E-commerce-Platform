@@ -53,8 +53,8 @@ public class AddressService {
     }
 
     @Transactional
-    public AddressDto updateAddress(Long userId, UpdateAddressRequest request) {
-        Address address = getAddressForUser(userId, request.getId());
+    public AddressDto updateAddress(Long userId, Long addressId, UpdateAddressRequest request) {
+        Address address = getAddressForUser(userId, addressId);
 
         address.setStreetLine1(request.getStreetLine1());
         address.setStreetLine2(request.getStreetLine2());
@@ -62,7 +62,7 @@ public class AddressService {
         address.setState(request.getState());
         address.setIsDefaultShipping(request.getIsDefaultShipping());
 
-        log.info("Address with id: {} successfully updated", request.getId());
+        log.info("Address: {} updated for user: {}", addressId, userId);
         return mapper.addressToDto(address);
     }
 

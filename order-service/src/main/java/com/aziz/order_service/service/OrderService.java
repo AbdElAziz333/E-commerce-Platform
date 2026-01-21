@@ -71,6 +71,7 @@ public class OrderService {
         Order order = getOrderForUser(userId, orderId);
 
         order.setOrderStatus(request.getOrderStatus());
+        order.setPaymentStatus(request.getPaymentStatus());
 
         log.info("Order {} updated to status {}", order.getOrderNumber(), order.getOrderStatus());
         return mapper.orderToDto(order);

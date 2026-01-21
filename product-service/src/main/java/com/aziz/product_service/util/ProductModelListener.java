@@ -14,13 +14,13 @@ public class ProductModelListener implements BeforeConvertCallback<Product> {
 
     @Override
     public Product onBeforeConvert(Product product, String collection) {
-        if (product.getProductId() == null) {
-            product.setProductId(generateProductId());
+        if (product.getId() == null) {
+            product.setId(generateProductId());
         }
 
         if (product.getSlug() == null || product.getSlug().isEmpty()) {
             String slug = generateSlug(product.getName());
-            product.setSlug(slug + "-" + product.getProductId());
+            product.setSlug(slug + "-" + product.getId());
         }
 
         return product;

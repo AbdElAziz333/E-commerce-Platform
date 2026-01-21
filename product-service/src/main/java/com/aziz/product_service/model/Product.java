@@ -19,7 +19,7 @@ import java.util.List;
 @Document(collection = "products")
 public class Product {
     @Id
-    private String productId;
+    private String id;
 
     @Field
     private Long userId;

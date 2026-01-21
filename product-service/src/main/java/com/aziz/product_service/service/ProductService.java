@@ -1,14 +1,19 @@
 package com.aziz.product_service.service;
 
-import com.aziz.product_service.dto.ProductCreationRequest;
+import com.aziz.product_service.request.CreateProductRequest;
 import com.aziz.product_service.dto.ProductDto;
-import com.aziz.product_service.dto.ProductUpdateRequest;
+import com.aziz.product_service.request.UpdateProductRequest;
 import com.aziz.product_service.mapper.ProductMapper;
 import com.aziz.product_service.model.Product;
 import com.aziz.product_service.repository.ProductRepository;
 import com.aziz.product_service.util.exceptions.NotFoundException;
+import com.aziz.product_service.util.exceptions.ProductAccessDeniedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,54 +23,39 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ProductService {
-    private final ProductRepository mongoRepository;
-
+    private final ProductRepository repository;
     private final ProductMapper mapper;
 
-    //TODO: needs pagination
     @Transactional(readOnly = true)
-    public List<ProductDto> getAllProducts() {
-        log.debug("Attempting to fetch all products");
-        List<ProductDto> products = mongoRepository.findAll().stream().map(mapper::productToDto).toList();
-        log.info("Fetched {} product", products.size());
-        return products;
+    public Page<ProductDto> getProducts(int page) {
+        Pageable pageable = PageRequest.of(page, 100, Sort.by("createdAt").ascending());
+        return repository.findAll(pageable).map(mapper::productToDto);
     }
 
     @Transactional(readOnly = true)
     public ProductDto getProductBySlug(String slug) {
-        log.debug("Attempting to fetch product with slug: {}", slug);
-        return mongoRepository.findBySlug(slug)
-                .map(product -> {
-                    log.info("Successfully fetched product with slug: {}", slug);
-                    return mapper.productToDto(product);
-                })
-                .orElseThrow(() -> {
-                    log.error("Cannot fetch product with slug: {}, product not found", slug);
-                    return new NotFoundException("Product not found with slug: " + slug);
-                });
+        log.debug("Fetching product: {}", slug);
+        return repository.findBySlug(slug)
+                .map(mapper::productToDto)
+                .orElseThrow(() -> new NotFoundException("Product not found with slug: " + slug));
     }
 
     @Transactional
-    public ProductDto createProduct(Long userId, ProductCreationRequest request) {
-        log.debug("Attempting to create a new product for user with id: {}", userId);
+    public ProductDto createProduct(Long userId, CreateProductRequest request) {
+        log.debug("Creating product for user: {}", userId);
+
         Product product = mapper.creationRequestToProduct(request);
         product.setUserId(userId);
 
-        Product savedProduct = mongoRepository.save(product);
-        log.info("Product successfully created with id: {}, for user with id: {}", savedProduct.getProductId(), savedProduct.getUserId());
+        Product savedProduct = repository.save(product);
+        log.info("Product {} created successfully for user {}", savedProduct.getId(), userId);
 
         return mapper.productToDto(product);
     }
 
-    //TODO: needs authentication so only who created the product can update it..
     @Transactional
-    public ProductDto updateProduct(Long userId, ProductUpdateRequest request) {
-        log.debug("Attempting to update a product with id: {}, for user with id: {}", request.getProductId(), userId);
-        Product product = mongoRepository.findById(request.getProductId())
-                .orElseThrow(() -> {
-                    log.error("Cannot update product info -- product not found with id: {}", request.getProductId());
-                    return new NotFoundException("Product not found with id: " + request.getProductId());
-                });
+    public ProductDto updateProduct(Long userId, String productId, UpdateProductRequest request) {
+        Product product = getProductForUser(userId, productId);
 
         product.setName(request.getName());
         product.setDescription(request.getDescription());
@@ -74,31 +64,34 @@ public class ProductService {
         product.setPrice(request.getPrice());
         product.setStockQuantity(request.getStockQuantity());
 
-        mongoRepository.save(product);
-        log.info("Product updated successfully with id: {}", request.getProductId());
+//        repository.save(product);
+        log.info("Product: {} updated for user: {}", productId, userId);
 
         return mapper.productToDto(product);
     }
 
     @Transactional
-    public void deleteProductById(Long userId, String id) {
-        log.debug("Attempting to delete product with id: {}, for user with id: {}", id, userId);
-
-        mongoRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Cannot delete product with id: {}, product not found", id);
-                    return new NotFoundException("Product not found with id: " + id);
-                });
-
-        mongoRepository.deleteById(id);
-        log.info("Product deleted successfully with id: {}", id);
+    public void deleteProductById(Long userId, String productId) {
+        repository.delete(getProductForUser(userId, productId));
+        log.info("Product: {} deleted for user {}", productId, userId);
     }
 
     @Transactional(readOnly = true)
     public List<ProductDto> getProductsByUserId(Long userId) {
         log.debug("Attempting to fetch products with user id: {}", userId);
-        List<ProductDto> products = mongoRepository.findProductsByUserId(userId).stream().map(mapper::productToDto).toList();
+        List<ProductDto> products = repository.findProductsByUserId(userId).stream().map(mapper::productToDto).toList();
         log.info("Successfully fetched {} product for user with id: {}", products.size(), userId);
         return products;
+    }
+
+    private Product getProductForUser(Long userId, String productId) {
+        Product product = repository.findById(productId)
+                .orElseThrow(() -> new NotFoundException("Product not found" + productId));
+
+        if (!product.getUserId().equals(userId)) {
+            throw new ProductAccessDeniedException("Access denied for product: " + productId);
+        }
+
+        return product;
     }
 }

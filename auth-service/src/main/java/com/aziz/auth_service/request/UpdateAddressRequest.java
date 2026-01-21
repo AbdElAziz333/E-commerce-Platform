@@ -11,9 +11,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateAddressRequest {
-    @NotNull
-    private Long id;
-
     @NotBlank
     private String streetLine1;
 

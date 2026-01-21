@@ -1,19 +1,20 @@
-package com.aziz.product_service.dto;
+package com.aziz.product_service.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.constraints.Size;
+import lombok.*;
 
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
 @AllArgsConstructor
-public class ProductUpdateRequest {
-    private String productId;
-
+public class UpdateProductRequest {
     private String name;
 
+    @Size(max = 10000)
     private String description;
 
+    @Size(max = 1000)
     private String shortDescription;
 
     private String sku;
