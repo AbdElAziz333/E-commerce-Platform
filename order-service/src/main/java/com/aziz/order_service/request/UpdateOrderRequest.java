@@ -1,20 +1,15 @@
-package com.aziz.order_service.dto;
+package com.aziz.order_service.request;
 
 import com.aziz.order_service.util.enums.OrderStatus;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-
-import java.util.UUID;
 
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderUpdateRequest {
-    @NotNull
-    private UUID orderId;
-
-    @NotNull
+public class UpdateOrderRequest {
+    @NotNull(message = "Order status is required")
     private OrderStatus orderStatus;
 }

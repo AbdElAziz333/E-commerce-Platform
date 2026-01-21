@@ -1,20 +1,22 @@
 package com.aziz.order_service.controller;
 
-import com.aziz.order_service.dto.OrderCreationRequest;
+import com.aziz.order_service.request.CreateOrderRequest;
 import com.aziz.order_service.dto.OrderDto;
-import com.aziz.order_service.dto.OrderUpdateRequest;
+import com.aziz.order_service.request.UpdateOrderRequest;
 import com.aziz.order_service.service.OrderService;
 import com.aziz.order_service.util.ApiResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
+@Validated
 @RestController
 @RequestMapping("/api/v1/orders")
 @RequiredArgsConstructor
@@ -24,12 +26,12 @@ public class OrderController {
     @GetMapping
     public ResponseEntity<ApiResponse<Page<OrderDto>>> getOrders(
             @RequestHeader("User-Id") Long userId,
-            Pageable pageable
+            @RequestParam(defaultValue = "0") @Min(0) int page
     ) {
         return ResponseEntity.ok(
                 ApiResponse.success(
-                        "orders for user: " + userId,
-                        service.getOrders(userId, pageable.withPage(100))
+                        "Orders fetched successfully",
+                        service.getOrders(userId, page)
                 )
         );
     }
@@ -41,7 +43,7 @@ public class OrderController {
     ) {
         return ResponseEntity.ok(
                 ApiResponse.success(
-                        "Successfully fetched order with id: " + id,
+                        "Order fetched successfully",
                         service.getOrderById(userId, id)
                 )
         );
@@ -50,30 +52,31 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<ApiResponse<OrderDto>> createOrder(
             @RequestHeader("User-Id") Long userId,
-            @Valid @RequestBody OrderCreationRequest request
+            @Valid @RequestBody CreateOrderRequest request
     ) {
-        return ResponseEntity.ok(
+        return ResponseEntity.status(HttpStatus.CREATED).body(
                 ApiResponse.success(
-                        "Successfully created order for user: " + userId,
+                        "Order created successfully",
                         service.createOrder(userId, request)
                 )
         );
     }
 
-    @PutMapping
+    @PutMapping("/{orderId}")
     public ResponseEntity<ApiResponse<OrderDto>> updateOrder(
             @RequestHeader("User-Id") Long userId,
-            @Valid @RequestBody OrderUpdateRequest request
+            @PathVariable UUID orderId,
+            @Valid @RequestBody UpdateOrderRequest request
     ) {
-        return ResponseEntity.ok(ApiResponse.success("Successfully updated order with id: " + request.getOrderId(), service.updateOrder(userId, request)));
+        return ResponseEntity.ok(ApiResponse.success("Order updated successfully", service.updateOrder(userId, orderId, request)));
     }
 
-    @DeleteMapping
-    public ResponseEntity<ApiResponse<Void>> deleteOrder(
+    @DeleteMapping("/{orderId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteOrder(
             @RequestHeader("User-Id") Long userId,
-            @PathVariable UUID id
+            @PathVariable UUID orderId
     ) {
-        service.deleteOrder(userId, id);
-        return ResponseEntity.ok(ApiResponse.success("Successfully deleted order with id: " + id, null));
+        service.deleteOrder(userId, orderId);
     }
 }

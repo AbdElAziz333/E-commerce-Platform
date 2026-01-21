@@ -5,8 +5,8 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 
-@FeignClient(name = "user-service")
+@FeignClient(name = "auth-service")
 public interface UserFeignClient {
-    @GetMapping("/api/v1/internal/auth/current/email")
+    @GetMapping("/api/v1/users/current/email")
     ApiResponse<String> getCurrentUserEmail(@RequestHeader("User-Id") Long userId);
 }

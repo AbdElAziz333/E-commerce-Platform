@@ -1,8 +1,5 @@
 package com.aziz.order_service.dto;
 
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -13,18 +10,10 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderItemDto {
-    @NotNull
+    private Long id;
     private String productNameSnapshot;
-
-    @NotNull
-    @Min(1)
+    private String skuSnapshot;
     private Integer quantity;
-
-    @NotNull
-    @DecimalMin(value = "0.01")
     private BigDecimal unitPrice;
-
-    @NotNull
-    @DecimalMin(value = "0.01")
     private BigDecimal totalPrice;
 }

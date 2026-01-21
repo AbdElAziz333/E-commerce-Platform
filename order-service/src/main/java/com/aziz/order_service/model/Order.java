@@ -23,11 +23,11 @@ import java.util.UUID;
 @Table(name = "orders")
 @EntityListeners(AuditingEntityListener.class)
 public class Order {
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Id
-    private UUID orderId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
-    @Column(updatable = false, nullable = false)
+    @Column(updatable = false, nullable = false, unique = true)
     private String orderNumber;
 
     @Column(nullable = false)
@@ -45,14 +45,14 @@ public class Order {
     private String notes;
 
     @CreatedDate
-    @Column(updatable = false,  nullable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @LastModifiedDate
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private Long userId;
 
     @Column(nullable = false)
@@ -69,5 +69,5 @@ public class Order {
     private PaymentMethod paymentMethod;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderItem> orderItems;
+    private List<OrderItem> items;
 }

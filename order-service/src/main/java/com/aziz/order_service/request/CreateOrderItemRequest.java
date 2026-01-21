@@ -1,4 +1,4 @@
-package com.aziz.order_service.dto;
+package com.aziz.order_service.request;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
@@ -12,22 +12,18 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderItemCreationRequest {
-    @NotNull
+public class CreateOrderItemRequest {
+    @NotNull(message = "Product name is required")
     private String productNameSnapshot;
 
-    @NotNull
+    @NotNull(message = "SKU is required")
     private String skuSnapshot;
 
-    @NotNull
     @Min(1)
+    @NotNull(message = "Quantity is required")
     private Integer quantity;
 
-    @NotNull
     @DecimalMin(value = "0.01")
+    @NotNull(message = "Unit price is required")
     private BigDecimal unitPrice;
-
-    @NotNull
-    @DecimalMin(value = "0.01")
-    private BigDecimal totalPrice;
 }

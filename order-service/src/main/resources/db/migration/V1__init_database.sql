@@ -3,7 +3,7 @@ CREATE TYPE p_status AS ENUM ('PENDING', 'PAID', 'FAILED', 'REFUNDED');
 CREATE TYPE p_method AS ENUM ('VISA', 'VODAFONE_CASH');
 
 CREATE TABLE orders (
-    order_id UUID PRIMARY KEY,
+    id UUID PRIMARY KEY,
     order_number VARCHAR(50) NOT NULL,
     order_status o_status NOT NULL,
     shipping_amount NUMERIC(12, 2) NOT NULL,
@@ -18,7 +18,7 @@ CREATE TABLE orders (
 );
 
 CREATE TABLE order_item (
-    order_item_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     order_id UUID NOT NULL,
     product_name_snapshot VARCHAR(30) NOT NULL,
     sku_snapshot VARCHAR(30) NOT NULL,
@@ -26,5 +26,5 @@ CREATE TABLE order_item (
     unit_price NUMERIC(12, 2) NOT NULL,
     total_price NUMERIC(12, 2) NOT NULL,
     CONSTRAINT fk_order_item_order FOREIGN KEY (order_id)
-        REFERENCES orders(order_id) ON DELETE CASCADE
+        REFERENCES orders(id) ON DELETE CASCADE
 );
