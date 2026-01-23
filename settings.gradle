@@ -1,0 +1,13 @@
+rootProject.name = 'ecommerce-platform'
+
+include (
+        'config-server',
+        'discovery-server',
+        'auth-service',
+        'product-service',
+        'cart-service',
+        'order-service',
+        'payment-service',
+        'notification-service',
+        'api-gateway'
+)

@@ -3,18 +3,21 @@
 FROM gradle:8.14.3-jdk17 AS build
 WORKDIR /home/gradle/project
 
-COPY build.gradle settings.gradle gradlew ./
+COPY build.gradle settings.gradle gradle.properties ./
 COPY gradle ./gradle
-RUN gradle dependencies --no-daemon
 
-COPY src ./src
-RUN gradle bootJar --no-daemon
+COPY payment-service/build.gradle payment-service/
+
+RUN gradle :payment-service:dependencies --no-daemon
+
+COPY payment-service/src payment-service/src
+RUN gradle :payment-service:bootJar --no-daemon
 
 # Runtime Stage
 
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
-COPY --from=build /home/gradle/project/build/libs/*.jar app.jar
-EXPOSE 8087
+COPY --from=build /home/gradle/project/payment-service/build/libs/*.jar app.jar
+EXPOSE 8086
 ENTRYPOINT ["java", "-jar", "app.jar"]

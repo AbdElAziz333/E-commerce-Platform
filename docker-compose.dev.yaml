@@ -191,6 +191,15 @@ services:
       - "--mongodb.uri=mongodb://aziz:aziz333@product-mongo:27017"
     <<:  *common-service
 
+  # Dev Only
+
+  dev-mailpit:
+    image: axllent/mailpit
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    <<: *common-service
+
 volumes:
   auth_postgres_data:
   product_mongo_data:

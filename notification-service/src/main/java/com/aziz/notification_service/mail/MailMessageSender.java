@@ -18,6 +18,7 @@ public class MailMessageSender {
      * */
     public void send(NotificationDto notification) {
         SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("adiue@test.local");
         message.setTo(notification.getEmail());
         message.setSubject(notification.getTitle());
         message.setText(notification.getMessage());

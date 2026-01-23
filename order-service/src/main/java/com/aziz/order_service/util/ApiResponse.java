@@ -1,16 +1,16 @@
 package com.aziz.order_service.util;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Builder
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ApiResponse<T> {
-    boolean success;
-    String message;
-    T data;
+    private boolean success;
+    private String message;
+    private T data;
 
     public static <T> ApiResponse<T> success(String message, T data) {
         return ApiResponse.<T>builder()
@@ -24,7 +24,6 @@ public class ApiResponse<T> {
         return ApiResponse.<T>builder()
                 .success(false)
                 .message(message)
-                .data(null)
                 .build();
     }
 }
