@@ -96,13 +96,21 @@ services:
       KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
       ALLOW_PLAINTEXT_LISTENER: yes
     <<:  *common-service
+    healthcheck:
+      test: [ "CMD-SHELL", "/opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 40s
 
   infra-prometheus:
     image: prom/prometheus:main
     volumes:
-      - ./infra/observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./infra/observability/prometheus/prometheus-dev.yaml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
+    extra_hosts:
+      - "host.docker.internal:host-gateway" # Linux-specific fix
     <<:  *common-service
 
   infra-grafana:
@@ -110,18 +118,25 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - GF_SECURITY_ADMIN=aziz
-      - GF_SECURITY_ADMIN_PASSWORD=aziz333
-      - GF_PATHS_PROVISIONING=/infra/observability/grafana/provisioning
+      GF_SECURITY_ADMIN: aziz
+      GF_SECURITY_ADMIN_PASSWORD: aziz333
+      GF_PATHS_PROVISIONING: /etc/grafana/provisioning
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./infra/observability/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./infra/observability/grafana/provisioning/dashboards/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml
+      - ./infra/observability/grafana/provisioning/dashboards/json:/var/lib/grafana/dashboards
       - ./infra/observability/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
     depends_on:
       - infra-prometheus
     <<:  *common-service
 
   # Exporters
+
+  node-exporter:
+    image: prom/node-exporter:v1.10.2
+    ports:
+      - "9100:9100"
+    <<: *common-service
 
   auth-postgres-exporter:
     image: prometheuscommunity/postgres-exporter:master
@@ -190,6 +205,17 @@ services:
     command:
       - "--mongodb.uri=mongodb://aziz:aziz333@product-mongo:27017"
     <<:  *common-service
+
+  kafka-exporter:
+    image: danielqsj/kafka-exporter:latest
+    ports:
+      - "9308:9308"
+    command:
+      - "--kafka.server=infra-kafka:9092"
+    <<: *common-service
+    depends_on:
+      infra-kafka:
+        condition: service_healthy
 
   # Dev Only
 

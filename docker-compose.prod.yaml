@@ -384,41 +384,6 @@ services:
 
       KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
       ALLOW_PLAINTEXT_LISTENER: yes
-      #KRaft mode configuration
-#      KAFKA_CFG_PROCESS_ROLES: controller,broker
-#      KAFKA_CFG_NODE_ID: 1
-#      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
-#
-#      # Listeners - SASL_PLAINTEXT for client connections, PLAINTEXT for controller
-#      KAFKA_CFG_LISTENERS: SASL_PLAINTEXT://:9092,CONTROLLER://:9093
-#      KAFKA_CFG_ADVERTISED_LISTENERS: SASL_PLAINTEXT://infra-kafka:9092
-#
-#      # KRaft controller quorum
-#      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 1@infra-kafka:9093
-#
-#      # Security Protocol Mapping
-#      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: SASL_PLAINTEXT:SASL_PLAINTEXT,CONTROLLER:SASL_PLAINTEXT
-#
-#      # SASL Configurations
-#      KAFKA_CFG_SASL_MECHANISM_INTER_BROKER_PROTOCOL: SCRAM-SHA-256
-#      KAFKA_CFG_SASL_ENABLED_MECHANISMS: SCRAM-SHA-256
-#
-#      # KRaft cluster ID
-#      KAFKA_KRAFT_CLUSTER_ID: abcdefghijklmnopqrstuv # 22 chars, base64
-#
-#      # Inter-broker communication (controller uses PLAINTEXT internally)
-#      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: SASL_PLAINTEXT # OR SASL_PLAINTEXT between inter-broker communication or PLAINTEXT
-#
-#      # Create initial admin user
-#      KAFKA_CLIENT_USERS: ${KAFKA_USERS}
-#      KAFKA_CLIENT_PASSWORDS: ${KAFKA_PASSWORDS}
-#
-#      # Authorization
-#      KAFKA_CFG_AUTHORIZER_CLASS_NAME: org.apache.kafka.metadata.authorizer.StandardAuthorizer
-#      KAFKA_CFG_SUPER_USERS: User:admin
-#      KAFKA_CFG_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "false"
-#
-#      KAFKA_CFG_CLIENT_LISTENER_NAME: SASL_PLAINTEXT
     <<: *common-service
     healthcheck:
       test: ["CMD-SHELL", "/opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list"]
@@ -429,10 +394,12 @@ services:
 
   infra-prometheus:
     image: prom/prometheus:main
+    ports:
+      - "9090:9090"
     volumes:
-      - ./infra/observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./infra/observability/prometheus/prometheus-prod.yaml:/etc/prometheus/prometheus.yaml
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--config.file=/etc/prometheus/prometheus.yaml'
       - '--storage.tsdb.path=/prometheus'
       - '--web.console.libraries=/usr/share/prometheus/console_libraries'
       - '--web.console.templates=/usr/share/prometheus/consoles'
@@ -446,13 +413,16 @@ services:
 
   infra-grafana:
     image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
     environment:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_USER}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
-      GF_PATHS_PROVISIONING: /infra/observability/grafana/provisioning
+      GF_PATHS_PROVISIONING: /etc/grafana/provisioning
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./infra/observability/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./infra/observability/grafana/provisioning/dashboards/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml
+      - ./infra/observability/grafana/provisioning/dashboards/json:/var/lib/grafana/dashboards
       - ./infra/observability/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
     <<: *common-service
     depends_on:
@@ -467,8 +437,12 @@ services:
 
   # Exporters
 
+  node-exporter:
+    image: prom/node-exporter:v1.10.2
+    <<: *common-service
+
   auth-postgres-exporter:
-    image: prometheuscommunity/postgres-exporter:latest
+    image: prometheuscommunity/postgres-exporter:v0.18.1
     environment:
       DATA_SOURCE_NAME: "postgresql://${AUTH_POSTGRES_USER}:${AUTH_POSTGRES_PASSWORD}@auth-postgres:5432/${AUTH_POSTGRES_DB}?sslmode=disable"
     <<: *common-service
@@ -477,7 +451,7 @@ services:
         condition: service_healthy
 
   cart-postgres-exporter:
-    image: prometheuscommunity/postgres-exporter:latest
+    image: prometheuscommunity/postgres-exporter:v0.18.1
     environment:
       DATA_SOURCE_NAME: "postgresql://${CART_POSTGRES_USER}:${CART_POSTGRES_PASSWORD}@cart-postgres:5432/${CART_POSTGRES_DB}?sslmode=disable"
     <<: *common-service
@@ -486,7 +460,7 @@ services:
         condition: service_healthy
 
   order-postgres-exporter:
-    image: prometheuscommunity/postgres-exporter:latest
+    image: prometheuscommunity/postgres-exporter:v0.18.1
     environment:
       DATA_SOURCE_NAME: "postgresql://${ORDER_POSTGRES_USER}:${ORDER_POSTGRES_PASSWORD}@order-postgres:5432/${ORDER_POSTGRES_DB}?sslmode=disable"
     <<: *common-service
@@ -495,7 +469,7 @@ services:
         condition: service_healthy
 
   payment-postgres-exporter:
-    image: prometheuscommunity/postgres-exporter:latest
+    image: prometheuscommunity/postgres-exporter:v0.18.1
     environment:
       DATA_SOURCE_NAME: "postgresql://${PAYMENT_POSTGRES_USER}:${PAYMENT_POSTGRES_PASSWORD}@payment-postgres:5432/${PAYMENT_POSTGRES_DB}?sslmode=disable"
     <<: *common-service
@@ -504,7 +478,7 @@ services:
         condition: service_healthy
 
   auth-redis-exporter:
-    image: oliver006/redis_exporter:alpine
+    image: oliver006/redis_exporter:v1.80.1-alpine
     environment:
       REDIS_ADDR: "redis://${EXPORTER_REDIS_USER}:${EXPORTER_REDIS_PASSWORD}@auth-redis:6379"
     <<: *common-service
@@ -513,7 +487,7 @@ services:
         condition: service_healthy
 
   cart-redis-exporter:
-    image: oliver006/redis_exporter:alpine
+    image: oliver006/redis_exporter:v1.80.1-alpine
     environment:
       REDIS_ADDR: "redis://${EXPORTER_REDIS_USER}:${EXPORTER_REDIS_PASSWORD}@cart-redis:6379"
     <<: *common-service
@@ -524,15 +498,14 @@ services:
   product-mongo-exporter:
     image: percona/mongodb_exporter:0.47.2
     command:
-      - "--mongodb.uri=mongodb://${PRODUCT_MONGO_USER}:${PRODUCT_MONGO_PASSWORD}@product-mongo:27017"
-      - "--collect-all"
+      - "--mongodb.uri=mongodb://${PRODUCT_MONGO_USER}:${PRODUCT_MONGO_PASSWORD}@product-mongo:27017/admin?authSource=admin"
     <<: *common-service
     depends_on:
       product-mongo:
         condition: service_healthy
 
   kafka-exporter:
-    image: danielqsj/kafka-exporter:latest
+    image: danielqsj/kafka-exporter:v1.9.0
     command:
       - "--kafka.server=infra-kafka:9092"
     <<: *common-service

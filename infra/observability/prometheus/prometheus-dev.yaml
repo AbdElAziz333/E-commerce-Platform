@@ -1,0 +1,93 @@
+global:
+  scrape_interval: 10s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets:
+          - 'localhost:9090'
+
+  - job_name: 'microservices'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8080']
+        labels:
+          service: 'config-server'
+
+      - targets: ['host.docker.internal:8081']
+        labels:
+          service: 'discovery-server'
+
+      - targets: ['host.docker.internal:8082']
+        labels:
+          service: 'auth-service'
+
+      - targets: ['host.docker.internal:8083']
+        labels:
+          service: 'product-service'
+
+      - targets: ['host.docker.internal:8084']
+        labels:
+          service: 'cart-service'
+
+      - targets: ['host.docker.internal:8085']
+        labels:
+          service: 'order-service'
+
+      - targets: ['host.docker.internal:8086']
+        labels:
+          service: 'payment-service'
+
+      - targets: ['host.docker.internal:8087']
+        labels:
+          service: 'notification-service'
+
+      - targets: ['host.docker.internal:8088']
+        labels:
+          service: 'api-gateway'
+
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['host.docker.internal:9100']
+        labels:
+          service: 'node-exporter'
+
+  - job_name: 'postgres-exporters'
+    static_configs:
+      - targets: ['host.docker.internal:9187']
+        labels:
+          service: 'auth-postgres-exporter'
+
+      - targets: ['host.docker.internal:9188']
+        labels:
+          service: 'order-postgres-exporter'
+
+      - targets: ['host.docker.internal:9189']
+        labels:
+          service: 'cart-postgres-exporter'
+
+      - targets: ['host.docker.internal:9190']
+        labels:
+          service: 'payment-postgres-exporter'
+
+  - job_name: 'redis-exporters'
+    static_configs:
+      - targets: ['host.docker.internal:9121']
+        labels:
+          service: 'auth-redis-exporter'
+
+      - targets: ['host.docker.internal:9122']
+        labels:
+          service: 'cart-redis-exporter'
+
+  - job_name: 'mongo-exporters'
+    static_configs:
+      - targets: ['host.docker.internal:9216']
+        labels:
+          service: 'product-mongo-exporter'
+
+  - job_name: 'kafka-exporters'
+    static_configs:
+      - targets: ['host.docker.internal:9308']
+        labels:
+          service: 'kafka-exporter'
