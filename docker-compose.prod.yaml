@@ -368,78 +368,7 @@ services:
       test: [ "CMD-SHELL", "pg_isready -U ${PAYMENT_POSTGRES_USER} -d ${PAYMENT_POSTGRES_DB}" ]
       <<: *database-healthcheck
 
-  # Infrastructure
-
-  infra-kafka:
-    image: bitnami/kafka:latest
-    volumes:
-      - infra_kafka_data:/bitnami/kafka
-    environment:
-      KAFKA_CFG_PROCESS_ROLES: controller,broker
-      KAFKA_CFG_NODE_ID: 1
-      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
-      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://infra-kafka:9092
-      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 1@infra-kafka:9093
-
-      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
-      ALLOW_PLAINTEXT_LISTENER: yes
-    <<: *common-service
-    healthcheck:
-      test: ["CMD-SHELL", "/opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list"]
-      interval: 10s
-      timeout: 10s
-      retries: 10
-      start_period: 40s
-
-  infra-prometheus:
-    image: prom/prometheus:main
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./infra/observability/prometheus/prometheus-prod.yaml:/etc/prometheus/prometheus.yaml
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yaml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-      - '--web.console.templates=/usr/share/prometheus/consoles'
-    <<: *common-service
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
-
-  infra-grafana:
-    image: grafana/grafana:latest
-    ports:
-      - "3000:3000"
-    environment:
-      GF_SECURITY_ADMIN_USER: ${GRAFANA_USER}
-      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
-      GF_PATHS_PROVISIONING: /etc/grafana/provisioning
-    volumes:
-      - grafana_data:/var/lib/grafana
-      - ./infra/observability/grafana/provisioning/dashboards/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml
-      - ./infra/observability/grafana/provisioning/dashboards/json:/var/lib/grafana/dashboards
-      - ./infra/observability/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
-    <<: *common-service
-    depends_on:
-      infra-prometheus:
-        condition: service_healthy
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:3000/api/health" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-
   # Exporters
-
-  node-exporter:
-    image: prom/node-exporter:v1.10.2
-    <<: *common-service
 
   auth-postgres-exporter:
     image: prometheuscommunity/postgres-exporter:v0.18.1
@@ -521,8 +450,6 @@ volumes:
   cart_postgres_data:
   cart_redis_data:
   payment_postgres_data:
-  infra_kafka_data:
-  grafana_data:
 
 networks:
   ecommerce-net:

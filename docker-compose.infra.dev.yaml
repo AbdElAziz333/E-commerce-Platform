@@ -1,0 +1,84 @@
+x-common-service: &common-service
+  networks:
+    ecommerce-net:
+  restart: unless-stopped
+
+services:
+  infra-kafka:
+    image: bitnami/kafka:latest
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    volumes:
+      - infra_kafka_data:/bitnami/kafka
+    environment:
+      KAFKA_CFG_PROCESS_ROLES: controller,broker
+      KAFKA_CFG_NODE_ID: 1
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      ALLOW_PLAINTEXT_LISTENER: yes
+    <<:  *common-service
+    healthcheck:
+      test: [ "CMD-SHELL", "/opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 40s
+
+  infra-prometheus:
+    image: prom/prometheus:main
+    volumes:
+      - ./infra/observability/prometheus/prometheus-dev.yaml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    extra_hosts:
+      - "host.docker.internal:host-gateway" # Linux-specific fix
+    <<:  *common-service
+
+  infra-grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN: aziz
+      GF_SECURITY_ADMIN_PASSWORD: aziz333
+      GF_PATHS_PROVISIONING: /etc/grafana/provisioning
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./infra/observability/grafana/provisioning/dashboards/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml
+      - ./infra/observability/grafana/provisioning/dashboards/json:/var/lib/grafana/dashboards
+      - ./infra/observability/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+    depends_on:
+      - infra-prometheus
+    <<:  *common-service
+
+  # Exporters
+
+  node-exporter:
+    image: prom/node-exporter:v1.10.2
+    ports:
+      - "9100:9100"
+    <<: *common-service
+
+  kafka-exporter:
+    image: danielqsj/kafka-exporter:latest
+    ports:
+      - "9308:9308"
+    command:
+      - "--kafka.server=infra-kafka:9092"
+    <<: *common-service
+    depends_on:
+      infra-kafka:
+        condition: service_healthy
+
+volumes:
+  infra_kafka_data:
+  grafana_data:
+
+networks:
+  ecommerce-net:
+    external: true
