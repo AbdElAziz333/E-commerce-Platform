@@ -1,3 +1,36 @@
 spring:
-  config:
-    import: configserver:http://${CONFIG_SERVER}:${CONFIG_SERVER_PORT}
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USER}
+    password: ${MAIL_PASSWORD}
+    protocol: smtp
+    properties:
+      mail:
+        debug: false
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  kafka:
+    bootstrap-servers: kafka:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: notification-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+        spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.type.mapping: "com.aziz.auth_service.kafka.events.UserRegisteredEvent:com.aziz.notification_service.kafka.events.UserRegisteredEvent,com.aziz.auth_service.kafka.events.OtpVerificationEvent:com.aziz.notification_service.kafka.events.OtpVerificationEvent,com.aziz.order_service.kafka.events.OrderCreationEvent:com.aziz.notification_service.kafka.events.OrderCreationEvent,com.aziz.payment_service.kafka.events.PaymentSuccessEvent:com.aziz.notification_service.kafka.events.PaymentSuccessEvent"
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    serviceUrl:
+      defaultZone: http://discovery-server:8080/eureka/

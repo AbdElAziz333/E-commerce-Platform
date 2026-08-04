@@ -3,3 +3,29 @@ spring:
     name: discovery-server
   profiles:
     active: prod
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, prometheus
+  endpoint:
+    prometheus:
+      access: READ_ONLY
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+logging:
+  level:
+    root: INFO
+    com.aziz.discovery_server: DEBUG
+  pattern:
+    console: "%d{HH:mm:ss} %-5level [%thread] %logger{36} - %msg%n"
+
+server:
+  port: 8080

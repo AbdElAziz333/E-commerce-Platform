@@ -1,3 +1,14 @@
 spring:
-  config:
-    import: configserver:http://${CONFIG_SERVER}:${CONFIG_SERVER_PORT}
+  mongodb:
+    host: mongo
+    database: ${MONGO_DB}
+    username: aziz
+    password: ${MONGO_PASSWORD}
+    authentication-database: admin
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    serviceUrl:
+      defaultZone: http://discovery-server:8080/eureka/

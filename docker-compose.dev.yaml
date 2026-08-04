@@ -1,166 +1,186 @@
+x-common-healthcheck: &common-healthcheck
+  interval: 10s
+  timeout: 5s
+  retries: 10
+  start_period: 90s
+
 x-common-service: &common-service
   networks:
     ecommerce-net:
   restart: unless-stopped
 
 services:
-  auth-postgres:
-    image: postgres:alpine
+  discovery-server:
+    image: abdelaziz333/discovery-server:0.0.1
+    build:
+      context: ./discovery-server
+      dockerfile: Dockerfile
     ports:
-      - "5432:5432"
-    volumes:
-      - auth_postgres_data:/var/lib/postgresql/data
+      - "8080:8080"
+    <<: *common-service
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health" ]
+      <<: *common-healthcheck
+    profiles:
+      - app
+      - all
+
+  auth-service:
+    image: abdelaziz333/auth-service:0.0.1
+    build:
+      context: .
+      dockerfile: ./auth-service/Dockerfile
+    ports:
+      - "8081:8081"
     environment:
       POSTGRES_DB: auth
-      POSTGRES_USER: aziz
-      POSTGRES_PASSWORD: aziz333
-    <<:  *common-service
-
-  auth-redis:
-    image: redis:alpine
-    ports:
-      - "6379:6379"
-    <<:  *common-service
-
-  product-mongo:
-    image: mongo:latest
-    ports:
-      - "27017:27017"
-    volumes:
-      - product_mongo_data:/data/db
-    environment:
-      MONGO_INITDB_DATABASE: product
-      MONGO_INITDB_ROOT_USERNAME: aziz
-      MONGO_INITDB_ROOT_PASSWORD: aziz333
-    <<:  *common-service
-
-  cart-postgres:
-    image: postgres:alpine
-    ports:
-      - "5433:5432"
-    volumes:
-      - cart_postgres_data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: cart
-      POSTGRES_USER: aziz
-      POSTGRES_PASSWORD: aziz333
-    <<:  *common-service
-
-  cart-redis:
-    image: redis:alpine
-    ports:
-      - "6380:6379"
-    <<:  *common-service
-
-  order-postgres:
-    image: postgres:alpine
-    ports:
-      - "5434:5432"
-    volumes:
-      - order_postgres_data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: order
-      POSTGRES_USER: aziz
-      POSTGRES_PASSWORD: aziz333
-    <<:  *common-service
-
-  payment-postgres:
-    image: postgres:alpine
-    ports:
-      - "5435:5432"
-    volumes:
-      - payment_postgres_data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: payment
-      POSTGRES_USER: aziz
-      POSTGRES_PASSWORD: aziz333
-    <<:  *common-service
-
-  # Exporters
-
-  auth-postgres-exporter:
-    image: prometheuscommunity/postgres-exporter:master
-    ports:
-      - "9187:9187"
-    environment:
-      DATA_SOURCE_NAME: "postgresql://aziz:aziz333@auth-postgres:5432/auth?sslmode=disable"
-    depends_on:
-      - auth-postgres
-    <<:  *common-service
-
-  order-postgres-exporter:
-    image: prometheuscommunity/postgres-exporter:master
-    ports:
-      - "9188:9187"
-    environment:
-      DATA_SOURCE_NAME: "postgresql://aziz:aziz333@order-postgres:5432/order?sslmode=disable"
-    depends_on:
-      - order-postgres
-    <<:  *common-service
-
-  cart-postgres-exporter:
-    image: prometheuscommunity/postgres-exporter:master
-    ports:
-      - "9189:9187"
-    environment:
-      DATA_SOURCE_NAME: "postgresql://aziz:aziz333@cart-postgres:5432/cart?sslmode=disable"
-    depends_on:
-      - cart-postgres
-    <<:  *common-service
-
-  payment-postgres-exporter:
-    image: prometheuscommunity/postgres-exporter:master
-    ports:
-      - "9190:9187"
-    environment:
-      DATA_SOURCE_NAME: "postgresql://aziz:aziz333@payment-postgres:5432/payment?sslmode=disable"
-    depends_on:
-      - payment-postgres
-    <<:  *common-service
-
-  auth-redis-exporter:
-    image: oliver006/redis_exporter:alpine
-    ports:
-      - "9121:9121"
-    environment:
-      REDIS_ADDR: "auth-redis:6379"
-    depends_on:
-      - auth-redis
-    <<:  *common-service
-
-  cart-redis-exporter:
-    image: oliver006/redis_exporter:alpine
-    ports:
-      - "9122:9121"
-    environment:
-      REDIS_ADDR: "cart-redis:6379"
-    depends_on:
-      - cart-redis
-    <<:  *common-service
-
-  product-mongo-exporter:
-    image: percona/mongodb_exporter:0.47.2
-    ports:
-      - "9216:9216"
-    command:
-      - "--mongodb.uri=mongodb://aziz:aziz333@product-mongo:27017"
-    <<:  *common-service
-
-  # Dev Only
-
-  dev-mailpit:
-    image: axllent/mailpit
-    ports:
-      - "8025:8025"
-      - "1025:1025"
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET}
+      REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET}
     <<: *common-service
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:8081/actuator/health" ]
+      <<: *common-healthcheck
+    profiles:
+      - app
+      - all
 
-volumes:
-  auth_postgres_data:
-  product_mongo_data:
-  order_postgres_data:
-  cart_postgres_data:
-  payment_postgres_data:
+  product-service:
+    image: abdelaziz333/product-service:0.0.1
+    build:
+      context: .
+      dockerfile: ./product-service/Dockerfile
+    ports:
+      - "8082:8082"
+    environment:
+      MONGO_DB: ${MONGO_DB}
+      MONGO_PASSWORD: ${MONGO_PASSWORD}
+    <<: *common-service
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:8082/actuator/health" ]
+      <<: *common-healthcheck
+    profiles:
+      - app
+      - all
+
+  cart-service:
+    image: abdelaziz333/cart-service:0.0.1
+    build:
+      context: .
+      dockerfile: ./cart-service/Dockerfile
+    ports:
+      - "8083:8083"
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    <<: *common-service
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:8083/actuator/health" ]
+      <<: *common-healthcheck
+    profiles:
+      - app
+      - all
+
+  order-service:
+    image: abdelaziz333/order-service:0.0.1
+    build:
+      context: .
+      dockerfile: ./order-service/Dockerfile
+    ports:
+      - "8084:8084"
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    <<: *common-service
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:8084/actuator/health" ]
+      <<: *common-healthcheck
+    profiles:
+      - app
+      - all
+
+  payment-service:
+    image: abdelaziz333/payment-service:0.0.1
+    build:
+      context: .
+      dockerfile: ./payment-service/Dockerfile
+    ports:
+      - "8085:8085"
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    <<: *common-service
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:8085/actuator/health" ]
+      <<: *common-healthcheck
+    profiles:
+      - app
+      - all
+
+  notification-service:
+    image: abdelaziz333/notification-service:0.0.1
+    build:
+      context: .
+      dockerfile: ./notification-service/Dockerfile
+    ports:
+      - "8086:8086"
+    environment:
+      MAIL_USER: ${MAIL_USER}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+    <<: *common-service
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:8086/actuator/health" ]
+      <<: *common-healthcheck
+    profiles:
+      - app
+      - all
+
+  api-gateway:
+    image: abdelaziz333/api-gateway:0.0.1
+    build:
+      context: .
+      dockerfile: ./api-gateway/Dockerfile
+    ports:
+      - "8087:8087"
+    <<: *common-service
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      auth-service:
+        condition: service_healthy
+      notification-service:
+        condition: service_healthy
+      product-service:
+        condition: service_healthy
+      payment-service:
+        condition: service_healthy
+      order-service:
+        condition: service_healthy
+      cart-service:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:8087/actuator/health" ]
+      <<: *common-healthcheck
+    profiles:
+      - app
+      - all
 
 networks:
   ecommerce-net:

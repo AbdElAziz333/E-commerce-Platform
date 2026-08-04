@@ -5,18 +5,64 @@ x-common-service: &common-service
   stdin_open: true
   tty: true
 
+x-database-healthcheck: &database-healthcheck
+  interval: 10s
+  timeout: 5s
+  retries: 10
+  start_period: 60s
+
 services:
-  infra-kafka:
+  postgres:
+    image: postgres:16-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    <<: *common-service
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      <<: *database-healthcheck
+
+  redis:
+    image: redis:8.4.0-alpine
+    environment:
+      REDISCLI_USER: ${REDIS_USER}
+      REDISCLI_PASSWORD: ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+      - ./infra/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+    <<: *common-service
+    healthcheck:
+      test: [ "CMD", "redis-cli", "PING" ]
+      <<: *database-healthcheck
+
+  mongo:
+    image: mongo:latest
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: ${MONGO_DB}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    <<: *common-service
+    healthcheck:
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      <<: *database-healthcheck
+
+  kafka:
     image: bitnami/kafka:latest
     volumes:
-      - infra_kafka_data:/bitnami/kafka
+      - kafka_data:/bitnami/kafka
     environment:
       KAFKA_CFG_PROCESS_ROLES: controller,broker
       KAFKA_CFG_NODE_ID: 1
       KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
-      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://infra-kafka:9092
-      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 1@infra-kafka:9093
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
 
       KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
       ALLOW_PLAINTEXT_LISTENER: yes
@@ -28,7 +74,7 @@ services:
       retries: 10
       start_period: 40s
 
-  infra-prometheus:
+  prometheus:
     image: prom/prometheus:main
     ports:
       - "9090:9090"
@@ -47,12 +93,12 @@ services:
       retries: 5
       start_period: 20s
 
-  infra-grafana:
+  grafana:
     image: grafana/grafana:latest
     ports:
       - "3000:3000"
     environment:
-      GF_SECURITY_ADMIN_USER: ${GRAFANA_USER}
+      GF_SECURITY_ADMIN_USER: aziz
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
       GF_PATHS_PROVISIONING: /etc/grafana/provisioning
     volumes:
@@ -62,7 +108,7 @@ services:
       - ./infra/observability/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
     <<: *common-service
     depends_on:
-      infra-prometheus:
+      prometheus:
         condition: service_healthy
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:3000/api/health" ]
@@ -77,17 +123,48 @@ services:
     image: prom/node-exporter:v1.10.2
     <<: *common-service
 
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:v0.18.1
+    environment:
+      DATA_SOURCE_NAME: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable"
+      PG_EXPORTER_AUTO_DISCOVER_DATABASES: "true"
+    <<: *common-service
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  redis-exporter:
+    image: oliver006/redis_exporter:v1.80.1-alpine
+    environment:
+      REDIS_ADDR: "redis://${REDIS_USER}:${REDIS_PASSWORD}@redis:6379"
+    <<: *common-service
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  mongo-exporter:
+    image: percona/mongodb_exporter:0.47.2
+    command:
+      - "--mongodb.uri=mongodb://${MONGO_USER}:${MONGO_PASSWORD}@mongo:27017/admin?authSource=admin"
+    <<: *common-service
+    depends_on:
+      product-mongo:
+        condition: service_healthy
+
   kafka-exporter:
     image: danielqsj/kafka-exporter:v1.9.0
     command:
-      - "--kafka.server=infra-kafka:9092"
+      - "--kafka.server=kafka:9092"
     <<: *common-service
     depends_on:
-      infra-kafka:
+      kafka:
         condition: service_healthy
 
 volumes:
-  infra_kafka_data:
+  postgres_data:
+  redis_data:
+  mongo_data:
+  kafka_data:
   grafana_data:
 
 networks:

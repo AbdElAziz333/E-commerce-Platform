@@ -3,3 +3,91 @@ spring:
     name: api-gateway
   profiles:
     active: prod
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      server:
+        webmvc:
+          routes:
+            - id: auth-service
+              uri: lb://auth-service
+              predicates:
+                - Path=/api/v1/auth/**
+
+            - id: registration-service
+              uri: lb://auth-service
+              predicates:
+                - Path=/api/v1/register/**
+
+            - id: user-service
+              uri: lb://auth-service
+              predicates:
+                - Path=/api/v1/users/**
+
+            - id: address-service
+              uri: lb://auth-service
+              predicates:
+                - Path=/api/v1/addresses/**
+
+            - id: product-service
+              uri: lb://product-service
+              predicates:
+                - Path=/api/v1/products/**
+
+            - id: cart-service
+              uri: lb://cart-service
+              predicates:
+                - Path=/api/v1/carts/**
+
+            - id: order-service
+              uri: lb://order-service
+              predicates:
+                - Path=/api/v1/orders/**
+
+            - id: order-items-service
+              uri: lb://order-service
+              predicates:
+                - Path=/api/v1/order-items/**
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, prometheus
+  endpoint:
+    prometheus:
+      access: READ_ONLY
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+logging:
+  level:
+    root: INFO
+    com.aziz.api_gateway: DEBUG
+  pattern:
+    console: "%d{HH:mm:ss} %-5level [%thread] %logger{36} - %msg%n"
+
+server:
+  port: 8087
+
+jwt:
+  accessTokenSecret: katykatykatykatykatykatykatykaty
+  cookieName: access_token
+
+session:
+  cookie: sessionId
+  maxAge: 7776000000 # 90 days
+  secure: false
+  headerName: Session-Id
+
+user:
+  idHeader: User-Id
+  roleHeader: User-Role

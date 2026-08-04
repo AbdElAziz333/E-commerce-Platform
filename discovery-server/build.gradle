@@ -3,7 +3,6 @@ version = '0.0.1-SNAPSHOT'
 description = 'Demo project for Spring Boot'
 
 dependencies {
-	implementation 'org.springframework.cloud:spring-cloud-starter-config'
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-server'
     implementation 'org.springframework.boot:spring-boot-starter-webmvc'
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'

@@ -10,84 +10,56 @@ scrape_configs:
   - job_name: 'microservices'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: ['config-server:8080']
-        labels:
-          service: 'config-server'
-
-      - targets: ['discovery-server:8081']
+      - targets: ['discovery-server:8080']
         labels:
           service: 'discovery-server'
 
-      - targets: ['auth-service:8082']
+      - targets: ['auth-service:8081']
         labels:
           service: 'auth-service'
 
-      - targets: ['product-service:8083']
+      - targets: ['product-service:8082']
         labels:
           service: 'product-service'
 
-      - targets: ['cart-service:8084']
+      - targets: ['cart-service:8083']
         labels:
           service: 'cart-service'
 
-      - targets: ['order-service:8085']
+      - targets: ['order-service:8084']
         labels:
           service: 'order-service'
 
-      - targets: ['payment-service:8086']
+      - targets: ['payment-service:8085']
         labels:
           service: 'payment-service'
 
-      - targets: ['notification-service:8087']
+      - targets: ['notification-service:8086']
         labels:
           service: 'notification-service'
 
-      - targets: ['api-gateway:8088']
+      - targets: ['api-gateway:8087']
         labels:
           service: 'api-gateway'
 
-  - job_name: 'node-exporter'
+  - job_name: 'exporters'
     static_configs:
       - targets: ['node-exporter:9100']
         labels:
           service: 'node-exporter'
 
-  - job_name: 'postgres-exporters'
-    static_configs:
-      - targets: ['auth-postgres-exporter:9187']
+      - targets: ['postgres-exporter:9187']
         labels:
-          service: 'auth-postgres-exporter'
+          service: 'postgres-exporter'
 
-      - targets: ['order-postgres-exporter:9187']
+      - targets: ['redis-exporter:9121']
         labels:
-          service: 'order-postgres-exporter'
+          service: 'redis-exporter'
 
-      - targets: ['cart-postgres-exporter:9187']
+      - targets: ['mongo-exporter:9216']
         labels:
-          service: 'cart-postgres-exporter'
+          service: 'mongo-exporter'
 
-      - targets: ['payment-postgres-exporter:9187']
-        labels:
-          service: 'payment-postgres-exporter'
-
-  - job_name: 'redis-exporters'
-    static_configs:
-      - targets: ['auth-redis-exporter:9121']
-        labels:
-          service: 'auth-redis-exporter'
-
-      - targets: ['cart-redis-exporter:9121']
-        labels:
-          service: 'cart-redis-exporter'
-
-  - job_name: 'mongo-exporters'
-    static_configs:
-      - targets: ['product-mongo-exporter:9216']
-        labels:
-          service: 'product-mongo-exporter'
-
-  - job_name: 'kafka-exporters'
-    static_configs:
       - targets: ['kafka-exporter:9308']
         labels:
           service: 'kafka-exporter'

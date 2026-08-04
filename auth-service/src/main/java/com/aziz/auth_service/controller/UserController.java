@@ -20,13 +20,13 @@ public class UserController {
     private final UserService service;
 
     @GetMapping("/current")
-    public ResponseEntity<?> getCurrentUser(@RequestHeader("User-Id") Long userId) {
-        return ResponseEntity.ok(service.getCurrentUser(userId));
+    public ResponseEntity<?> getCurrentUser(@RequestHeader("User-Id") Long id) {
+        return ResponseEntity.ok(service.getCurrentUser(id));
     }
 
     @GetMapping("/current/email")
-    public ResponseEntity<ApiResponse<String>> getCurrentUserEmail(@RequestHeader("User-Id") Long userId) {
-        return ResponseEntity.ok(ApiResponse.success("Successfully fetched current user's email", service.getCurrentUserEmail(userId)));
+    public ResponseEntity<ApiResponse<String>> getCurrentUserEmail(@RequestHeader("User-Id") Long id) {
+        return ResponseEntity.ok(ApiResponse.success("Successfully fetched current user's email", service.getCurrentUserEmail(id)));
     }
 
     @GetMapping
