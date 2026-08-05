@@ -25,19 +25,13 @@ services:
       - app
       - all
 
-  auth-service:
-    image: abdelaziz333/auth-service:0.0.1
+  api-gateway:
+    image: abdelaziz333/api-gateway:0.0.1
     build:
       context: .
-      dockerfile: ./auth-service/Dockerfile
+      dockerfile: ./api-gateway/Dockerfile
     ports:
       - "8081:8081"
-    environment:
-      POSTGRES_DB: auth
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
-      ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET}
-      REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET}
     <<: *common-service
     depends_on:
       discovery-server:
@@ -49,16 +43,13 @@ services:
       - app
       - all
 
-  product-service:
-    image: abdelaziz333/product-service:0.0.1
+  auth-service:
+    image: abdelaziz333/auth-service:0.0.1
     build:
       context: .
-      dockerfile: ./product-service/Dockerfile
+      dockerfile: ./auth-service/Dockerfile
     ports:
       - "8082:8082"
-    environment:
-      MONGO_DB: ${MONGO_DB}
-      MONGO_PASSWORD: ${MONGO_PASSWORD}
     <<: *common-service
     depends_on:
       discovery-server:
@@ -70,16 +61,13 @@ services:
       - app
       - all
 
-  cart-service:
-    image: abdelaziz333/cart-service:0.0.1
+  product-service:
+    image: abdelaziz333/product-service:0.0.1
     build:
       context: .
-      dockerfile: ./cart-service/Dockerfile
+      dockerfile: ./product-service/Dockerfile
     ports:
       - "8083:8083"
-    environment:
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
     <<: *common-service
     depends_on:
       discovery-server:
@@ -91,15 +79,13 @@ services:
       - app
       - all
 
-  order-service:
-    image: abdelaziz333/order-service:0.0.1
+  cart-service:
+    image: abdelaziz333/cart-service:0.0.1
     build:
       context: .
-      dockerfile: ./order-service/Dockerfile
+      dockerfile: ./cart-service/Dockerfile
     ports:
       - "8084:8084"
-    environment:
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     <<: *common-service
     depends_on:
       discovery-server:
@@ -111,15 +97,13 @@ services:
       - app
       - all
 
-  payment-service:
-    image: abdelaziz333/payment-service:0.0.1
+  order-service:
+    image: abdelaziz333/order-service:0.0.1
     build:
       context: .
-      dockerfile: ./payment-service/Dockerfile
+      dockerfile: ./order-service/Dockerfile
     ports:
       - "8085:8085"
-    environment:
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     <<: *common-service
     depends_on:
       discovery-server:
@@ -131,16 +115,13 @@ services:
       - app
       - all
 
-  notification-service:
-    image: abdelaziz333/notification-service:0.0.1
+  payment-service:
+    image: abdelaziz333/payment-service:0.0.1
     build:
       context: .
-      dockerfile: ./notification-service/Dockerfile
+      dockerfile: ./payment-service/Dockerfile
     ports:
       - "8086:8086"
-    environment:
-      MAIL_USER: ${MAIL_USER}
-      MAIL_PASSWORD: ${MAIL_PASSWORD}
     <<: *common-service
     depends_on:
       discovery-server:
@@ -152,28 +133,16 @@ services:
       - app
       - all
 
-  api-gateway:
-    image: abdelaziz333/api-gateway:0.0.1
+  notification-service:
+    image: abdelaziz333/notification-service:0.0.1
     build:
       context: .
-      dockerfile: ./api-gateway/Dockerfile
+      dockerfile: ./notification-service/Dockerfile
     ports:
       - "8087:8087"
     <<: *common-service
     depends_on:
       discovery-server:
-        condition: service_healthy
-      auth-service:
-        condition: service_healthy
-      notification-service:
-        condition: service_healthy
-      product-service:
-        condition: service_healthy
-      payment-service:
-        condition: service_healthy
-      order-service:
-        condition: service_healthy
-      cart-service:
         condition: service_healthy
     healthcheck:
       test: [ "CMD-SHELL", "wget -qO- http://localhost:8087/actuator/health" ]

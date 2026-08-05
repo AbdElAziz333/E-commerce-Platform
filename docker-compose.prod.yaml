@@ -17,32 +17,54 @@ x-common-service: &common-service
 
 services:
   discovery-server:
-    image: abdelaziz333/discovery-server:1.0
+    image: abdelaziz333/discovery-server:0.1
     build:
       context: .
       dockerfile: discovery-server/Dockerfile
     ports:
-      - "8080:8080"
+      - "${DISCOVERY_SERVER_PORT}:${DISCOVERY_SERVER_PORT}"
     environment:
       <<: *common-env
+      PORT: ${DISCOVERY_SERVER_PORT}
     <<: *common-service
     healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health" ]
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:${DISCOVERY_SERVER_PORT}/actuator/health" ]
+      <<: *common-healthcheck
+    profiles:
+      - app
+      - all
+
+  api-gateway:
+    image: abdelaziz333/api-gateway:0.1
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    ports:
+      - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
+    environment:
+      <<: *common-env
+      PORT: ${API_GATEWAY_PORT}
+    <<: *common-service
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:${API_GATEWAY_PORT}/actuator/health" ]
       <<: *common-healthcheck
     profiles:
       - app
       - all
 
   auth-service:
-    image: abdelaziz333/auth-service:1.0
+    image: abdelaziz333/auth-service:0.1
     build:
       context: .
       dockerfile: auth-service/Dockerfile
     ports:
-      - "8081:8081"
+      - "${AUTH_SVC_PORT}:${AUTH_SVC_PORT}"
     environment:
       <<: *common-env
-      PORT: 8081
+      PORT: ${AUTH_SVC_PORT}
       POSTGRES_DB: auth
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -56,22 +78,22 @@ services:
       discovery-server:
         condition: service_healthy
     healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:8081/actuator/health" ]
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:${AUTH_SVC_PORT}/actuator/health" ]
       <<: *common-healthcheck
     profiles:
       - app
       - all
 
   product-service:
-    image: abdelaziz333/product-service:1.0
+    image: abdelaziz333/product-service:0.1
     build:
       context: .
       dockerfile: product-service/Dockerfile
     ports:
-      - "8082:8082"
+      - "${PRODUCT_SVC_PORT}:${PRODUCT_SVC_PORT}"
     environment:
       <<: *common-env
-      PORT: 8082
+      PORT: ${PRODUCT_SVC_PORT}
       MONGO_DB: ${MONGO_DB}
       MONGO_USER: ${MONGO_USER}
       MONGO_PASSWORD: ${MONGO_PASSWORD}
@@ -80,22 +102,22 @@ services:
       discovery-server:
         condition: service_healthy
     healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:8082/actuator/health" ]
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:${PRODUCT_SVC_PORT}/actuator/health" ]
       <<: *common-healthcheck
     profiles:
       - app
       - all
 
   cart-service:
-    image: abdelaziz333/cart-service:1.0
+    image: abdelaziz333/cart-service:0.1
     build:
       context: .
       dockerfile: cart-service/Dockerfile
     ports:
-      - "8083:8083"
+      - "${CART_SVC_PORT}:${CART_SVC_PORT}"
     environment:
       <<: *common-env
-      PORT: 8083
+      PORT: ${CART_SVC_PORT}
       POSTGRES_HOST: postgres
       POSTGRES_DB: cart
       POSTGRES_USER: ${POSTGRES_USER}
@@ -107,22 +129,22 @@ services:
       discovery-server:
         condition: service_healthy
     healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:8083/actuator/health" ]
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:${CART_SVC_PORT}/actuator/health" ]
       <<: *common-healthcheck
     profiles:
       - app
       - all
 
   order-service:
-    image: abdelaziz333/order-service:1.0
+    image: abdelaziz333/order-service:0.1
     build:
       context: .
       dockerfile: order-service/Dockerfile
     ports:
-      - "8084:8084"
+      - "${ORDER_SVC_PORT}:${ORDER_SVC_PORT}"
     environment:
       <<: *common-env
-      PORT: 8084
+      PORT: ${ORDER_SVC_PORT}
       POSTGRES_DB: order
       POSTGRES_USER: aziz
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -132,22 +154,22 @@ services:
       discovery-server:
         condition: service_healthy
     healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:8084/actuator/health" ]
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:${ORDER_SVC_PORT}/actuator/health" ]
       <<: *common-healthcheck
     profiles:
       - app
       - all
 
   payment-service:
-    image: abdelaziz333/payment-service:1.0
+    image: abdelaziz333/payment-service:0.1
     build:
       context: .
       dockerfile: payment-service/Dockerfile
     ports:
-      - "8085:8085"
+      - "${PAYMENT_SVC_PORT}:${PAYMENT_SVC_PORT}"
     environment:
       <<: *common-env
-      PORT: 8085
+      PORT: ${PAYMENT_SVC_PORT}
       POSTGRES_DB: payment
       POSTGRES_USER: aziz
       POSTGRES_PASSWORD: ${PAYMENT_POSTGRES_PASSWORD}
@@ -157,22 +179,22 @@ services:
       discovery-server:
         condition: service_healthy
     healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:8085/actuator/health" ]
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:${PAYMENT_SVC_PORT}/actuator/health" ]
       <<: *common-healthcheck
     profiles:
       - app
       - all
 
   notification-service:
-    image: abdelaziz333/notification-service:1.0
+    image: abdelaziz333/notification-service:0.1
     build:
       context: .
       dockerfile: notification-service/Dockerfile
     ports:
-      - "8086:8086"
+      - "${NOTIFICATION_SVC_PORT}:${NOTIFICATION_SVC_PORT}"
     environment:
       <<: *common-env
-      PORT: 8086
+      PORT: ${NOTIFICATION_SVC_PORT}
       MAIL_USER: ${MAIL_USER}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
@@ -181,39 +203,7 @@ services:
       discovery-server:
         condition: service_healthy
     healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:8086/actuator/health" ]
-      <<: *common-healthcheck
-    profiles:
-      - app
-      - all
-
-  api-gateway:
-    image: abdelaziz333/api-gateway:1.0
-    build:
-      context: .
-      dockerfile: api-gateway/Dockerfile
-    ports:
-      - "8087:8087"
-    environment:
-      <<: *common-env
-    <<: *common-service
-    depends_on:
-      discovery-server:
-        condition: service_healthy
-      auth-service:
-        condition: service_healthy
-      notification-service:
-        condition: service_healthy
-      product-service:
-        condition: service_healthy
-      payment-service:
-        condition: service_healthy
-      order-service:
-        condition: service_healthy
-      cart-service:
-        condition: service_healthy
-    healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:8087/actuator/health" ]
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:${NOTIFICATION_SVC_PORT}/actuator/health" ]
       <<: *common-healthcheck
     profiles:
       - app
