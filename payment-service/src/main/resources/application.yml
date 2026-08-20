@@ -20,14 +20,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, info, metrics, prometheus
-  endpoint:
-    prometheus:
-      access: READ_ONLY
-  prometheus:
-    metrics:
-      export:
-        enabled: true
+        include: health, info, metrics
 
 logging:
   level:
@@ -38,17 +31,3 @@ logging:
 
 server:
   port: ${PORT}
-
-kafka:
-  topic:
-    payment-completed: payment.completed
-    order-payment: order.payment
-
-  # paymob:
-  #   apiKey: ${PAYMOB_API_KEY}
-  #   secretKey: ${PAYMOB_SECRET_KEY}
-  # publicKey: ${PAYMOB_PUBLIC_KEY}
-  # integrationId: ${PAYMOB_INTEGRATION_ID}
-  # iFrameId: ${PAYMOB_IFRAME_ID}
-  # hmacSecret: ${PAYMOB_HMAC_SECRET}
-  # baseUrl: ${PAYMOB_BASE_URL}

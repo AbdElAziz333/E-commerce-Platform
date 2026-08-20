@@ -11,14 +11,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, info, metrics, prometheus
-  endpoint:
-    prometheus:
-      access: READ_ONLY
-  prometheus:
-    metrics:
-      export:
-        enabled: true
+        include: health, info, metrics
 
 logging:
   level:
@@ -29,11 +22,3 @@ logging:
 
 server:
   port: ${PORT}
-
-kafka:
-  topic:
-    user-registered: user.registered
-    otp-verification: otp.verification
-    order-created: order.created
-    order-payment: order.payment
-    payment-completed: payment.completed

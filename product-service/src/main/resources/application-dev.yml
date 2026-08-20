@@ -1,12 +1,3 @@
-spring:
-  mongodb:
-    host: localhost
-    port: 27017
-    username: aziz
-    password: aziz333
-    database: product
-    authentication-database: admin
-
 eureka:
   client:
     register-with-eureka: true
