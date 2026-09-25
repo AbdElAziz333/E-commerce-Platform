@@ -7,7 +7,7 @@ import com.aziz.api_gateway.model.User;
 import com.aziz.api_gateway.repository.AddressRepository;
 import com.aziz.api_gateway.dto.request.CreateAddressRequest;
 import com.aziz.api_gateway.dto.request.UpdateAddressRequest;
-import com.aziz.api_gateway.util.exceptions.AddressAccessDeniedException;
+import com.aziz.api_gateway.util.exceptions.AccessDeniedException;
 import com.aziz.api_gateway.util.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +44,7 @@ public class AddressService {
         log.debug("Creating address for user: {}", userId);
 
         User user = userService.getUserEntityById(userId);
-        Address address = mapper.registerRequestToAddress(request);
+        Address address = mapper.createRequestToAddress(request);
         address.setUser(user);
 
         repository.save(address);
@@ -77,7 +77,7 @@ public class AddressService {
                 .orElseThrow(() -> new NotFoundException("Address not found" + addressId));
 
         if (!address.getUser().getId().equals(userId)) {
-            throw new AddressAccessDeniedException("Access denied for address: " + addressId);
+            throw new AccessDeniedException("Access denied for address: " + addressId);
         }
 
         return address;

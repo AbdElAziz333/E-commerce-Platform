@@ -27,7 +27,7 @@ public class AddressMapper {
                 .toList();
     }
 
-    public Address registerRequestToAddress(CreateAddressRequest request) {
+    public Address createRequestToAddress(CreateAddressRequest request) {
         return Address.builder()
                 .streetLine1(request.getStreetLine1())
                 .streetLine2(request.getStreetLine2())
