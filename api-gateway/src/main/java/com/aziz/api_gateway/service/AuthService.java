@@ -10,7 +10,6 @@ import com.aziz.api_gateway.util.TokenEncryptor;
 import com.aziz.api_gateway.util.exceptions.InvalidCredentialsException;
 import com.aziz.api_gateway.util.exceptions.NotFoundException;
 import com.aziz.api_gateway.util.exceptions.UnauthorizedException;
-import com.aziz.api_gateway.util.exceptions.UsernameNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +36,7 @@ public class AuthService {
         log.debug("Attempting to login user with email: {}", request.getEmail());
 
         User user = repository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new UsernameNotFoundException("Cannot verify credentials for user with email: {}, user not found"));
+                .orElseThrow(() -> new NotFoundException("Cannot verify credentials for user with email: {}, user not found"));
 
         if (!encoder.matches(request.getPassword(), user.getPassword())) {
             throw new InvalidCredentialsException("Password are wrong, please enter a valid one");

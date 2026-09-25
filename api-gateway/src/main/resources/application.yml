@@ -21,33 +21,13 @@ spring:
       server:
         webmvc:
           routes:
-            - id: auth-service
-              uri: lb://auth-service
-              predicates:
-                - Path=/api/v1/auth/**
-
-            - id: registration-service
-              uri: lb://auth-service
-              predicates:
-                - Path=/api/v1/register/**
-
-            - id: user-service
-              uri: lb://auth-service
-              predicates:
-                - Path=/api/v1/users/**
-
-            - id: address-service
-              uri: lb://auth-service
-              predicates:
-                - Path=/api/v1/addresses/**
-
             - id: product-service
               uri: lb://product-service
               predicates:
                 - Path=/api/v1/products/**
 
             - id: cart-service
-              uri: lb://cart-service
+              uri: lb://order-service
               predicates:
                 - Path=/api/v1/carts/**
 

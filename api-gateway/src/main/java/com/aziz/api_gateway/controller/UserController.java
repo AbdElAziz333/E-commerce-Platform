@@ -1,9 +1,11 @@
 package com.aziz.api_gateway.controller;
 
+import com.aziz.api_gateway.dto.request.UserCreationRequest;
 import com.aziz.api_gateway.dto.response.UserDto;
 import com.aziz.api_gateway.dto.request.UserUpdateRequest;
 import com.aziz.api_gateway.service.UserService;
 import com.aziz.api_gateway.util.ApiResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +41,21 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<UserDto>> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.success("User fetched successfully", service.getUserById(id)));
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<ApiResponse<String>> createUser(
+            @RequestBody @Valid UserCreationRequest request,
+            HttpServletResponse response
+    ) {
+        service.createUser(request, response);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Registration successful. Now you can login.",
+                        null
+                )
+        );
     }
 
     @PatchMapping("/{id}")
