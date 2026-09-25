@@ -22,7 +22,10 @@ services:
     image: abdelaziz333/api-gateway:0.1
     build:
       context: .
-      dockerfile: api-gateway/Dockerfile
+      dockerfile: Dockerfile
+      args:
+        SVC_NAME: api-gateway
+        SVC_PORT: ${API_GATEWAY_PORT}
     ports:
       - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
     environment:
@@ -46,7 +49,10 @@ services:
     image: abdelaziz333/product-service:0.1
     build:
       context: .
-      dockerfile: product-service/Dockerfile
+      dockerfile: Dockerfile
+      args:
+        SVC_NAME: product-service
+        SVC_PORT: ${PRODUCT_SVC_PORT}
     ports:
       - "${PRODUCT_SVC_PORT}:${PRODUCT_SVC_PORT}"
     environment:
@@ -66,7 +72,10 @@ services:
     image: abdelaziz333/order-service:0.1
     build:
       context: .
-      dockerfile: order-service/Dockerfile
+      dockerfile: Dockerfile
+      args:
+        SVC_NAME: order-service
+        SVC_PORT: ${ORDER_SVC_PORT}
     ports:
       - "${ORDER_SVC_PORT}:${ORDER_SVC_PORT}"
     environment:
@@ -104,8 +113,8 @@ services:
   redis:
     image: redis:8.6.2-alpine
     environment:
-      REDISCLI_USER: ${REDIS_USER}
-      REDISCLI_PASSWORD: ${REDIS_PASSWORD}
+      REDISCLI_USER: ${REDIS_ADMIN_USER}
+      REDISCLI_PASSWORD: ${REDIS_ADMIN_PASSWORD}
     volumes:
       - redis_data:/data
       - ./infra/redis/redis.conf:/usr/local/etc/redis/redis.conf
