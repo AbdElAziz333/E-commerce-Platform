@@ -1,6 +1,22 @@
-eureka:
-  client:
-    register-with-eureka: true
-    fetch-registry: true
-    serviceUrl:
-      defaultZone: http://localhost:8080/eureka/
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/auth
+    username: aziz
+    password: aziz333
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000ms
+
+jwt:
+  accessToken:
+    secret: katykatykatykatykatykatykatykaty
+    cookieName: access_token
+    maxAge: 900000 # 15 minutes
+    secured: false
+  refreshToken:
+    secret: azizazizazizazizazizazizazizaziz
+    cookieName: refresh_token
+    maxAge: 1209600000 # 15 days
+    secured: false

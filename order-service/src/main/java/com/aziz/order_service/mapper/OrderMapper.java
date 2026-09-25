@@ -1,9 +1,9 @@
 package com.aziz.order_service.mapper;
 
-import com.aziz.order_service.request.CreateOrderRequest;
-import com.aziz.order_service.dto.OrderDto;
-import com.aziz.order_service.request.CreateOrderItemRequest;
-import com.aziz.order_service.dto.OrderItemDto;
+import com.aziz.order_service.dto.request.CreateOrderRequest;
+import com.aziz.order_service.dto.response.OrderDto;
+import com.aziz.order_service.dto.request.CreateOrderItemRequest;
+import com.aziz.order_service.dto.response.OrderItemDto;
 import com.aziz.order_service.model.Order;
 import com.aziz.order_service.model.OrderItem;
 import org.springframework.stereotype.Component;

@@ -3,10 +3,8 @@ spring:
     url: jdbc:postgresql://localhost:5432/order
     username: aziz
     password: aziz333
-
-eureka:
-  client:
-    register-with-eureka: true
-    fetch-registry: true
-    serviceUrl:
-      defaultZone: http://localhost:8080/eureka/
+  data:
+    redis:
+      host: localhost
+      port: 6380
+      timeout: 2000ms

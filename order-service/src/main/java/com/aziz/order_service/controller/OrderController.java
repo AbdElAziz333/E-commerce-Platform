@@ -1,8 +1,8 @@
 package com.aziz.order_service.controller;
 
-import com.aziz.order_service.request.CreateOrderRequest;
-import com.aziz.order_service.dto.OrderDto;
-import com.aziz.order_service.request.UpdateOrderRequest;
+import com.aziz.order_service.dto.request.CreateOrderRequest;
+import com.aziz.order_service.dto.response.OrderDto;
+import com.aziz.order_service.dto.request.UpdateOrderRequest;
 import com.aziz.order_service.service.OrderService;
 import com.aziz.order_service.util.ApiResponse;
 import jakarta.validation.Valid;

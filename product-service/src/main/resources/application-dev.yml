@@ -1,6 +1,5 @@
-eureka:
-  client:
-    register-with-eureka: true
-    fetch-registry: true
-    serviceUrl:
-      defaultZone: http://localhost:8080/eureka/
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/order
+    username: aziz
+    password: aziz333

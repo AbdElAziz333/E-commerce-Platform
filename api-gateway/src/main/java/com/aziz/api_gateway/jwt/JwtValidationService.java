@@ -24,7 +24,7 @@ public class JwtValidationService {
 
     @PostConstruct
     public void init() {
-        accessTokenSecret = Keys.hmacShaKeyFor(config.getAccessTokenSecret().getBytes(StandardCharsets.UTF_8));
+        accessTokenSecret = Keys.hmacShaKeyFor(config.getAccessToken().getSecret().getBytes(StandardCharsets.UTF_8));
         accessTokenParser = Jwts.parser().verifyWith(accessTokenSecret).build();
     }
 
@@ -49,7 +49,7 @@ public class JwtValidationService {
         if (request.getCookies() == null) return null;
 
         for (Cookie cookie : request.getCookies()) {
-            if (cookie.getName().equals(config.getCookieName())) return cookie.getValue();
+            if (cookie.getName().equals(config.getAccessToken().getCookieName())) return cookie.getValue();
         }
 
         return null;

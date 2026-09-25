@@ -1,7 +1,3 @@
-x-common-env: &common-env
-  DISCOVERY_SERVER: discovery-server
-  DISCOVERY_SERVER_PORT: 8080
-
 x-common-healthcheck: &common-healthcheck
   interval: 10s
   timeout: 5s
@@ -15,25 +11,13 @@ x-common-service: &common-service
   stdin_open: true
   tty: true
 
-services:
-  discovery-server:
-    image: abdelaziz333/discovery-server:0.1
-    build:
-      context: .
-      dockerfile: discovery-server/Dockerfile
-    ports:
-      - "${DISCOVERY_SERVER_PORT}:${DISCOVERY_SERVER_PORT}"
-    environment:
-      <<: *common-env
-      PORT: ${DISCOVERY_SERVER_PORT}
-    <<: *common-service
-    healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:${DISCOVERY_SERVER_PORT}/actuator/health" ]
-      <<: *common-healthcheck
-    profiles:
-      - app
-      - all
+x-database-healthcheck: &database-healthcheck
+  interval: 10s
+  timeout: 5s
+  retries: 10
+  start_period: 60s
 
+services:
   api-gateway:
     image: abdelaziz333/api-gateway:0.1
     build:
@@ -42,42 +26,17 @@ services:
     ports:
       - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
     environment:
-      <<: *common-env
       PORT: ${API_GATEWAY_PORT}
-    <<: *common-service
-    depends_on:
-      discovery-server:
-        condition: service_healthy
-    healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:${API_GATEWAY_PORT}/actuator/health" ]
-      <<: *common-healthcheck
-    profiles:
-      - app
-      - all
-
-  auth-service:
-    image: abdelaziz333/auth-service:0.1
-    build:
-      context: .
-      dockerfile: auth-service/Dockerfile
-    ports:
-      - "${AUTH_SVC_PORT}:${AUTH_SVC_PORT}"
-    environment:
-      <<: *common-env
-      PORT: ${AUTH_SVC_PORT}
       POSTGRES_DB: auth
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      REDIS_USER: ${REDIS_USER}
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_USER: ${REDIS_APP_USER}
+      REDIS_PASSWORD: ${REDIS_APP_PASSWORD}
       ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET}
       REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET}
     <<: *common-service
-    depends_on:
-      discovery-server:
-        condition: service_healthy
     healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:${AUTH_SVC_PORT}/actuator/health" ]
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:${API_GATEWAY_PORT}/actuator/health" ]
       <<: *common-healthcheck
     profiles:
       - app
@@ -91,44 +50,13 @@ services:
     ports:
       - "${PRODUCT_SVC_PORT}:${PRODUCT_SVC_PORT}"
     environment:
-      <<: *common-env
       PORT: ${PRODUCT_SVC_PORT}
-      MONGO_DB: ${MONGO_DB}
-      MONGO_USER: ${MONGO_USER}
-      MONGO_PASSWORD: ${MONGO_PASSWORD}
-    <<: *common-service
-    depends_on:
-      discovery-server:
-        condition: service_healthy
-    healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:${PRODUCT_SVC_PORT}/actuator/health" ]
-      <<: *common-healthcheck
-    profiles:
-      - app
-      - all
-
-  cart-service:
-    image: abdelaziz333/cart-service:0.1
-    build:
-      context: .
-      dockerfile: cart-service/Dockerfile
-    ports:
-      - "${CART_SVC_PORT}:${CART_SVC_PORT}"
-    environment:
-      <<: *common-env
-      PORT: ${CART_SVC_PORT}
-      POSTGRES_HOST: postgres
-      POSTGRES_DB: cart
+      POSTGRES_DB: product
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      REDIS_USER: ${REDIS_USER}
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
     <<: *common-service
-    depends_on:
-      discovery-server:
-        condition: service_healthy
     healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:${CART_SVC_PORT}/actuator/health" ]
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:${PRODUCT_SVC_PORT}/actuator/health" ]
       <<: *common-healthcheck
     profiles:
       - app
@@ -142,15 +70,13 @@ services:
     ports:
       - "${ORDER_SVC_PORT}:${ORDER_SVC_PORT}"
     environment:
-      <<: *common-env
       PORT: ${ORDER_SVC_PORT}
       POSTGRES_DB: order
       POSTGRES_USER: aziz
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      REDIS_USER: ${REDIS_APP_USER}
+      REDIS_PASSWORD: ${REDIS_APP_PASSWORD}
     <<: *common-service
-    depends_on:
-      discovery-server:
-        condition: service_healthy
     healthcheck:
       test: [ "CMD-SHELL", "wget -qO- http://localhost:${ORDER_SVC_PORT}/actuator/health" ]
       <<: *common-healthcheck
@@ -158,52 +84,43 @@ services:
       - app
       - all
 
-  payment-service:
-    image: abdelaziz333/payment-service:0.1
-    build:
-      context: .
-      dockerfile: payment-service/Dockerfile
-    ports:
-      - "${PAYMENT_SVC_PORT}:${PAYMENT_SVC_PORT}"
+  postgres:
+    image: postgres:16-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/postgres/init-databases.sql:/docker-entrypoint-initdb.d/init-databases.sql
     environment:
-      <<: *common-env
-      PORT: ${PAYMENT_SVC_PORT}
-      POSTGRES_DB: payment
-      POSTGRES_USER: aziz
-      POSTGRES_PASSWORD: ${PAYMENT_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     <<: *common-service
-    depends_on:
-      discovery-server:
-        condition: service_healthy
     healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:${PAYMENT_SVC_PORT}/actuator/health" ]
-      <<: *common-healthcheck
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      <<: *database-healthcheck
     profiles:
-      - app
+      - database
       - all
 
-  notification-service:
-    image: abdelaziz333/notification-service:0.1
-    build:
-      context: .
-      dockerfile: notification-service/Dockerfile
-    ports:
-      - "${NOTIFICATION_SVC_PORT}:${NOTIFICATION_SVC_PORT}"
+  redis:
+    image: redis:8.6.2-alpine
     environment:
-      <<: *common-env
-      PORT: ${NOTIFICATION_SVC_PORT}
-      MAIL_USER: ${MAIL_USER}
-      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      REDISCLI_USER: ${REDIS_USER}
+      REDISCLI_PASSWORD: ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+      - ./infra/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
     <<: *common-service
-    depends_on:
-      discovery-server:
-        condition: service_healthy
     healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:${NOTIFICATION_SVC_PORT}/actuator/health" ]
-      <<: *common-healthcheck
+      test: [ "CMD", "redis-cli", "PING" ]
+      <<: *database-healthcheck
     profiles:
-      - app
+      - database
       - all
+
+volumes:
+  postgres_data:
+  redis_data:
 
 networks:
   ecommerce-net:

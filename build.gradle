@@ -39,6 +39,7 @@ subprojects {
     }
 
     dependencies {
+        implementation 'me.paulschwarz:spring-dotenv:4.0.0'
         implementation 'org.springframework.boot:spring-boot-starter-actuator'
         compileOnly 'org.projectlombok:lombok'
         annotationProcessor 'org.projectlombok:lombok'
@@ -60,5 +61,13 @@ subprojects {
             downloadSources = true
             downloadJavadoc = true
         }
+    }
+
+    bootJar {
+        archiveFileName = 'app.jar'
+    }
+
+    jar {
+        enabled = false
     }
 }

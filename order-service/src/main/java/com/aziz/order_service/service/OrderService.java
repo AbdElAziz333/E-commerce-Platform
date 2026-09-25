@@ -1,13 +1,9 @@
 package com.aziz.order_service.service;
 
-import com.aziz.order_service.client.UserFeignClient;
 import com.aziz.order_service.model.OrderItem;
-import com.aziz.order_service.request.CreateOrderRequest;
-import com.aziz.order_service.dto.OrderDto;
-import com.aziz.order_service.request.UpdateOrderRequest;
-import com.aziz.order_service.kafka.OrderPublisher;
-import com.aziz.order_service.kafka.events.OrderCreationEvent;
-import com.aziz.order_service.kafka.events.OrderPaymentEvent;
+import com.aziz.order_service.dto.request.CreateOrderRequest;
+import com.aziz.order_service.dto.response.OrderDto;
+import com.aziz.order_service.dto.request.UpdateOrderRequest;
 import com.aziz.order_service.mapper.OrderMapper;
 import com.aziz.order_service.model.Order;
 import com.aziz.order_service.repository.OrderRepository;
@@ -22,8 +18,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -34,8 +28,6 @@ import java.util.UUID;
 public class OrderService {
     private final OrderRepository repository;
     private final OrderMapper mapper;
-    private final OrderPublisher publisher;
-    private final UserFeignClient feignClient;
 
     @Transactional(readOnly = true)
     public Page<OrderDto> getOrders(Long userId, int page) {
@@ -59,8 +51,6 @@ public class OrderService {
         calculateAmounts(order);
 
         Order savedOrder = repository.save(order);
-
-        publishEventsAfterCommit(savedOrder);
 
         log.info("Order {} created successfully for user {}", savedOrder.getOrderNumber(), userId);
         return mapper.orderToDto(savedOrder);
@@ -98,42 +88,6 @@ public class OrderService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         order.setTotalAmount(itemsTotal.add(order.getShippingAmount()));
-    }
-
-    private void publishEventsAfterCommit(Order order) {
-        TransactionSynchronizationManager.registerSynchronization(
-                new TransactionSynchronization() {
-                    @Override
-                    public void afterCommit() {
-                        String email = feignClient.getCurrentUserEmail(order.getUserId()).getData();
-
-                        publisher.publish(
-                                new OrderCreationEvent(
-                                        email,
-                                        order.getOrderNumber(),
-                                        order.getOrderStatus(),
-                                        order.getShippingAmount(),
-                                        order.getTotalAmount(),
-                                        order.getShippingAddressId(),
-                                        order.getItems().stream().map(mapper::itemToDto).toList()
-                                )
-                        );
-
-                        publisher.publish(
-                                new OrderPaymentEvent(
-                                        order.getUserId(),
-                                        email,
-                                        order.getId(),
-                                        order.getOrderNumber(),
-                                        order.getOrderStatus(),
-                                        order.getTotalAmount(),
-                                        order.getPaymentMethod(),
-                                        order.getPaymentStatus()
-                                )
-                        );
-                    }
-                }
-        );
     }
 
     private String generateOrderNumber() {

@@ -8,9 +8,8 @@ A simple e-commerce web platform written in spring boot.
 
 - Programming Language: Java
 - Backend: Spring Boot
-- Databases: PostgreSQL, Mongo, Redis
+- Databases: PostgreSQL, Redis
 - Security: JWT
-- AI: RAG and Chroma Database
 
 #
 

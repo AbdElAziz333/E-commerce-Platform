@@ -1,8 +1,8 @@
 package com.aziz.product_service.service;
 
-import com.aziz.product_service.request.CreateProductRequest;
-import com.aziz.product_service.dto.ProductDto;
-import com.aziz.product_service.request.UpdateProductRequest;
+import com.aziz.product_service.dto.request.CreateProductRequest;
+import com.aziz.product_service.dto.response.ProductDto;
+import com.aziz.product_service.dto.request.UpdateProductRequest;
 import com.aziz.product_service.mapper.ProductMapper;
 import com.aziz.product_service.model.Product;
 import com.aziz.product_service.repository.ProductRepository;

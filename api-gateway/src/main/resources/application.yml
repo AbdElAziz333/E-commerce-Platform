@@ -3,6 +3,15 @@ spring:
     name: api-gateway
   profiles:
     active: prod
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+    flyway:
+      enabled: true
+      locations: classpath:db/migration
+      baseline-on-migrate: true
+      clean-disabled: true
   cloud:
     gateway:
       discovery:
@@ -70,10 +79,6 @@ logging:
 
 server:
   port: ${PORT}
-
-jwt:
-  accessTokenSecret: katykatykatykatykatykatykatykaty
-  cookieName: access_token
 
 session:
   cookie: sessionId

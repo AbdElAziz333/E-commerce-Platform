@@ -10,56 +10,22 @@ x-common-service: &common-service
   restart: unless-stopped
 
 services:
-  discovery-server:
-    image: abdelaziz333/discovery-server:0.0.1
-    build:
-      context: ./discovery-server
-      dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
-    <<: *common-service
-    healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health" ]
-      <<: *common-healthcheck
-    profiles:
-      - app
-      - all
-
   api-gateway:
     image: abdelaziz333/api-gateway:0.0.1
     build:
       context: .
       dockerfile: ./api-gateway/Dockerfile
     ports:
-      - "8081:8081"
+      - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
+    environment:
+      PORT: ${API_GATEWAY_PORT}
     <<: *common-service
-    depends_on:
-      discovery-server:
-        condition: service_healthy
     healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:8081/actuator/health" ]
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:${API_GATEWAY_PORT}/actuator/health" ]
       <<: *common-healthcheck
     profiles:
-      - app
       - all
-
-  auth-service:
-    image: abdelaziz333/auth-service:0.0.1
-    build:
-      context: .
-      dockerfile: ./auth-service/Dockerfile
-    ports:
-      - "8082:8082"
-    <<: *common-service
-    depends_on:
-      discovery-server:
-        condition: service_healthy
-    healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:8082/actuator/health" ]
-      <<: *common-healthcheck
-    profiles:
       - app
-      - all
 
   product-service:
     image: abdelaziz333/product-service:0.0.1
@@ -67,35 +33,16 @@ services:
       context: .
       dockerfile: ./product-service/Dockerfile
     ports:
-      - "8083:8083"
+      - "${PRODUCT_SVC_PORT}:${PRODUCT_SVC_PORT}"
+    environment:
+      PORT: ${PRODUCT_SVC_PORT}
     <<: *common-service
-    depends_on:
-      discovery-server:
-        condition: service_healthy
     healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:8083/actuator/health" ]
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:${PRODUCT_SVC_PORT}/actuator/health" ]
       <<: *common-healthcheck
     profiles:
-      - app
       - all
-
-  cart-service:
-    image: abdelaziz333/cart-service:0.0.1
-    build:
-      context: .
-      dockerfile: ./cart-service/Dockerfile
-    ports:
-      - "8084:8084"
-    <<: *common-service
-    depends_on:
-      discovery-server:
-        condition: service_healthy
-    healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:8084/actuator/health" ]
-      <<: *common-healthcheck
-    profiles:
       - app
-      - all
 
   order-service:
     image: abdelaziz333/order-service:0.0.1
@@ -103,53 +50,44 @@ services:
       context: .
       dockerfile: ./order-service/Dockerfile
     ports:
-      - "8085:8085"
+      - "${ORDER_SVC_PORT}:${ORDER_SVC_PORT}"
+    environment:
+      PORT: ${ORDER_SVC_PORT}
     <<: *common-service
-    depends_on:
-      discovery-server:
-        condition: service_healthy
     healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:8085/actuator/health" ]
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:${ORDER_SVC_PORT}/actuator/health" ]
       <<: *common-healthcheck
     profiles:
-      - app
       - all
+      - app
 
-  payment-service:
-    image: abdelaziz333/payment-service:0.0.1
-    build:
-      context: .
-      dockerfile: ./payment-service/Dockerfile
+  postgres:
+    image: postgres:16-alpine
     ports:
-      - "8086:8086"
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/postgres/init-databases.sql:/docker-entrypoint-initdb.d/init-databases.sql
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: aziz
+      POSTGRES_PASSWORD: aziz333
     <<: *common-service
-    depends_on:
-      discovery-server:
-        condition: service_healthy
-    healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:8086/actuator/health" ]
-      <<: *common-healthcheck
     profiles:
-      - app
       - all
+      - database
 
-  notification-service:
-    image: abdelaziz333/notification-service:0.0.1
-    build:
-      context: .
-      dockerfile: ./notification-service/Dockerfile
+  redis:
+    image: redis:8.6.2-alpine
     ports:
-      - "8087:8087"
-    <<: *common-service
-    depends_on:
-      discovery-server:
-        condition: service_healthy
-    healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:8087/actuator/health" ]
-      <<: *common-healthcheck
+      - "6379:6379"
+    <<:  *common-service
     profiles:
-      - app
       - all
+      - database
+
+volumes:
+  postgres_data:
 
 networks:
   ecommerce-net:
