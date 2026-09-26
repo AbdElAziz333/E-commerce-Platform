@@ -142,7 +142,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public CurrentUserDto getCurrentUser(Long userId) {
         User user = repository.findById(userId).orElseThrow(
-                () -> new NotFoundException("User not found with id: " + userId));
+                () -> new NotFoundException("User not logged in: " + userId));
 
         return CurrentUserDto.builder()
                 .userId(user.getId())

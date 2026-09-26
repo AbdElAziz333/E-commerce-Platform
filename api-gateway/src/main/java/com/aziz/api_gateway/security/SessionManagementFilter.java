@@ -1,4 +1,4 @@
-package com.aziz.api_gateway.jwt;
+package com.aziz.api_gateway.security;
 
 import com.aziz.api_gateway.config.SessionConfig;
 import jakarta.servlet.FilterChain;

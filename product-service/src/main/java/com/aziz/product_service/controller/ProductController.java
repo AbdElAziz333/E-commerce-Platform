@@ -46,9 +46,9 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<ApiResponse<ProductDto>> createProduct(
             @RequestHeader("User-Id") Long userId,
-            @RequestBody CreateProductRequest registerRequest
+            @RequestBody CreateProductRequest createRequest
     ) {
-        return ResponseEntity.ok(ApiResponse.success("Product Created Successfully", service.createProduct(userId, registerRequest)));
+        return ResponseEntity.ok(ApiResponse.success("Product Created Successfully", service.createProduct(userId, createRequest)));
     }
 
     @PatchMapping("/{productId}")

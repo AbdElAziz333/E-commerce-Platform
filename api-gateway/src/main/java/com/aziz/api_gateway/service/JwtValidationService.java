@@ -1,4 +1,4 @@
-package com.aziz.api_gateway.jwt;
+package com.aziz.api_gateway.service;
 
 import com.aziz.api_gateway.config.JwtConfig;
 import io.jsonwebtoken.Claims;

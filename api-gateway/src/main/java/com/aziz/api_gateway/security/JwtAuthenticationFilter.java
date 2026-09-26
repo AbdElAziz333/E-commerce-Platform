@@ -1,5 +1,6 @@
-package com.aziz.api_gateway.jwt;
+package com.aziz.api_gateway.security;
 
+import com.aziz.api_gateway.service.JwtValidationService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

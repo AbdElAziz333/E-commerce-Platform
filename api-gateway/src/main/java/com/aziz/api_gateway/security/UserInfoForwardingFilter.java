@@ -1,4 +1,4 @@
-package com.aziz.api_gateway.jwt;
+package com.aziz.api_gateway.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
