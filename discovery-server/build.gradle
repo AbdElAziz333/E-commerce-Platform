@@ -1,0 +1,14 @@
+group = 'com.aziz'
+version = '0.0.1-SNAPSHOT'
+description = 'Demo project for Spring Boot'
+
+bootJar {
+	archiveFileName = 'app.jar'
+}
+
+dependencies {
+	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-server'
+
+	implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer'
+	testImplementation 'org.springframework.security:spring-security-test'
+}

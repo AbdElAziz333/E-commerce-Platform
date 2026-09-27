@@ -14,6 +14,7 @@ dependencies {
 	// Jackson 3 Databind (managed version by Spring Boot BOM)
 	implementation 'tools.jackson.core:jackson-databind'
 
+	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 	// Jackson Annotations remain com.fasterxml (managed version by Spring Boot BOM)
 	implementation 'com.fasterxml.jackson.core:jackson-annotations'
 	implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer'

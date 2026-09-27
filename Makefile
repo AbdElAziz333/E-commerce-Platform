@@ -1,5 +1,7 @@
 # Run Locally
 
+run_discovery:
+	./gradlew :discovery-server:bootRun --args='--spring.profiles.active=dev' --console=plain
 run_product:
 	./gradlew :product-service:bootRun --args='--spring.profiles.active=dev' --console=plain
 run_order:
@@ -8,6 +10,9 @@ run_gateway:
 	./gradlew :api-gateway:bootRun --args='--spring.profiles.active=dev' --console=plain
 
 # Docker
+
+docker_build_discovery_dev:
+	docker compose -f docker-compose.dev.yaml build discovery-server
 
 docker_build_product_dev:
 	docker compose -f docker-compose.dev.yaml build product-service
@@ -18,7 +23,7 @@ docker_build_order_dev:
 docker_build_gateway_dev:
 	docker compose -f docker-compose.dev.yaml build api-gateway
 
-build_each_separately_dev: docker_build_product_dev docker_build_order_dev docker_build_gateway_dev
+build_each_separately_dev: docker_build_product_dev docker_build_order_dev docker_build_gateway_dev docker_build_discovery_dev
 
 docker_run_apps_dev:
 	docker compose -f docker-compose.dev.yaml --profile app up
@@ -29,6 +34,8 @@ docker_run_dbs_dev:
 docker_run_all_dev:
 	docker compose -f docker-compose.dev.yaml --profile all up
 
+docker_build_discovery_prod:
+	docker compose -f docker-compose.prod.yaml build discovery-server
 
 docker_build_product_prod:
 	docker compose -f docker-compose.prod.yaml build product-service
@@ -39,7 +46,7 @@ docker_build_order_prod:
 docker_build_gateway_prod:
 	docker compose -f docker-compose.prod.yaml build api-gateway
 
-build_each_separately_prod: docker_build_product_prod docker_build_order_prod docker_build_gateway_prod
+build_each_separately_prod: docker_build_product_prod docker_build_order_prod docker_build_gateway_prod docker_build_discovery_prod
 
 docker_run_apps_prod:
 	docker compose -f docker-compose.prod.yaml --profile app up

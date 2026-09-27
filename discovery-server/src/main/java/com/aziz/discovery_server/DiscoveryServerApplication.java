@@ -1,21 +1,19 @@
-package com.aziz.product_service;
+package com.aziz.discovery_server;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@EnableJpaAuditing
-@EnableDiscoveryClient
+@EnableEurekaServer
 @SpringBootApplication
-public class ProductServiceApplication {
-	public static void main(String[] args) {
-        SpringApplication app = new SpringApplication(ProductServiceApplication.class);
+public class DiscoveryServerApplication {
+     public static void main(String[] args) {
+        SpringApplication app = new SpringApplication(DiscoveryServerApplication.class);
         app.run(args);
-	}
+     }
 
     @GetMapping("/health")
     public String health() {

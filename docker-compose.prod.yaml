@@ -18,28 +18,22 @@ x-database-healthcheck: &database-healthcheck
   start_period: 60s
 
 services:
-  api-gateway:
-    image: abdelaziz333/api-gateway:0.1
+  discovery-server:
+    image: abdelaziz333/discovery-server:0.1
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        SVC_NAME: api-gateway
-        SVC_PORT: ${API_GATEWAY_PORT}
+        SVC_NAME: discovery-server
+        SVC_PORT: ${DISCOVERY_SERVER_PORT}
     ports:
-      - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
+      - "${DISCOVERY_SERVER_PORT}:${DISCOVERY_SERVER_PORT}"
     environment:
-      PORT: ${API_GATEWAY_PORT}
-      POSTGRES_DB: auth
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      REDIS_USER: ${REDIS_APP_USER}
-      REDIS_PASSWORD: ${REDIS_APP_PASSWORD}
-      ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET}
-      REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET}
+      SPRING_PROFILES_ACTIVE: prod
+      PORT: ${DISCOVERY_SERVER_PORT}
     <<: *common-service
     healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:${API_GATEWAY_PORT}/actuator/health" ]
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:${DISCOVERY_SERVER_PORT}/actuator/health" ]
       <<: *common-healthcheck
     profiles:
       - app
@@ -56,6 +50,7 @@ services:
     ports:
       - "${PRODUCT_SVC_PORT}:${PRODUCT_SVC_PORT}"
     environment:
+      SPRING_PROFILES_ACTIVE: prod
       PORT: ${PRODUCT_SVC_PORT}
       POSTGRES_DB: product
       POSTGRES_USER: ${POSTGRES_USER}
@@ -67,6 +62,9 @@ services:
     profiles:
       - app
       - all
+    depends_on:
+      discovery-server:
+        condition: service_healthy
 
   order-service:
     image: abdelaziz333/order-service:0.1
@@ -79,6 +77,7 @@ services:
     ports:
       - "${ORDER_SVC_PORT}:${ORDER_SVC_PORT}"
     environment:
+      SPRING_PROFILES_ACTIVE: prod
       PORT: ${ORDER_SVC_PORT}
       POSTGRES_DB: order
       POSTGRES_USER: aziz
@@ -92,6 +91,44 @@ services:
     profiles:
       - app
       - all
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+
+  api-gateway:
+    image: abdelaziz333/api-gateway:0.1
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SVC_NAME: api-gateway
+        SVC_PORT: ${API_GATEWAY_PORT}
+    ports:
+      - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      PORT: ${API_GATEWAY_PORT}
+      POSTGRES_DB: auth
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      REDIS_USER: ${REDIS_APP_USER}
+      REDIS_PASSWORD: ${REDIS_APP_PASSWORD}
+      ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET}
+      REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET}
+    <<: *common-service
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:${API_GATEWAY_PORT}/actuator/health" ]
+      <<: *common-healthcheck
+    profiles:
+      - app
+      - all
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      order-service:
+        condition: service_healthy
+      product-service:
+        condition: service_healthy
 
   postgres:
     image: postgres:16-alpine

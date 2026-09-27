@@ -1,66 +1,9 @@
-x-common-healthcheck: &common-healthcheck
-  interval: 10s
-  timeout: 5s
-  retries: 10
-  start_period: 90s
-
 x-common-service: &common-service
   networks:
     ecommerce-net:
   restart: unless-stopped
 
 services:
-  api-gateway:
-    image: abdelaziz333/api-gateway:0.0.1
-    build:
-      context: .
-      dockerfile: ./api-gateway/Dockerfile
-    ports:
-      - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
-    environment:
-      PORT: ${API_GATEWAY_PORT}
-    <<: *common-service
-    healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:${API_GATEWAY_PORT}/actuator/health" ]
-      <<: *common-healthcheck
-    profiles:
-      - all
-      - app
-
-  product-service:
-    image: abdelaziz333/product-service:0.0.1
-    build:
-      context: .
-      dockerfile: ./product-service/Dockerfile
-    ports:
-      - "${PRODUCT_SVC_PORT}:${PRODUCT_SVC_PORT}"
-    environment:
-      PORT: ${PRODUCT_SVC_PORT}
-    <<: *common-service
-    healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:${PRODUCT_SVC_PORT}/actuator/health" ]
-      <<: *common-healthcheck
-    profiles:
-      - all
-      - app
-
-  order-service:
-    image: abdelaziz333/order-service:0.0.1
-    build:
-      context: .
-      dockerfile: ./order-service/Dockerfile
-    ports:
-      - "${ORDER_SVC_PORT}:${ORDER_SVC_PORT}"
-    environment:
-      PORT: ${ORDER_SVC_PORT}
-    <<: *common-service
-    healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:${ORDER_SVC_PORT}/actuator/health" ]
-      <<: *common-healthcheck
-    profiles:
-      - all
-      - app
-
   postgres:
     image: postgres:16-alpine
     ports:
