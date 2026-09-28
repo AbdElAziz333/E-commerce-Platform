@@ -2,8 +2,6 @@
 
 A simple e-commerce web platform written in spring boot.
 
-#
-
 ### Technologies Used
 
 - Programming Language: Java
@@ -11,19 +9,26 @@ A simple e-commerce web platform written in spring boot.
 - Databases: PostgreSQL, Redis
 - Security: JWT
 
-#
-
 ### How To Run
 
 #### Locally
+
+apps runs locally
+databases in docker
 
 - First, run make run-dev in cmd (runs docker compose dev and infra.dev)
 - Second, run services in-order (config-server, discovery-server, auth-service, product-service, order-service, cart-service, payment-service, notification-service, api-gateway)
 check the Makefile for the commands (run-(service-name))
 
-#### Docker Compose
+#### Docker
+
+apps runs in docker
+databases in docker
 
 - First, run make docker-build in cmd (builds docker images)
 - Second, run make run-prod in cmd and volah
 
 #### Kubernetes
+
+apps runs in k8s
+databases in k8s

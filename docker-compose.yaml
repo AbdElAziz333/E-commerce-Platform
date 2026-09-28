@@ -29,7 +29,7 @@ services:
     ports:
       - "${DISCOVERY_SERVER_PORT}:${DISCOVERY_SERVER_PORT}"
     environment:
-      SPRING_PROFILES_ACTIVE: prod
+      SPRING_PROFILES_ACTIVE: docker
       PORT: ${DISCOVERY_SERVER_PORT}
     <<: *common-service
     healthcheck:
@@ -50,7 +50,7 @@ services:
     ports:
       - "${PRODUCT_SVC_PORT}:${PRODUCT_SVC_PORT}"
     environment:
-      SPRING_PROFILES_ACTIVE: prod
+      SPRING_PROFILES_ACTIVE: docker
       PORT: ${PRODUCT_SVC_PORT}
       POSTGRES_DB: product
       POSTGRES_USER: ${POSTGRES_USER}
@@ -77,7 +77,7 @@ services:
     ports:
       - "${ORDER_SVC_PORT}:${ORDER_SVC_PORT}"
     environment:
-      SPRING_PROFILES_ACTIVE: prod
+      SPRING_PROFILES_ACTIVE: docker
       PORT: ${ORDER_SVC_PORT}
       POSTGRES_DB: order
       POSTGRES_USER: aziz
@@ -106,7 +106,7 @@ services:
     ports:
       - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
     environment:
-      SPRING_PROFILES_ACTIVE: prod
+      SPRING_PROFILES_ACTIVE: docker
       PORT: ${API_GATEWAY_PORT}
       POSTGRES_DB: auth
       POSTGRES_USER: ${POSTGRES_USER}
