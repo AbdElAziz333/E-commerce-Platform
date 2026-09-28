@@ -8,17 +8,17 @@ ARG SVC_NAME
 COPY build.gradle settings.gradle gradle.properties ./
 COPY gradle ./gradle
 
-COPY discovery-server/build.gradle discovery-server/
-COPY api-gateway/build.gradle api-gateway/
-COPY product-service/build.gradle product-service/
-COPY order-service/build.gradle order-service/
+COPY discovery/build.gradle discovery/
+COPY gateway/build.gradle gateway/
+COPY product/build.gradle product/
+COPY order/build.gradle order/
 
 RUN gradle :${SVC_NAME}:dependencies --no-daemon
 
-COPY discovery-server/src discovery-server/src
-COPY api-gateway/src api-gateway/src
-COPY product-service/src product-service/src
-COPY order-service/src order-service/src
+COPY discovery/src discovery/src
+COPY gateway/src gateway/src
+COPY product/src product/src
+COPY order/src order/src
 
 RUN gradle :${SVC_NAME}:bootJar --no-daemon
 

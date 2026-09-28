@@ -1,8 +1,8 @@
 rootProject.name = 'ecommerce-platform'
 
 include (
-        'discovery-server',
-        'api-gateway',
-        'product-service',
-        'order-service'
+        'discovery',
+        'gateway',
+        'product',
+        'order'
 )

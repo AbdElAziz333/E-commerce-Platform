@@ -18,46 +18,46 @@ x-database-healthcheck: &database-healthcheck
   start_period: 60s
 
 services:
-  discovery-server:
-    image: abdelaziz333/discovery-server:0.1
+  discovery:
+    image: abdelaziz333/ecommerce-discovery:0.0.1
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        SVC_NAME: discovery-server
-        SVC_PORT: ${DISCOVERY_SERVER_PORT}
+        SVC_NAME: discovery
+        SVC_PORT: ${DISCOVERY_PORT}
     ports:
-      - "${DISCOVERY_SERVER_PORT}:${DISCOVERY_SERVER_PORT}"
+      - "${DISCOVERY_PORT}:${DISCOVERY_PORT}"
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      PORT: ${DISCOVERY_SERVER_PORT}
+      PORT: ${DISCOVERY_PORT}
     <<: *common-service
     healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:${DISCOVERY_SERVER_PORT}/actuator/health" ]
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:${DISCOVERY_PORT}/actuator/health" ]
       <<: *common-healthcheck
     profiles:
       - app
       - all
 
-  product-service:
-    image: abdelaziz333/product-service:0.1
+  product:
+    image: abdelaziz333/ecommerce-product:0.0.1
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        SVC_NAME: product-service
-        SVC_PORT: ${PRODUCT_SVC_PORT}
+        SVC_NAME: product
+        SVC_PORT: ${PRODUCT_PORT}
     ports:
-      - "${PRODUCT_SVC_PORT}:${PRODUCT_SVC_PORT}"
+      - "${PRODUCT_PORT}:${PRODUCT_PORT}"
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      PORT: ${PRODUCT_SVC_PORT}
+      PORT: ${PRODUCT_PORT}
       POSTGRES_DB: product
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     <<: *common-service
     healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:${PRODUCT_SVC_PORT}/actuator/health" ]
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:${PRODUCT_PORT}/actuator/health" ]
       <<: *common-healthcheck
     profiles:
       - app
@@ -66,19 +66,19 @@ services:
       discovery-server:
         condition: service_healthy
 
-  order-service:
-    image: abdelaziz333/order-service:0.1
+  order:
+    image: abdelaziz333/ecommerce-order:0.0.1
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        SVC_NAME: order-service
-        SVC_PORT: ${ORDER_SVC_PORT}
+        SVC_NAME: order
+        SVC_PORT: ${ORDER_PORT}
     ports:
-      - "${ORDER_SVC_PORT}:${ORDER_SVC_PORT}"
+      - "${ORDER_PORT}:${ORDER_PORT}"
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      PORT: ${ORDER_SVC_PORT}
+      PORT: ${ORDER_PORT}
       POSTGRES_DB: order
       POSTGRES_USER: aziz
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -86,7 +86,7 @@ services:
       REDIS_PASSWORD: ${REDIS_APP_PASSWORD}
     <<: *common-service
     healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:${ORDER_SVC_PORT}/actuator/health" ]
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:${ORDER_PORT}/actuator/health" ]
       <<: *common-healthcheck
     profiles:
       - app
@@ -95,19 +95,19 @@ services:
       discovery-server:
         condition: service_healthy
 
-  api-gateway:
-    image: abdelaziz333/api-gateway:0.1
+  gateway:
+    image: abdelaziz333/ecommerce-gateway:0.0.1
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        SVC_NAME: api-gateway
-        SVC_PORT: ${API_GATEWAY_PORT}
+        SVC_NAME: gateway
+        SVC_PORT: ${GATEWAY_PORT}
     ports:
-      - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
+      - "${GATEWAY_PORT}:${GATEWAY_PORT}"
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      PORT: ${API_GATEWAY_PORT}
+      PORT: ${GATEWAY_PORT}
       POSTGRES_DB: auth
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -117,7 +117,7 @@ services:
       REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET}
     <<: *common-service
     healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:${API_GATEWAY_PORT}/actuator/health" ]
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:${GATEWAY_PORT}/actuator/health" ]
       <<: *common-healthcheck
     profiles:
       - app

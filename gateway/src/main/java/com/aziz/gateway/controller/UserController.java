@@ -1,0 +1,104 @@
+package com.aziz.gateway.controller;
+
+import com.aziz.gateway.dto.request.UserCreationRequest;
+import com.aziz.gateway.dto.response.UserDto;
+import com.aziz.gateway.dto.request.UserUpdateRequest;
+import com.aziz.gateway.service.UserService;
+import com.aziz.gateway.util.ApiResponse;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+@Validated
+@RestController
+@RequestMapping("/api/v1/users")
+@RequiredArgsConstructor
+public class UserController {
+    private final UserService service;
+
+    @GetMapping("/current")
+    public ResponseEntity<?> getCurrentUser(
+            @RequestHeader("User-Id") Long id
+    ) {
+        return ResponseEntity.ok(
+                service.getCurrentUser(id)
+        );
+    }
+
+    @GetMapping("/current/email")
+    public ResponseEntity<ApiResponse<String>> getCurrentUserEmail(
+            @RequestHeader("User-Id") Long id
+    ) {
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Successfully fetched current user's email",
+                        service.getCurrentUserEmail(id)
+                )
+        );
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<Page<UserDto>>> getUsers(
+            @RequestParam(defaultValue = "0") @Min(0) int page
+    ) {
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Fetched users for page " + page,
+                        service.getUsers(page)
+                )
+        );
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<UserDto>> getUserById(
+            @PathVariable Long id
+    ) {
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "User fetched successfully",
+                        service.getUserById(id)
+                )
+        );
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<ApiResponse<String>> createUser(
+            @RequestBody @Valid UserCreationRequest request,
+            HttpServletResponse response
+    ) {
+        service.createUser(request, response);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Registration successful. Now you can login.",
+                        null
+                )
+        );
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<ApiResponse<UserDto>> updateUser(
+            @PathVariable Long id,
+            @RequestBody @Valid UserUpdateRequest request
+    ) {
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "User updated successfully",
+                        service.updateUser(id, request)
+                )
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteUser(
+            @PathVariable Long id
+    ) {
+        service.deleteUserById(id);
+        return ResponseEntity.noContent().build();
+    }
+}

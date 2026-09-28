@@ -1,26 +1,26 @@
 # Gradle
 
 gradle_build_discovery:
-	./gradlew :discovery-server:bootRun --args='--spring.profiles.active=local' --console=plain
-gradle_build_product:
-	./gradlew :product-service:bootRun --args='--spring.profiles.active=local' --console=plain
-gradle_build_order:
-	./gradlew :order-service:bootRun --args='--spring.profiles.active=local' --console=plain
+	./gradlew :discovery:bootRun --args='--spring.profiles.active=local' --console=plain
 gradle_build_gateway:
-	./gradlew :api-gateway:bootRun --args='--spring.profiles.active=local' --console=plain
+	./gradlew :gateway:bootRun --args='--spring.profiles.active=local' --console=plain
+gradle_build_product:
+	./gradlew :product:bootRun --args='--spring.profiles.active=local' --console=plain
+gradle_build_order:
+	./gradlew :order:bootRun --args='--spring.profiles.active=local' --console=plain
 
 # Run Locally
 
 run_discovery_local:
-	./gradlew :discovery-server:bootRun --args='--spring.profiles.active=local' --console=plain
+	./gradlew :discovery:bootRun --args='--spring.profiles.active=local' --console=plain
 run_product_local:
-	./gradlew :product-service:bootRun --args='--spring.profiles.active=local' --console=plain
+	./gradlew :product:bootRun --args='--spring.profiles.active=local' --console=plain
 run_order_local:
-	./gradlew :order-service:bootRun --args='--spring.profiles.active=local' --console=plain
+	./gradlew :order:bootRun --args='--spring.profiles.active=local' --console=plain
 run_gateway_local:
-	./gradlew :api-gateway:bootRun --args='--spring.profiles.active=local' --console=plain
+	./gradlew :gateway:bootRun --args='--spring.profiles.active=local' --console=plain
 
-run_apps_local: run_discovery_local run_product_local run_order_local run_gateway_local
+run_apps_local: run_discovery_local run_gateway_local run_product_local run_order_local
 
 # Docker
 
