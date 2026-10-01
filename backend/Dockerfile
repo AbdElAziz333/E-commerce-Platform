@@ -20,7 +20,7 @@ COPY gateway/src gateway/src
 COPY product/src product/src
 COPY order/src order/src
 
-RUN gradle :${SVC_NAME}:bootJar --no-daemon
+RUN gradle :${SVC_NAME}:clean :${SVC_NAME}:bootJar --no-daemon --no-build-cache
 
 RUN cp /home/gradle/project/${SVC_NAME}/build/libs/app.jar /app.jar
 
