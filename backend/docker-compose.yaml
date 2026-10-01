@@ -39,62 +39,6 @@ services:
       - app
       - all
 
-  product:
-    image: abdelaziz333/ecommerce-product:0.0.1
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        SVC_NAME: product
-        SVC_PORT: ${PRODUCT_PORT}
-    ports:
-      - "${PRODUCT_PORT}:${PRODUCT_PORT}"
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
-      PORT: ${PRODUCT_PORT}
-      POSTGRES_DB: product
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    <<: *common-service
-    healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:${PRODUCT_PORT}/actuator/health" ]
-      <<: *common-healthcheck
-    profiles:
-      - app
-      - all
-    depends_on:
-      discovery-server:
-        condition: service_healthy
-
-  order:
-    image: abdelaziz333/ecommerce-order:0.0.1
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        SVC_NAME: order
-        SVC_PORT: ${ORDER_PORT}
-    ports:
-      - "${ORDER_PORT}:${ORDER_PORT}"
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
-      PORT: ${ORDER_PORT}
-      POSTGRES_DB: order
-      POSTGRES_USER: aziz
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      REDIS_USER: ${REDIS_APP_USER}
-      REDIS_PASSWORD: ${REDIS_APP_PASSWORD}
-    <<: *common-service
-    healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:${ORDER_PORT}/actuator/health" ]
-      <<: *common-healthcheck
-    profiles:
-      - app
-      - all
-    depends_on:
-      discovery-server:
-        condition: service_healthy
-
   gateway:
     image: abdelaziz333/ecommerce-gateway:0.0.1
     build:
@@ -123,11 +67,67 @@ services:
       - app
       - all
     depends_on:
-      discovery-server:
+      discovery:
         condition: service_healthy
-      order-service:
+
+  product:
+    image: abdelaziz333/ecommerce-product:0.0.1
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SVC_NAME: product
+        SVC_PORT: ${PRODUCT_PORT}
+    ports:
+      - "${PRODUCT_PORT}:${PRODUCT_PORT}"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      PORT: ${PRODUCT_PORT}
+      POSTGRES_DB: product
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    <<: *common-service
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:${PRODUCT_PORT}/actuator/health" ]
+      <<: *common-healthcheck
+    profiles:
+      - app
+      - all
+    depends_on:
+      discovery:
         condition: service_healthy
-      product-service:
+      gateway:
+        condition: service_healthy
+
+  order:
+    image: abdelaziz333/ecommerce-order:0.0.1
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SVC_NAME: order
+        SVC_PORT: ${ORDER_PORT}
+    ports:
+      - "${ORDER_PORT}:${ORDER_PORT}"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      PORT: ${ORDER_PORT}
+      POSTGRES_DB: order
+      POSTGRES_USER: aziz
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      REDIS_USER: ${REDIS_APP_USER}
+      REDIS_PASSWORD: ${REDIS_APP_PASSWORD}
+    <<: *common-service
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:${ORDER_PORT}/actuator/health" ]
+      <<: *common-healthcheck
+    profiles:
+      - app
+      - all
+    depends_on:
+      discovery:
+        condition: service_healthy
+      gateway:
         condition: service_healthy
 
   postgres:
