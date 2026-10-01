@@ -22,6 +22,11 @@ run_gateway_local:
 
 run_apps_local: run_discovery_local run_gateway_local run_product_local run_order_local
 
+# npm
+
+npm_run_local:
+	npm run dev
+
 # Docker
 
 docker_run_dbs_local:
@@ -39,35 +44,35 @@ docker_down_all_local:
 # Docker Build
 
 docker_build_discovery:
-	docker compose -f docker-compose.yaml build discovery-server
+	docker compose -f backend/docker-compose.yaml build discovery
 
 docker_build_product:
-	docker compose -f docker-compose.yaml build product-service
+	docker compose -f backend/docker-compose.yaml build product
 
 docker_build_order:
-	docker compose -f docker-compose.yaml build order-service
+	docker compose -f backend/docker-compose.yaml build order
 
 docker_build_gateway:
-	docker compose -f docker-compose.yaml build api-gateway
+	docker compose -f backend/docker-compose.yaml build gateway
 
 docker_build_all: docker_build_discovery docker_build_product docker_build_order docker_build_gateway
 
 # Docker Run
 
 docker_run_apps:
-	docker compose -f docker-compose.yaml --profile app up
+	docker compose -f backend/docker-compose.yaml --profile app up
 
 docker_run_dbs:
-	docker compose -f docker-compose.yaml --profile database up
+	docker compose -f backend/docker-compose.yaml --profile database up
 
 docker_run_all:
-	docker compose -f docker-compose.yaml --profile all up
+	docker compose -f backend/docker-compose.yaml --profile all up
 
 docker_apps_down:
-	docker compose -f docker-compose.yaml --profile app down -v
+	docker compose -f backend/docker-compose.yaml --profile app down -v
 
 docker_dbs_down:
-	docker compose -f docker-compose.yaml --profile db down -v
+	docker compose -f backend/docker-compose.yaml --profile db down -v
 
 docker_all_down:
-	docker compose -f docker-compose.yaml --profile all down -v
+	docker compose -f backend/docker-compose.yaml --profile all down -v
