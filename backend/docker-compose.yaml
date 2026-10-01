@@ -112,8 +112,8 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: docker
       PORT: ${ORDER_PORT}
-      POSTGRES_DB: order
-      POSTGRES_USER: aziz
+      POSTGRES_DB: orders
+      POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       REDIS_USER: ${REDIS_APP_USER}
       REDIS_PASSWORD: ${REDIS_APP_PASSWORD}
@@ -150,20 +150,36 @@ services:
   redis:
     image: redis:8.6.2-alpine
     environment:
-      REDISCLI_USER: ${REDIS_ADMIN_USER}
-      REDISCLI_PASSWORD: ${REDIS_ADMIN_PASSWORD}
+      REDIS_ADMIN_USER: ${REDIS_ADMIN_USER}
+      REDIS_ADMIN_PASSWORD: ${REDIS_ADMIN_PASSWORD}
+      REDIS_APP_USER: ${REDIS_APP_USER}
+      REDIS_APP_PASSWORD: ${REDIS_APP_PASSWORD}
     volumes:
       - redis_data:/data
-      - ./infra/redis/redis.conf:/usr/local/etc/redis/redis.conf
-    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+    command:
+      - redis-server
+      - --user
+      - default
+      - "off"
+      - --user
+      - ${REDIS_ADMIN_USER}
+      - "on"
+      - ">${REDIS_ADMIN_PASSWORD}"
+      - "~*"
+      - "+@all"
+      - --user
+      - ${REDIS_APP_USER}
+      - "on"
+      - ">${REDIS_APP_PASSWORD}"
+      - "~*"
+      - "+@all"
     <<: *common-service
     healthcheck:
-      test: [ "CMD", "redis-cli", "PING" ]
+      test: ["CMD-SHELL", "redis-cli --user ${REDIS_ADMIN_USER} -a ${REDIS_ADMIN_PASSWORD} --no-auth-warning PING"]
       <<: *database-healthcheck
     profiles:
       - database
       - all
-
 volumes:
   postgres_data:
   redis_data:
