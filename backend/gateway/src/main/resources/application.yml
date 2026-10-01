@@ -10,34 +10,6 @@ spring:
       locations: classpath:db/migration
       baseline-on-migrate: true
       clean-disabled: true
-  cloud:
-    gateway:
-      discovery:
-        locator:
-          enabled: true
-          lower-case-service-id: true
-      server:
-        webmvc:
-          routes:
-            - id: product-service
-              uri: lb://product-service
-              predicates:
-                - Path=/api/v1/products/**
-
-            - id: cart-service
-              uri: lb://order-service
-              predicates:
-                - Path=/api/v1/carts/**
-
-            - id: order-service
-              uri: lb://order-service
-              predicates:
-                - Path=/api/v1/orders/**
-
-            - id: order-items-service
-              uri: lb://order-service
-              predicates:
-                - Path=/api/v1/order-items/**
 
 management:
   tracing:
