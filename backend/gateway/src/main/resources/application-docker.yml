@@ -16,7 +16,7 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
     serviceUrl:
-      defaultZone: http://discovery-server:8080/eureka/
+      defaultZone: http://discovery:8080/eureka/
 
 jwt:
   accessToken:
