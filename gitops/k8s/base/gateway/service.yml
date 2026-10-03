@@ -2,11 +2,6 @@ apiVersion: v1
 kind: Service
 metadata:
   name: gateway-service
-  namespace: ecommerce-platform
-  labels:
-    app: gateway
-    app.kubernetes.io/name: gateway
-    app.kubernetes.io/part-of: ecommerce-platform
 spec:
   type: NodePort
   selector:
