@@ -1,0 +1,22 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: product
+  namespace: ecommerce-platform
+spec:
+  name: product
+  owner: aziz
+  cluster:
+    name: pg
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: orders
+  namespace: ecommerce-platform
+spec:
+  name: orders
+  owner: aziz
+  cluster:
+    name: pg
