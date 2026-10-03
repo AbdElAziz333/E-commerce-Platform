@@ -1,0 +1,51 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST}:5432/${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+  data:
+    redis:
+      host: redis
+      port: 6379
+      password: ${REDIS_PASSWORD}
+      timeout: 2000ms
+  cloud:
+    gateway:
+      server:
+        webmvc:
+          routes:
+            - id: product-service
+              uri: http://product-service:8082
+              predicates:
+                - Path=/api/v1/products/**
+
+            - id: cart-service
+              uri: http://order-service:8083
+              predicates:
+                - Path=/api/v1/carts/**
+
+            - id: order-service
+              uri: http://order-service:8083
+              predicates:
+                - Path=/api/v1/orders/**
+
+            - id: order-items-service
+              uri: http://order-service:8083
+              predicates:
+                - Path=/api/v1/order-items/**
+
+eureka:
+  client:
+    enabled: false
+
+jwt:
+  accessToken:
+    secret: ${ACCESS_TOKEN_SECRET}
+    cookieName: access_token
+    maxAge: 900000 # 15 minutes
+    secured: false
+  refreshToken:
+    secret: ${REFRESH_TOKEN_SECRET}
+    cookieName: refresh_token
+    maxAge: 1209600000 # 15 days
+    secured: false
