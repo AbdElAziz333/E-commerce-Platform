@@ -12,3 +12,7 @@ spec:
     name: flux-system
   targetNamespace: default
   wait: true
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age

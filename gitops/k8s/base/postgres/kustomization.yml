@@ -8,6 +8,6 @@ resources:
 
 secretGenerator:
   - name: postgres-secret
-    envs: [secret.env]
+    envs: [secret.enc.env]
     options:
       disableNameSuffixHash: true

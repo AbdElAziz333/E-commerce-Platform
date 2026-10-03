@@ -7,6 +7,6 @@ resources:
 
 secretGenerator:
   - name: redis-secret
-    envs: [secret.env]
+    envs: [secret.enc.env]
     options:
       disableNameSuffixHash: true
